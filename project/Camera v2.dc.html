@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&family=Rammetto+One&family=Lexend:wght@400;600;800&display=swap">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#f1e6cf;color:#c4472b;font-family:'Lexend',sans-serif}
+a{color:#c4472b}a:hover{color:#9e3420}
+button{font-family:inherit}
+button:focus-visible{outline:2px solid #f2b544;outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed}
+</style>
+</helmet>
+<div onDragOver="{{ onDragOver }}" onDrop="{{ onDrop }}" style="height:100vh;display:flex;flex-direction:column;box-sizing:border-box;background-image:radial-gradient(rgba(120,70,30,.07) 1px,transparent 1px);background-size:4px 4px">
+  <nav style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px clamp(16px,3vw,40px)">
+    <a href="Home.dc.html" style="font-family:'Rammetto One',serif;font-size:20px;text-decoration:none">← Rewind</a>
+    <span style="font-family:'Rammetto One',serif;font-size:18px;text-shadow:2px 2px 0 #f2b544">photo booth</span>
+    <button onClick="{{ pickFiles }}" style="font-size:12px;font-weight:600;border:1.5px solid #c4472b;box-shadow:2px 2px 0 #c4472b;background:#f2b544;color:#22392a;padding:7px 14px;cursor:pointer" style-active="transform:translate(2px,2px);box-shadow:none">+ add photos</button>
+    <input ref="{{ fileRef }}" type="file" multiple accept="image/*" onChange="{{ onFiles }}" style="display:none">
+  </nav>
+
+  <sc-if value="{{ always }}" hint-placeholder-val="{{ true }}">
+    <div style="{{ workStyle }}">
+      <div style="{{ previewWrapStyle }}">
+        <div style="position:absolute;inset:0 0 26px 0;display:flex;align-items:center;justify-content:center">
+          <canvas ref="{{ previewRef }}" style="{{ canvasStyle }}"></canvas>
+          <sc-if value="{{ noSel }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ emptyClick }}" style="display:flex;flex-direction:column;align-items:center;gap:10px;max-width:360px;padding:28px 32px;border:1.5px dashed #c4472b;background:transparent;color:#c4472b;cursor:pointer;text-align:center" style-hover="background:rgba(242,181,68,.18)">
+              <span style="font-family:'Rammetto One',serif;font-size:24px;line-height:1.1;text-shadow:3px 3px 0 #f2b544">{{ emptyTitle }}</span>
+              <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;line-height:1.5">{{ emptySub }}</span>
+            </button>
+          </sc-if>
+        </div>
+        <span style="position:absolute;left:0;right:0;bottom:0;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;text-align:center">{{ previewInfo }}</span>
+      </div>
+      <aside style="min-height:0;overflow-y:auto;background:#22392a;color:#f1e6cf;border:1.5px solid #f2b544;border-radius:14px;box-shadow:6px 6px 0 #c4472b;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(242,181,68,.25)">
+          <span style="font-family:'Rammetto One',serif;font-size:20px;line-height:1">darkroom</span>
+          <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#d9c9a3">{{ selInfo }}</span>
+        </div>
+        <div style="padding:12px 18px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid rgba(242,181,68,.25)">
+          <sc-for list="{{ layouts }}" as="l" hint-placeholder-count="3">
+            <button onClick="{{ l.pick }}" style="{{ l.style }}"><span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase">{{ l.label }}</span><span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.8">{{ l.desc }}</span></button>
+          </sc-for>
+          <div style="display:flex;gap:8px">
+            <button onClick="{{ selectAll }}" style="flex:1;font-size:11px;font-weight:600;border:1.5px solid #f2b544;background:transparent;color:#f1e6cf;padding:6px 0;cursor:pointer" style-hover="background:#f2b544;color:#22392a">pick all</button>
+            <button onClick="{{ clearSel }}" style="flex:1;font-size:11px;font-weight:600;border:1.5px solid #f2b544;background:transparent;color:#f1e6cf;padding:6px 0;cursor:pointer" style-hover="background:#f2b544;color:#22392a">clear</button>
+          </div>
+        </div>
+        <div style="padding:12px 18px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid rgba(242,181,68,.25)">
+          <sc-for list="{{ sliders }}" as="s" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;width:86px">{{ s.label }}</span>
+              <div onPointerDown="{{ s.down }}" style="position:relative;flex:1;height:30px;cursor:pointer;touch-action:none">
+                <div style="position:absolute;left:0;right:0;top:13px;height:4px;border-radius:2px;background:rgba(241,230,207,.18)"></div>
+                <div style="{{ s.fill }}"></div>
+                <div style="{{ s.thumb }}"></div>
+              </div>
+              <span style="min-width:40px;height:26px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:1.5px solid #f2b544;border-radius:4px;font-family:'VT323',monospace;font-size:20px">{{ s.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:6px 18px 8px;display:flex;flex-direction:column;border-bottom:1px solid rgba(242,181,68,.25)">
+          <sc-for list="{{ switches }}" as="w" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0">
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase">{{ w.label }}</span><span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#d9c9a3">{{ w.desc }}</span></div>
+              <button onClick="{{ w.toggle }}" aria-label="{{ w.label }}" style="position:relative;width:56px;height:24px;flex-shrink:0;border-radius:4px;border:1.5px solid #f2b544;background:transparent;cursor:pointer;padding:0"><span style="{{ w.block }}"></span></button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:14px 18px;display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;border:1.5px solid #f2b544">
+            <sc-for list="{{ formats }}" as="x" hint-placeholder-count="2">
+              <button onClick="{{ x.pick }}" style="{{ x.style }}">{{ x.label }}</button>
+            </sc-for>
+          </div>
+          <button onClick="{{ doExport }}" disabled="{{ cantExport }}" style="height:46px;width:100%;border-radius:4px;border:1.5px solid #f2b544;background:#f2b544;color:#22392a;box-shadow:3px 3px 0 #c4472b;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:.04em" style-hover="background:#f1e6cf;border-color:#f1e6cf" style-active="transform:translate(3px,3px);box-shadow:none">{{ exportLabel }}</button>
+          <span style="{{ exportMsgStyle }}">{{ exportMsg }}</span>
+        </div>
+      </aside>
+    </div>
+    <div style="flex-shrink:0;position:relative;background:#17130f;padding:22px 0 20px">
+      <div style="position:absolute;left:0;right:0;top:6px;height:8px;background:repeating-linear-gradient(90deg,transparent 0 10px,rgba(241,230,207,.75) 10px 22px);pointer-events:none"></div>
+      <div style="position:absolute;left:0;right:0;bottom:6px;height:8px;background:repeating-linear-gradient(90deg,transparent 0 10px,rgba(241,230,207,.75) 10px 22px);pointer-events:none"></div>
+      <div style="display:flex;gap:12px;overflow-x:auto;padding:6px clamp(16px,3vw,40px);align-items:center">
+        <sc-for list="{{ tray }}" as="p" hint-placeholder-count="4">
+          <div style="position:relative;flex-shrink:0;display:flex;flex-direction:column;gap:4px">
+            <button onClick="{{ p.click }}" title="{{ p.name }}" style="{{ p.frameStyle }}"><img src="{{ p.thumb }}" alt="{{ p.name }}" draggable="false" style="height:100%;width:auto;display:block"></button>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;height:14px">
+              <span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:#e8962f">{{ p.no }}</span>
+              <span style="{{ p.badgeStyle }}">{{ p.badge }}</span>
+            </div>
+            <button onClick="{{ p.remove }}" aria-label="Remove photo" style="position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:#c4472b;color:#f1e6cf;border:1.5px solid #f1e6cf;font-size:10px;line-height:1;cursor:pointer;padding:0">✕</button>
+          </div>
+        </sc-for>
+        <button onClick="{{ pickFiles }}" style="flex-shrink:0;height:72px;width:72px;margin-bottom:18px;border:1.5px dashed #f2b544;background:transparent;color:#f2b544;font-size:11px;font-weight:600;cursor:pointer">+ add</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="position:fixed;top:64px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:20;max-width:min(360px,calc(100vw - 40px));pointer-events:none">
+    <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="1">
+      <div style="{{ t.style }}">{{ t.text }}</div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;maxUploadMB&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:80,&quot;min&quot;:10,&quot;max&quot;:500,&quot;step&quot;:10,&quot;unit&quot;:&quot;MB&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;defaultLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;strip&quot;,&quot;booth&quot;,&quot;contact&quot;],&quot;default&quot;:&quot;strip&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const MAX_PX = 16e6;
+const FILM = {
+  strip: { label: 'film strip', desc: 'vertical 35mm · up to 6 frames', max: 6 },
+  booth: { label: 'booth grid', desc: 'classic print · up to 9 frames', max: 9 },
+  contact: { label: 'contact sheet', desc: 'the whole roll · up to 36', max: 36 },
+};
+const SLIDERS = [['grain', 'grain'], ['warmth', 'warm tone'], ['fade', 'fade'], ['leak', 'light leak']];
+const pad = n => String(n).padStart(2, '0');
+const stampText = ts => { const d = new Date(ts); return "'" + String(d.getFullYear()).slice(2) + ' ' + pad(d.getMonth() + 1) + ' ' + pad(d.getDate()); };
+const longDate = d => MONTHS[d.getMonth()] + ' ' + d.getDate() + ' ' + d.getFullYear();
+
+function scaleCanvas(img, edge) {
+  const w = img.naturalWidth, h = img.naturalHeight, s = Math.min(1, edge / Math.max(w, h));
+  const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * s)); c.height = Math.max(1, Math.round(h * s));
+  const x = c.getContext('2d'); x.fillStyle = '#f1e6cf'; x.fillRect(0, 0, c.width, c.height);
+  x.imageSmoothingQuality = 'high'; x.drawImage(img, 0, 0, c.width, c.height); return c;
+}
+const toBlob = (c, type, q) => new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error('encode')), type, q));
+const loadImg = url => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('decode')); i.src = url; });
+function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); c.fill(); }
+function drawFit(c, img, r, contain) {
+  const sw = img.naturalWidth || img.width, sh = img.naturalHeight || img.height, sa = sw / sh, ra = r.w / r.h;
+  if (contain) { let w = r.w, h = r.h; if (sa > ra) h = r.w / sa; else w = r.h * sa; c.drawImage(img, r.x + (r.w - w) / 2, r.y + (r.h - h) / 2, w, h); return; }
+  let cw = sw, ch = sh, cx = 0, cy = 0;
+  if (sa > ra) { cw = sh * ra; cx = (sw - cw) / 2; } else { ch = sw / ra; cy = (sh - ch) / 2; }
+  c.drawImage(img, cx, cy, cw, ch, r.x, r.y, r.w, r.h);
+}
+function rng(seed) { let s = (seed >>> 0) || 1; return () => { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; return (s >>> 0) / 4294967296; }; }
+
+class Component extends DCLogic {
+  state = { photos: [], sel: [], layout: 'strip', grain: 35, warmth: 45, fade: 30, leak: 25, mono: false, date: true, fmt: 'png', toasts: [], exporting: false, exportMsg: '', exportOk: true, vw: window.innerWidth };
+  fileRef = React.createRef(); previewRef = React.createRef(); imgs = new Map();
+  componentDidMount() {
+    if (this.props.defaultLayout && FILM[this.props.defaultLayout]) this.setState({ layout: this.props.defaultLayout });
+    this.onResize = () => this.setState({ vw: window.innerWidth });
+    window.addEventListener('resize', this.onResize);
+    this.fontsReady = document.fonts ? Promise.all(["76px 'Rammetto One'", "bold 26px 'Space Mono'", "40px 'VT323'"].map(f => document.fonts.load(f))).catch(() => {}) : Promise.resolve();
+    this.fontsReady.then(() => this.schedulePreview());
+    window.__afterplay = { add: fs => this.addFiles(fs), test: l => this.testRender(l) };
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); clearTimeout(this.pvT); }
+  componentDidUpdate(pp, ps) {
+    const s = this.state;
+    if (ps.sel !== s.sel || ps.photos !== s.photos || ps.layout !== s.layout || ps.grain !== s.grain || ps.warmth !== s.warmth || ps.fade !== s.fade || ps.leak !== s.leak || ps.mono !== s.mono || ps.date !== s.date) this.schedulePreview();
+  }
+  toast(text, kind) {
+    const id = Math.random();
+    this.setState(s => ({ toasts: s.toasts.concat([{ id, text, kind }]) }));
+    setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(t => t.id !== id) })), kind === 'err' ? 7000 : 3500);
+  }
+  async addFiles(list) {
+    const files = Array.from(list || []); if (!files.length) return;
+    const max = this.props.maxUploadMB ?? 80, bad = []; let ok = 0;
+    for (const f of files) {
+      if (!/^image\//.test(f.type) && !/\.(jpe?g|png|gif|webp|bmp|avif)$/i.test(f.name)) { bad.push(f.name + " isn't an image"); continue; }
+      if (f.size > max * 1048576) { bad.push(f.name + ' is over ' + max + ' MB'); continue; }
+      try { const p = await this.develop(f); ok++; this.setState(s => ({ photos: s.photos.concat([p]), sel: s.sel.length < 4 ? s.sel.concat([p.id]) : s.sel })); }
+      catch (e) { bad.push(/\.(heic|heif)$/i.test(f.name) ? f.name + ": HEIC isn't supported — save it as JPEG" : f.name + " couldn't be read"); }
+    }
+    if (ok) this.toast(ok + ' photo' + (ok > 1 ? 's' : '') + ' added', 'ok');
+    if (bad.length) this.toast('skipped: ' + bad.slice(0, 3).join(' · ') + (bad.length > 3 ? ' …' : ''), 'err');
+  }
+  async develop(f) {
+    const orig = URL.createObjectURL(f);
+    try {
+      const img = await loadImg(orig);
+      if (!img.naturalWidth || !img.naturalHeight) throw new Error('size');
+      const work = scaleCanvas(img, 2000);
+      const thumb = URL.createObjectURL(await toBlob(scaleCanvas(img, 320), 'image/jpeg', .82));
+      const id = 'p' + Math.random().toString(36).slice(2, 9);
+      this.imgs.set(id, work);
+      return { id, name: f.name, thumb, w: img.naturalWidth, h: img.naturalHeight, date: f.lastModified || Date.now() };
+    } finally { URL.revokeObjectURL(orig); }
+  }
+  remove(id) {
+    const p = this.state.photos.find(x => x.id === id); if (!p) return;
+    URL.revokeObjectURL(p.thumb); this.imgs.delete(id);
+    this.setState(s => ({ photos: s.photos.filter(x => x.id !== id), sel: s.sel.filter(x => x !== id) }));
+  }
+  filmSel() {
+    const m = new Map(this.state.photos.map(p => [p.id, p]));
+    return this.state.sel.map(id => m.get(id)).filter(Boolean).slice(0, FILM[this.state.layout].max);
+  }
+  geom(layout, n) {
+    if (layout === 'strip') {
+      const FW = 1000, FH = 750, SIDE = 160, GAP = 80, TOP = 150, BOT = 300, cells = [];
+      for (let i = 0; i < n; i++) cells.push({ x: SIDE, y: TOP + i * (FH + GAP), w: FW, h: FH });
+      return { W: FW + 2 * SIDE, H: TOP + n * FH + (n - 1) * GAP + BOT, SIDE, cells };
+    }
+    if (layout === 'booth') {
+      const cols = n === 1 ? 1 : n <= 4 ? 2 : 3, rows = Math.ceil(n / cols), CW = 900, CH = 1125, M = 90, G = 44, FOOT = 320, cells = [];
+      for (let i = 0; i < cols * rows; i++) cells.push({ x: M + (i % cols) * (CW + G), y: M + Math.floor(i / cols) * (CH + G), w: CW, h: CH });
+      return { W: 2 * M + cols * CW + (cols - 1) * G, H: M + rows * CH + (rows - 1) * G + FOOT, M, FOOT, cells };
+    }
+    const cols = Math.max(1, Math.min(n, 6, Math.ceil(Math.sqrt(n * 1.4)))), rows = Math.ceil(n / cols), CW = 720, CH = 480, FG = 28, M = 110, HEAD = 230, RG = 56, BH = CH + 140, cells = [];
+    for (let i = 0; i < n; i++) cells.push({ x: M + (i % cols) * (CW + FG), y: HEAD + Math.floor(i / cols) * (BH + RG) + 70, w: CW, h: CH, contain: true });
+    return { W: 2 * M + cols * CW + (cols - 1) * FG, H: HEAD + rows * BH + (rows - 1) * RG + M, M, HEAD, BH, RG, CW, FG, cols, rows, cells };
+  }
+  exportScale(g) { return Math.min(2, Math.sqrt(MAX_PX / (g.W * g.H))); }
+  grade(c, r, o, k, i) {
+    const warm = o.warmth / 100, fade = o.fade / 100, gr = o.grain / 100 * 80, mono = o.mono;
+    if (!warm && !fade && !gr && !mono) return;
+    const X = Math.max(0, Math.round(r.x * k)), Y = Math.max(0, Math.round(r.y * k));
+    const Wd = Math.min(c.canvas.width - X, Math.round(r.w * k)), Hd = Math.min(c.canvas.height - Y, Math.round(r.h * k));
+    if (Wd < 1 || Hd < 1) return;
+    const im = c.getImageData(X, Y, Wd, Hd), d = im.data;
+    let s = ((i + 1) * 2654435761) >>> 0 || 1;
+    const fr = 1 - .3 * fade, fb = 1 - .34 * fade, lr = 46 * fade + 22 * warm, lg = 40 * fade + 7 * warm, lb = 34 * fade - 24 * warm;
+    for (let j = 0; j < d.length; j += 4) {
+      let R = d[j], G = d[j + 1], B = d[j + 2];
+      if (mono) { const l = (.299 * R + .587 * G + .114 * B - 128) * 1.12 + 128; R = G = B = l; }
+      let n = 0; if (gr) { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; n = ((s >>> 0) / 4294967296 - .5) * gr; }
+      d[j] = R * fr + lr + n; d[j + 1] = G * fr + lg + n; d[j + 2] = B * fb + lb + n;
+    }
+    c.putImageData(im, X, Y);
+  }
+  leak(c, r, o, i) {
+    if (!o.leak) return; const R = rng(i * 7919 + 31), a = o.leak / 100;
+    c.save(); c.beginPath(); c.rect(r.x, r.y, r.w, r.h); c.clip(); c.globalCompositeOperation = 'screen';
+    const right = R() < .5, cx = right ? r.x + r.w * (.9 + R() * .25) : r.x - r.w * (.15 - R() * .2), cy = r.y + r.h * R(), rad = Math.max(r.w, r.h) * (.55 + R() * .4);
+    let g = c.createRadialGradient(cx, cy, 0, cx, cy, rad);
+    g.addColorStop(0, 'rgba(255,150,60,' + (.9 * a) + ')'); g.addColorStop(.35, 'rgba(255,70,40,' + (.6 * a) + ')'); g.addColorStop(1, 'rgba(255,40,20,0)');
+    c.fillStyle = g; c.fillRect(r.x, r.y, r.w, r.h);
+    const bx = r.x + r.w * R(); g = c.createLinearGradient(bx - r.w * .14, 0, bx + r.w * .14, 0);
+    g.addColorStop(0, 'rgba(255,200,120,0)'); g.addColorStop(.5, 'rgba(255,190,110,' + (.35 * a) + ')'); g.addColorStop(1, 'rgba(255,200,120,0)');
+    c.fillStyle = g; c.fillRect(r.x, r.y, r.w, r.h); c.restore();
+  }
+  stamp(c, r, ts, k) {
+    const fs = Math.max(20, r.h * .08); c.save();
+    c.font = fs + "px 'VT323', monospace"; c.textAlign = 'right'; c.textBaseline = 'alphabetic';
+    c.shadowColor = 'rgba(255,80,20,.9)'; c.shadowBlur = fs * .35 * k; c.fillStyle = '#ff9a3c';
+    c.fillText(stampText(ts), r.x + r.w - fs * .6, r.y + r.h - fs * .5); c.restore();
+  }
+  title(c, t, x, y, size, col, sh, align) {
+    c.font = size + "px 'Rammetto One', serif"; c.textAlign = align;
+    c.fillStyle = sh; c.fillText(t, x + size * .07, y + size * .07); c.fillStyle = col; c.fillText(t, x, y);
+  }
+  paint(cv, sel, o, k) {
+    const layout = o.layout, n = sel.length, g = this.geom(layout, n);
+    cv.width = Math.max(1, Math.round(g.W * k)); cv.height = Math.max(1, Math.round(g.H * k));
+    const c = cv.getContext('2d'); if (!c) throw new Error('no-canvas');
+    c.setTransform(k, 0, 0, k, 0, 0); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high'; c.textBaseline = 'alphabetic';
+    const today = longDate(new Date());
+    if (layout === 'strip') {
+      c.fillStyle = '#17130f'; c.fillRect(0, 0, g.W, g.H); c.fillStyle = '#f1e6cf';
+      for (let y = 34; y < g.H - 60; y += 100) { rr(c, 36, y, 60, 42, 9); rr(c, g.W - 96, y, 60, 42, 9); }
+    } else if (layout === 'booth') { c.fillStyle = '#fbf5e6'; c.fillRect(0, 0, g.W, g.H); }
+    else {
+      c.fillStyle = '#f4eee2'; c.fillRect(0, 0, g.W, g.H);
+      for (let r = 0; r < g.rows; r++) {
+        const cnt = Math.min(g.cols, n - r * g.cols), bx = g.M - 34, by = g.HEAD + r * (g.BH + g.RG), bw = cnt * g.CW + (cnt - 1) * g.FG + 68;
+        c.fillStyle = '#141110'; c.fillRect(bx, by, bw, g.BH); c.fillStyle = '#f4eee2';
+        for (let x = bx + 20; x < bx + bw - 40; x += 62) { rr(c, x, by + 18, 32, 24, 5); rr(c, x, by + g.BH - 42, 32, 24, 5); }
+      }
+    }
+    sel.forEach((p, i) => {
+      const r = g.cells[i], img = this.imgs.get(p.id);
+      c.save(); c.beginPath(); c.rect(r.x, r.y, r.w, r.h); c.clip(); c.fillStyle = '#0c0a09'; c.fillRect(r.x, r.y, r.w, r.h);
+      if (img) drawFit(c, img, r, r.contain); c.restore();
+      this.grade(c, r, o, k, i); this.leak(c, r, o, i); if (o.date) this.stamp(c, r, p.date, k);
+    });
+    if (layout === 'strip') {
+      sel.forEach((p, i) => { const r = g.cells[i]; c.save(); c.translate(g.SIDE - 24, r.y + r.h / 2); c.rotate(-Math.PI / 2); c.fillStyle = '#e0892f'; c.font = "bold 24px 'Space Mono', monospace"; c.textAlign = 'center'; c.fillText((i + 1) + '    ▸' + (i + 1) + 'A    AFTERPLAY 400', 0, 8); c.restore(); });
+      this.title(c, 'afterplay', g.W / 2, g.H - 150, 76, '#f2b544', '#c4472b', 'center');
+      c.font = "bold 26px 'Space Mono', monospace"; c.fillStyle = '#f1e6cf'; c.textAlign = 'center'; c.fillText('PHOTO BOOTH · ' + today, g.W / 2, g.H - 88);
+    } else if (layout === 'booth') {
+      for (let i = n; i < g.cells.length; i++) { const r = g.cells[i]; c.fillStyle = '#f2b544'; c.fillRect(r.x, r.y, r.w, r.h); this.title(c, 'afterplay', r.x + r.w / 2, r.y + r.h / 2 + r.w * .04, r.w * .11, '#c4472b', '#f1e6cf', 'center'); }
+      const fy = g.H - g.FOOT / 2;
+      this.title(c, 'afterplay', g.M, fy + 36, 104, '#c4472b', '#f2b544', 'left');
+      c.font = "bold 30px 'Space Mono', monospace"; c.fillStyle = '#c4472b'; c.textAlign = 'right';
+      c.fillText('PHOTO BOOTH', g.W - g.M, fy - 6); c.fillText(today + ' · ' + n + ' FRAME' + (n > 1 ? 'S' : ''), g.W - g.M, fy + 40);
+    } else {
+      this.title(c, 'afterplay', g.M, 150, 84, '#c4472b', '#f2b544', 'left');
+      c.font = "bold 26px 'Space Mono', monospace"; c.fillStyle = '#c4472b'; c.textAlign = 'right';
+      c.fillText('CONTACT SHEET · ROLL 01', g.W - g.M, 110); c.fillText(n + ' FRAME' + (n > 1 ? 'S' : '') + ' · ' + today, g.W - g.M, 150);
+      c.font = "bold 22px 'Space Mono', monospace"; c.fillStyle = '#e8962f';
+      sel.forEach((p, i) => { const r = g.cells[i]; c.textAlign = 'left'; c.fillText(String(i + 1), r.x, r.y - 14); c.textAlign = 'right'; c.fillText('▸' + (i + 1) + 'A', r.x + r.w, r.y - 14); });
+    }
+    return g;
+  }
+  schedulePreview(tries = 0) { clearTimeout(this.pvT); this.pvT = setTimeout(() => { if (this.previewRef.current) this.drawPreview(); else if (tries < 25) this.schedulePreview(tries + 1); }, 40); }
+  drawPreview() {
+    const cv = this.previewRef.current; if (!cv) return;
+    const sel = this.filmSel(); if (!sel.length) return;
+    const g = this.geom(this.state.layout, sel.length), k = Math.min(1, 1500 / Math.max(g.W, g.H));
+    try { this.paint(cv, sel, this.state, k); } catch (e) { this.setState({ exportMsg: 'preview failed', exportOk: false }); }
+  }
+  testRender(layout) {
+    const sel = this.filmSel(), cv = document.createElement('canvas'), o = Object.assign({}, this.state, { layout: layout || this.state.layout });
+    const g = this.geom(o.layout, sel.length); this.paint(cv, sel, o, this.exportScale(g));
+    const res = { w: cv.width, h: cv.height, frames: sel.length }; cv.width = cv.height = 0; return res;
+  }
+  async doExport() {
+    const sel = this.filmSel(); if (!sel.length || this.state.exporting) return;
+    const fmt = this.state.fmt, layout = this.state.layout;
+    this.setState({ exporting: true, exportMsg: 'developing your print…', exportOk: true });
+    await new Promise(r => setTimeout(r, 40)); await this.fontsReady;
+    const cv = document.createElement('canvas');
+    try {
+      const g = this.geom(layout, sel.length); this.paint(cv, sel, this.state, this.exportScale(g));
+      const blob = await toBlob(cv, fmt === 'jpeg' ? 'image/jpeg' : 'image/png', .93);
+      const url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = 'afterplay-' + layout + '-' + new Date().toISOString().slice(0, 10) + (fmt === 'jpeg' ? '.jpg' : '.png');
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 8000);
+      this.setState({ exportMsg: 'saved · ' + cv.width + ' × ' + cv.height + ' ' + fmt + ' · ' + (blob.size / 1048576).toFixed(1) + ' mb', exportOk: true });
+    } catch (e) {
+      this.setState({ exportMsg: e.message === 'encode' || e.message === 'no-canvas' ? 'export failed — image too big for this browser. try jpeg or fewer frames.' : 'export failed — something went wrong. try again or switch format.', exportOk: false });
+    } finally { cv.width = cv.height = 0; this.setState({ exporting: false }); }
+  }
+  renderVals() {
+    const st = this.state, { photos, sel, layout, fmt, toasts, exporting, exportMsg, exportOk, vw } = st;
+    const has = photos.length > 0, fsel = this.filmSel(), maxF = FILM[layout].max;
+    const pvKey = [layout, st.grain, st.warmth, st.fade, st.leak, st.mono, st.date, fsel.map(p => p.id).join(',')].join('|');
+    if (pvKey !== this.pvKey) { this.pvKey = pvKey; this.schedulePreview(); }
+    const g = fsel.length ? this.geom(layout, fsel.length) : null, ek = g ? this.exportScale(g) : 1;
+    const narrow = vw < 880;
+    const drag = key => e => {
+      const r = e.currentTarget.getBoundingClientRect();
+      const go = ev => this.setState({ [key]: Math.max(0, Math.min(100, Math.round((ev.clientX - r.left) / r.width * 100))) });
+      go(e); const up = () => { window.removeEventListener('pointermove', go); window.removeEventListener('pointerup', up); };
+      window.addEventListener('pointermove', go); window.addEventListener('pointerup', up);
+    };
+    const block = on => ({ position: 'absolute', top: 2, left: on ? 28 : 2, width: 23, height: 17, borderRadius: 2, background: on ? '#f2b544' : 'rgba(241,230,207,.35)', boxShadow: on ? '2px 2px 0 #c4472b' : 'none', transition: 'left .18s' });
+    return {
+      fileRef: this.fileRef, previewRef: this.previewRef, maxMB: this.props.maxUploadMB ?? 80,
+      always: true,
+      emptyTitle: has ? 'tap photos below to add frames' : 'load your photos',
+      emptySub: has ? 'they print in the order you tap them' : 'click or drop images here · jpg png webp · up to ' + (this.props.maxUploadMB ?? 80) + ' mb each · stays in your browser',
+      emptyClick: () => { if (!has && this.fileRef.current) this.fileRef.current.click(); },
+      pickFiles: () => this.fileRef.current && this.fileRef.current.click(),
+      onFiles: e => { this.addFiles(e.target.files); e.target.value = ''; },
+      onDragOver: e => e.preventDefault(),
+      onDrop: e => { e.preventDefault(); this.addFiles(e.dataTransfer.files); },
+      workStyle: { flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: narrow ? 'minmax(0,1fr)' : 'minmax(0,1fr) minmax(280px,340px)', gridTemplateRows: narrow ? '60vh auto' : 'minmax(0,1fr)', gap: 24, padding: '4px clamp(16px,3vw,40px) 16px', boxSizing: 'border-box', overflowY: narrow ? 'auto' : 'hidden' },
+      previewWrapStyle: { position: 'relative', minHeight: 0, minWidth: 0 },
+      canvasStyle: { display: fsel.length ? 'block' : 'none', maxWidth: '100%', maxHeight: '100%', boxShadow: '6px 6px 0 #c4472b, 0 20px 50px rgba(60,30,10,.25)' },
+      noSel: !fsel.length,
+      previewInfo: g ? 'preview · exports at ' + Math.round(g.W * ek) + ' × ' + Math.round(g.H * ek) + ' px' + (sel.length > maxF ? ' · using first ' + maxF + ' of ' + sel.length : '') : '',
+      selInfo: sel.length + ' picked',
+      layouts: Object.keys(FILM).map(id => ({ label: FILM[id].label, desc: FILM[id].desc, pick: () => this.setState({ layout: id }),
+        style: Object.assign({ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 3, padding: '8px 12px', borderRadius: 4, cursor: 'pointer', textAlign: 'left', border: '1.5px solid #f2b544' }, layout === id ? { background: '#f2b544', color: '#22392a', boxShadow: '2px 2px 0 #c4472b' } : { background: 'transparent', color: '#f1e6cf' }) })),
+      selectAll: () => this.setState({ sel: photos.map(p => p.id) }), clearSel: () => this.setState({ sel: [] }),
+      sliders: SLIDERS.map(([k, label]) => ({ label, value: st[k], down: drag(k),
+        fill: { position: 'absolute', left: 0, top: 13, height: 4, borderRadius: 2, width: st[k] + '%', background: '#f2b544', pointerEvents: 'none' },
+        thumb: { position: 'absolute', top: 2, left: 'calc(' + st[k] + '% - ' + (st[k] * .2) + 'px)', width: 20, height: 26, borderRadius: 2, background: '#f1e6cf', border: '1.5px solid #c4472b', boxSizing: 'border-box', boxShadow: '2px 2px 0 #c4472b', pointerEvents: 'none' } })),
+      switches: [['mono', 'monochrome', 'black & white stock'], ['date', 'date stamp', 'orange camera date']].map(([k, label, desc]) => ({ label, desc, block: block(st[k]), toggle: () => this.setState({ [k]: !st[k] }) })),
+      formats: [['png', 'png · lossless'], ['jpeg', 'jpeg · smaller']].map(([id, label]) => ({ label, pick: () => this.setState({ fmt: id }),
+        style: { flex: 1, border: 0, padding: '7px 0', fontSize: 11, fontWeight: 600, cursor: 'pointer', background: fmt === id ? '#f2b544' : 'transparent', color: fmt === id ? '#22392a' : '#f1e6cf' } })),
+      doExport: () => this.doExport(), cantExport: !fsel.length || exporting,
+      exportLabel: exporting ? 'developing…' : 'download ' + fmt + ' ↓',
+      exportMsg: exportMsg || 'filters, layout and stamps are baked into the file',
+      exportMsgStyle: { fontFamily: "'Space Mono',monospace", fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.4, color: exportOk ? '#d9c9a3' : '#f2b544' },
+      tray: photos.map((p, i) => {
+        const si = sel.indexOf(p.id), on = si >= 0;
+        return { name: p.name, thumb: p.thumb, no: pad(i + 1) + 'A', badge: on ? '#' + (si + 1) : '',
+          badgeStyle: { fontFamily: "'Space Mono',monospace", fontSize: 9, fontWeight: 700, background: on ? '#f2b544' : 'transparent', color: '#22392a', padding: '0 5px', borderRadius: 2 },
+          frameStyle: { height: 72, padding: 0, border: 0, cursor: 'pointer', background: '#0c0a09', outline: on ? '3px solid #f2b544' : '1px solid rgba(241,230,207,.2)', outlineOffset: on ? 2 : 0, opacity: on ? 1 : .55, filter: 'sepia(.25)' },
+          remove: () => this.remove(p.id),
+          click: () => this.setState(s => ({ sel: s.sel.includes(p.id) ? s.sel.filter(x => x !== p.id) : s.sel.concat([p.id]) })) };
+      }),
+      toasts: toasts.map(t => ({ text: t.text, style: { background: t.kind === 'err' ? '#c4472b' : '#22392a', color: '#f1e6cf', border: '1.5px solid #f2b544', padding: '10px 14px', fontSize: 12, fontWeight: 600, lineHeight: 1.35 } }))
+    };
+  }
+}
+</script>
+</body>
+</html>

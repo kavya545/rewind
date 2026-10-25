@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<template id="__bundler_thumbnail" data-bg-color="#f1e6cf"><svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg"><rect x="380" y="260" width="440" height="280" rx="36" fill="none" stroke="#c4472b" stroke-width="16"/><circle cx="500" cy="420" r="56" fill="#c4472b"/><circle cx="700" cy="420" r="56" fill="#c4472b"/><circle cx="500" cy="420" r="20" fill="#f2b544"/><circle cx="700" cy="420" r="20" fill="#f2b544"/></svg></template>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rammetto+One&family=Lexend:wght@400;600;800&family=Space+Mono:wght@400;700&family=VT323&display=swap">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#f1e6cf;color:#c4472b;font-family:'Lexend',sans-serif}
+a{color:#c4472b}a:hover{color:#9e3420}
+a:focus-visible{outline:2px solid #c4472b;outline-offset:3px}
+</style>
+</helmet>
+<div style="height:100vh;display:grid;grid-template-rows:auto minmax(0,1fr);gap:clamp(10px,2vh,24px);padding:clamp(16px,2.6vh,30px) clamp(20px,4vw,64px) clamp(24px,4vh,48px);box-sizing:border-box;background:#f1e6cf;background-image:radial-gradient(rgba(120,70,30,.07) 1px,transparent 1px);background-size:4px 4px;position:relative">
+  <nav style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+    <span style="font-family:'Rammetto One',serif;font-size:22px">Rewind</span>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase">side a · 1994</span>
+  </nav>
+  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:clamp(32px,7vw,120px);min-height:0">
+    <div style="flex:0 1 380px;display:flex;flex-direction:column;gap:16px">
+      <a href="TV.dc.html" aria-label="Open the TV" style="display:block;aspect-ratio:4/3;max-height:40vh">
+        <img src="assets/tv.jpg" alt="90s television" style="width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;filter:sepia(.5) contrast(1.05);display:block">
+      </a>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1.5px solid #c4472b;padding-top:12px">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700">01</span><span style="font-family:'Rammetto One',serif;font-size:clamp(20px,2vw,28px)">tv</span></div>
+        <a href="TV.dc.html" style="font-size:12px;font-weight:600;text-decoration:none;border:1.5px solid #c4472b;padding:8px 16px;box-shadow:3px 3px 0 #c4472b;background:transparent;color:#c4472b;transition:background .15s,color .15s,transform .15s,box-shadow .15s" style-hover="background:#c4472b;color:#f1e6cf;transform:translate(-2px,-2px);box-shadow:5px 5px 0 #f2b544" style-active="transform:translate(3px,3px);box-shadow:none">tune in →</a>
+      </div>
+    </div>
+    <div style="flex:0 1 380px;display:flex;flex-direction:column;gap:16px">
+      <a href="Camera.dc.html" aria-label="Open the camera" style="display:block;position:relative;aspect-ratio:4/3;max-height:40vh;overflow:hidden">
+        <img src="assets/camera.jpg" alt="Film camera" style="position:absolute;width:120%;left:-8.8%;top:-78%;max-width:none;transform-origin:49% 60%;transform:rotate(78deg);mix-blend-mode:multiply;filter:sepia(.5) contrast(1.25) brightness(1.08);display:block">
+      </a>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1.5px solid #c4472b;padding-top:12px">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700">02</span><span style="font-family:'Rammetto One',serif;font-size:clamp(20px,2vw,28px)">camera</span></div>
+        <a href="Camera.dc.html" style="font-size:12px;font-weight:600;text-decoration:none;border:1.5px solid #c4472b;padding:8px 16px;box-shadow:3px 3px 0 #c4472b;background:transparent;color:#c4472b;transition:background .15s,color .15s,transform .15s,box-shadow .15s" style-hover="background:#c4472b;color:#f1e6cf;transform:translate(-2px,-2px);box-shadow:5px 5px 0 #f2b544" style-active="transform:translate(3px,3px);box-shadow:none">shoot →</a>
+      </div>
+    </div>
+  </div>
+  <sc-if value="{{ showLoader }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ loaderStyle }}">
+      <div style="{{ deckStyle }}">
+        <div style="position:relative;width:min(340px,76vw);aspect-ratio:17/7;border:2px solid #c4472b;border-radius:14px;box-shadow:5px 5px 0 #f2b544;background:#f1e6cf">
+          <div style="position:absolute;left:8%;right:8%;top:14%;height:12%;border:1.5px solid #c4472b;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase">side a · rewind</div>
+          <div style="position:absolute;left:27%;right:27%;top:58%;height:2px;background:#3a2418"></div>
+          <div style="position:absolute;left:25%;top:60%;width:0;height:0">
+            <div style="{{ tapeL }}"></div>
+            <div style="{{ hubL }}"></div>
+          </div>
+          <div style="position:absolute;left:75%;top:60%;width:0;height:0">
+            <div style="{{ tapeR }}"></div>
+            <div style="{{ hubR }}"></div>
+          </div>
+        </div>
+        <div style="width:min(340px,76vw);display:flex;justify-content:space-between;align-items:center;font-family:'VT323',monospace">
+          <span style="{{ blinkStyle }}">◀◀ REW</span>
+          <span style="font-size:28px;letter-spacing:.06em">{{ counter }}</span>
+        </div>
+      </div>
+      <span style="{{ wordStyle }}">Rewind</span>
+      <div style="{{ wipeStyle }}"></div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showIntro&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;oncePerSession&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;introMs&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:2200,&quot;min&quot;:1000,&quot;max&quot;:5000,&quot;step&quot;:100,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  state = { t: 0, done: false };
+  componentDidMount() {
+    let seen = false;
+    if (this.props.oncePerSession) { try { seen = sessionStorage.getItem('rewind-intro') === '1'; } catch (e) {} }
+    if (seen || (this.props.showIntro ?? true) === false) { this.setState({ done: true }); return; }
+    const t0 = performance.now(), total = (this.props.introMs ?? 2200) + 1300;
+    const tick = now => {
+      const t = now - t0;
+      if (t >= total) { try { sessionStorage.setItem('rewind-intro', '1'); } catch (e) {} this.setState({ done: true }); return; }
+      this.setState({ t }); this.raf = requestAnimationFrame(tick);
+    };
+    this.raf = requestAnimationFrame(tick);
+  }
+  componentWillUnmount() { cancelAnimationFrame(this.raf); }
+  renderVals() {
+    const { t, done } = this.state, D = this.props.introMs ?? 2200;
+    const p = Math.min(1, t / D), e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    const after = Math.max(0, t - D);
+    const reveal = Math.min(1, after / 450), wipe = Math.max(0, Math.min(1, (after - 650) / 600));
+    const wipeE = 1 - Math.pow(1 - wipe, 3);
+    const rL = 18 + 30 * e, rR = 48 - 30 * e, ang = -(t * .9 + e * 1400);
+    const disc = r => ({ position: 'absolute', left: -r, top: -r, width: r * 2, height: r * 2, borderRadius: '50%', background: 'repeating-radial-gradient(circle,#3a2418 0 1.5px,#4a2f20 1.5px 3px)' });
+    const hub = { position: 'absolute', left: -15, top: -15, width: 30, height: 30, borderRadius: '50%', border: '2px solid #c4472b', boxSizing: 'border-box', background: 'repeating-conic-gradient(#c4472b 0 22deg,#f1e6cf 22deg 60deg)', transform: `rotate(${ang}deg)` };
+    return {
+      showLoader: !done,
+      loaderStyle: { position: 'fixed', inset: 0, zIndex: 50, overflow: 'hidden', background: '#f1e6cf', backgroundImage: 'radial-gradient(rgba(120,70,30,.07) 1px,transparent 1px)', backgroundSize: '4px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', clipPath: `inset(0 0 ${wipeE * 100}% 0)` },
+      deckStyle: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, opacity: 1 - reveal, transform: `translateY(${-reveal * 24}px) scale(${1 - reveal * .06})`, position: reveal >= 1 ? 'absolute' : 'relative' },
+      tapeL: disc(rL), tapeR: disc(rR), hubL: hub, hubR: { ...hub, transform: `rotate(${ang * rL / rR * .6}deg)` },
+      blinkStyle: { fontSize: 24, letterSpacing: '.08em', opacity: Math.floor(t / 320) % 2 ? .25 : 1 },
+      counter: String(Math.max(0, Math.round(1994 * (1 - e)))).padStart(4, '0'),
+      wordStyle: { position: 'absolute', fontFamily: "'Rammetto One',serif", fontSize: 'clamp(56px,9vw,128px)', lineHeight: 1, color: '#c4472b', textShadow: `${5 * reveal}px ${5 * reveal}px 0 #f2b544`, opacity: reveal, transform: `translateY(${(1 - reveal) * 30}px)`, letterSpacing: `${(1 - reveal) * .2}em` },
+      wipeStyle: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 4, background: '#c4472b', opacity: wipe > 0 && wipe < 1 ? 1 : 0 }
+    };
+  }
+}
+</script>
+</body>
+</html>

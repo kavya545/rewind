@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Rammetto+One&family=Lexend:wght@400;600;800&display=swap">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;font-family:'Lexend',sans-serif;background:#22392a}
+a{color:inherit}a:hover{color:#f2b544}
+button:disabled{opacity:.45;cursor:not-allowed}
+input[type=range]{accent-color:#f2b544}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" onMouseMove="{{ poke }}" style="{{ pageStyle }}">
+  <div style="{{ glowStyle }}"></div>
+  <div onDragOver="{{ onDragOver }}" onDrop="{{ onDrop }}" style="position:relative;width:min(100vw, calc(100vh * 705 / 465));aspect-ratio:705/465;flex-shrink:0">
+    <div style="position:absolute;inset:0;clip-path:inset(3.6% 2.6% 5.2% 3% round 1.2%)">
+      <img src="assets/tv.jpg" alt="" style="{{ tvImgStyle }}">
+    </div>
+    <div onClick="{{ onScreenClick }}" style="position:absolute;left:8.2%;top:11.6%;width:63.6%;height:75.2%;border-radius:7% / 9%;overflow:hidden;background:#0b0d0e;cursor:pointer">
+      <video ref="{{ videoRef }}" playsInline="{{ true }}" loop="{{ true }}" onTimeUpdate="{{ onTime }}" onPlay="{{ onPlay }}" onPause="{{ onPause }}" onEnded="{{ onEnded }}" style="position:absolute;width:2px;height:2px;opacity:0;pointer-events:none"></video>
+      <canvas ref="{{ outRef }}" width="640" height="480" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 30% 20%,rgba(255,255,255,.07),transparent 60%);box-shadow:inset 0 0 70px rgba(0,0,0,.85);pointer-events:none"></div>
+      <sc-if value="{{ noTape }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;font-family:'VT323',monospace;color:#e9f4ea;text-shadow:2px 0 rgba(255,0,60,.55),-2px 0 rgba(0,200,255,.55);pointer-events:none;text-align:center">
+          <span ref="{{ blinkRef }}" style="font-size:clamp(32px,5vw,72px);line-height:1">INSERT TAPE</span>
+          <span style="font-size:clamp(16px,1.8vw,26px)">CLICK SCREEN OR DROP A VIDEO · MAX {{ maxMB }} MB</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasErr }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:0;right:0;top:42%;text-align:center;font-family:'VT323',monospace;font-size:clamp(22px,3vw,42px);color:#22392a;background:#f2b544;padding:6px 0;pointer-events:none">{{ err }}</div>
+      </sc-if>
+    </div>
+  </div>
+  <nav style="{{ navStyle }}">
+    <a href="Home.dc.html" style="font-family:'Rammetto One',serif;font-size:20px;text-decoration:none">← Rewind</a>
+    <span style="font-size:12px;font-weight:600;max-width:36vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ fileLabel }}</span>
+  </nav>
+  <div style="{{ dockStyle }}">
+    <sc-if value="{{ fxOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px;padding-bottom:12px;border-bottom:1.5px solid currentColor">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;max-width:640px">
+          <sc-for list="{{ fxList }}" as="f" hint-placeholder-count="10">
+            <button onClick="{{ f.toggle }}" style="{{ f.style }}">{{ f.label }}</button>
+          </sc-for>
+        </div>
+        <label style="display:flex;align-items:center;gap:12px;font-size:12px;font-weight:600">intensity<input type="range" min="0" max="100" value="{{ intensity }}" onChange="{{ onIntensity }}" style="flex:1"><span style="width:32px;text-align:right">{{ intensity }}</span></label>
+      </div>
+    </sc-if>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center">
+      <input ref="{{ fileRef }}" type="file" accept="video/*" onChange="{{ onFile }}" style="display:none">
+      <button onClick="{{ pickFile }}" style="font-family:'Lexend',sans-serif;font-size:12px;font-weight:600;border:1.5px solid #c4472b;box-shadow:3px 3px 0 #f2b544;background:#c4472b;color:#f1e6cf;padding:7px 16px;cursor:pointer;white-space:nowrap" style-hover="background:#9e3420">insert tape</button>
+      <button onClick="{{ togglePlay }}" disabled="{{ noTape }}" style="font-family:'Lexend',sans-serif;font-size:12px;font-weight:600;border:1.5px solid currentColor;box-shadow:2px 2px 0 currentColor;background:transparent;color:inherit;padding:7px 14px;cursor:pointer;white-space:nowrap" style-hover="background:rgba(242,181,68,.25)">{{ playLabel }}</button>
+      <button onClick="{{ toggleMute }}" disabled="{{ noTape }}" style="font-family:'Lexend',sans-serif;font-size:12px;font-weight:600;border:1.5px solid currentColor;box-shadow:2px 2px 0 currentColor;background:transparent;color:inherit;padding:7px 14px;cursor:pointer;white-space:nowrap" style-hover="background:rgba(242,181,68,.25)">{{ muteLabel }}</button>
+      <div style="display:flex;border:1.5px solid currentColor;box-shadow:2px 2px 0 currentColor">
+        <sc-for list="{{ presets }}" as="m" hint-placeholder-count="5">
+          <button onClick="{{ m.pick }}" style="{{ m.style }}">{{ m.label }}</button>
+        </sc-for>
+      </div>
+      <button onClick="{{ toggleFx }}" style="{{ fxBtnStyle }}">effects {{ fxArrow }}</button>
+      <button onClick="{{ onExport }}" disabled="{{ noTape }}" style="font-family:'Lexend',sans-serif;font-size:12px;font-weight:600;border:1.5px solid #f2b544;box-shadow:2px 2px 0 #c4472b;background:#f2b544;color:#22392a;padding:7px 14px;cursor:pointer;white-space:nowrap" style-hover="background:#e9a42d">{{ exportLabel }}</button>
+      <button onClick="{{ toggleLights }}" style="font-family:'Lexend',sans-serif;font-size:12px;font-weight:600;border:1.5px solid currentColor;box-shadow:2px 2px 0 currentColor;background:transparent;color:inherit;padding:7px 14px;cursor:pointer;white-space:nowrap" style-hover="background:rgba(242,181,68,.25)">{{ lightsLabel }}</button>
+      <button onClick="{{ goFull }}" style="font-family:'Lexend',sans-serif;font-size:12px;font-weight:600;border:1.5px solid currentColor;box-shadow:2px 2px 0 currentColor;background:transparent;color:inherit;padding:7px 14px;cursor:pointer;white-space:nowrap" style-hover="background:rgba(242,181,68,.25)">fullscreen</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;maxUploadMB&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:100,&quot;min&quot;:10,&quot;max&quot;:1000,&quot;step&quot;:10,&quot;unit&quot;:&quot;MB&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;defaultPreset&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;vhs&quot;,&quot;crt&quot;,&quot;bw&quot;,&quot;super8&quot;,&quot;cam&quot;],&quot;default&quot;:&quot;vhs&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const W = 640, H = 480;
+const PRESETS = {
+  vhs:   { label: 'vhs', grade: 'saturate(1.35) contrast(1.1) sepia(.15) brightness(1.04) blur(.7px)', chroma: 3, grain: .12, fx: { chroma: 1, static: 1, scan: 1, tracking: 1, vignette: 1, flicker: 1, weave: 0, dust: 0, date: 0, osd: 1 } },
+  crt:   { label: 'crt', grade: 'contrast(1.2) saturate(1.15) brightness(1.06) blur(.3px)', chroma: 1, grain: .05, fx: { chroma: 1, static: 1, scan: 1, tracking: 0, vignette: 1, flicker: 1, weave: 0, dust: 0, date: 0, osd: 1 } },
+  bw:    { label: 'b&w', grade: 'grayscale(1) contrast(1.35) brightness(1.08) blur(.5px)', chroma: 0, grain: .15, fx: { chroma: 0, static: 1, scan: 1, tracking: 0, vignette: 1, flicker: 1, weave: 1, dust: 1, date: 0, osd: 0 } },
+  super8:{ label: 'super 8', grade: 'sepia(.5) saturate(1.35) contrast(1.15) brightness(1.05) blur(.4px)', chroma: 1, grain: .2, fx: { chroma: 0, static: 1, scan: 0, tracking: 0, vignette: 1, flicker: 1, weave: 1, dust: 1, date: 0, osd: 0 } },
+  cam:   { label: 'camcorder', grade: 'saturate(1.2) contrast(1.05) brightness(1.1) blur(.5px)', chroma: 2, grain: .08, fx: { chroma: 1, static: 1, scan: 1, tracking: 0, vignette: 0, flicker: 0, weave: 0, dust: 0, date: 1, osd: 1 } }
+};
+const FX = [['chroma','chroma bleed'],['static','static'],['scan','scanlines'],['tracking','tracking'],['vignette','vignette'],['flicker','flicker'],['weave','gate weave'],['dust','dust & hair'],['date','date stamp'],['osd','on-screen display']];
+const BTN = { fontFamily: "'Lexend',sans-serif", fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' };
+
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    const preset = this.props.defaultPreset ?? 'vhs';
+    this.state = { src: null, name: '', playing: false, muted: false, t: 0, dur: 0, preset, fx: { ...PRESETS[preset].fx }, intensity: 50, dark: true, fxOpen: false, ui: true, err: '', exporting: false };
+  }
+  videoRef = React.createRef(); outRef = React.createRef(); blinkRef = React.createRef(); fileRef = React.createRef(); rootRef = React.createRef();
+  componentDidMount() {
+    this.srcC = document.createElement('canvas'); this.srcC.width = W; this.srcC.height = H;
+    this.sctx = this.srcC.getContext('2d', { willReadFrequently: true });
+    this.octx = this.outRef.current.getContext('2d');
+    this.outImg = this.octx.createImageData(W, H);
+    this.vig = new Float32Array(W * H);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const dx = (x / W - .5) * 1.25, dy = (y / H - .5) * 1.25, d = Math.sqrt(dx * dx + dy * dy);
+      this.vig[y * W + x] = Math.max(0, Math.min(1, 1.25 - d * d * 1.6));
+    }
+    document.fonts && document.fonts.load('28px VT323');
+    this.trackY = -40; this.frame = 0; this.wx = 0; this.wy = 0;
+    const loop = () => { try { this.draw(); } catch (e) {} this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+  }
+  componentWillUnmount() { cancelAnimationFrame(this.raf); clearTimeout(this.uiT); clearTimeout(this.errT); if (this.state.src) URL.revokeObjectURL(this.state.src); }
+  draw() {
+    const { fx, preset, intensity, src, playing } = this.state, P = PRESETS[preset], k = intensity / 50;
+    const v = this.videoRef.current, s = this.sctx, o = this.octx;
+    this.frame++;
+    const b = this.blinkRef.current; if (b) b.style.visibility = Math.floor(this.frame / 40) % 2 ? 'hidden' : 'visible';
+    if (!src || !v || v.readyState < 2) {
+      const d = this.outImg.data;
+      for (let i = 0; i < d.length; i += 4) { const n = Math.random() * 200; d[i] = d[i + 1] = d[i + 2] = n; d[i + 3] = 255; }
+      o.putImageData(this.outImg, 0, 0); return;
+    }
+    if (fx.weave) { this.wx += ((Math.random() - .5) * 3 * k - this.wx) * .3; this.wy += ((Math.random() - .5) * 4 * k - this.wy) * .3; } else { this.wx = this.wy = 0; }
+    const vw = v.videoWidth, vh = v.videoHeight, ar = vw / vh;
+    let cw = vw, chh = vh, cx = 0, cy = 0;
+    if (ar > W / H) { cw = vh * W / H; cx = (vw - cw) / 2; } else { chh = vw * H / W; cy = (vh - chh) / 2; }
+    s.filter = P.grade; s.fillStyle = '#000'; s.fillRect(0, 0, W, H);
+    s.drawImage(v, cx, cy, cw, chh, this.wx - 2, this.wy - 2, W + 4, H + 4);
+    s.filter = 'none';
+    const sd = s.getImageData(0, 0, W, H).data, od = this.outImg.data, vig = this.vig;
+    const ch = fx.chroma ? Math.round(Math.max(1, P.chroma) * k) : 0;
+    const grain = fx.static ? P.grain * k * 255 : 0;
+    const flick = fx.flicker ? 1 + (Math.random() - .5) * .08 * k : 1;
+    const scanMul = fx.scan ? Math.max(.4, 1 - .26 * k) : 1;
+    if (fx.tracking) { this.trackY += 1.6; if (this.trackY > H + 60) this.trackY = -60 - Math.random() * 300; }
+    const tt = this.frame * .2;
+    for (let y = 0; y < H; y++) {
+      let shift = 0, glow = 0;
+      if (fx.tracking) {
+        const dd = y - this.trackY;
+        if (dd >= 0 && dd < 40) { shift = Math.round(Math.sin(dd * .35 + tt) * 7 * k); glow = 28 * k * (1 - dd / 40); }
+        if (Math.random() < .0015 * k) shift += (Math.random() * 14 - 7) | 0;
+      }
+      const sl = (y & 1) ? scanMul : 1, row = y * W;
+      for (let x = 0; x < W; x++) {
+        let sx = x + shift; sx = sx < 0 ? 0 : sx >= W ? W - 1 : sx;
+        const xr = sx + ch >= W ? W - 1 : sx + ch, xb = sx - ch < 0 ? 0 : sx - ch;
+        const m = sl * flick * (fx.vignette ? vig[row + x] : 1), n = grain ? (Math.random() - .5) * grain : 0, i = (row + x) * 4;
+        od[i] = sd[(row + xr) * 4] * m + n + glow;
+        od[i + 1] = sd[(row + sx) * 4 + 1] * m + n + glow;
+        od[i + 2] = sd[(row + xb) * 4 + 2] * m + n + glow;
+        od[i + 3] = 255;
+      }
+    }
+    o.putImageData(this.outImg, 0, 0);
+    if (fx.dust) {
+      const cnt = Math.random() < .5 ? 0 : Math.ceil(Math.random() * 3 * k);
+      for (let j = 0; j < cnt; j++) {
+        o.fillStyle = Math.random() < .5 ? 'rgba(15,10,5,.75)' : 'rgba(255,250,235,.7)';
+        o.beginPath(); o.ellipse(Math.random() * W, Math.random() * H, 1 + Math.random() * 2.5, 1 + Math.random() * 2, Math.random() * 3, 0, 7); o.fill();
+      }
+      if (Math.random() < .04 * k) {
+        o.strokeStyle = 'rgba(15,10,5,.6)'; o.lineWidth = 1; o.beginPath();
+        const hx = Math.random() * W, hy = Math.random() * H; o.moveTo(hx, hy);
+        o.bezierCurveTo(hx + 20, hy + 10, hx - 10, hy + 30, hx + 15, hy + 45); o.stroke();
+      }
+      if (Math.random() < .02 * k) { o.fillStyle = 'rgba(255,250,235,.18)'; o.fillRect(Math.random() * W, 0, 1, H); }
+    }
+    const txt = (t, x, y, align, color) => {
+      o.textAlign = align; o.fillStyle = 'rgba(255,0,60,.55)'; o.fillText(t, x + 2, y); o.fillStyle = 'rgba(0,200,255,.55)'; o.fillText(t, x - 2, y);
+      o.fillStyle = color || '#e9f4ea'; o.fillText(t, x, y);
+    };
+    o.font = '30px VT323, monospace'; o.textBaseline = 'alphabetic';
+    if (fx.osd) {
+      if (preset === 'cam') { if (Math.floor(this.frame / 30) % 2) { o.fillStyle = '#ff2a2a'; o.beginPath(); o.arc(48, 46, 8, 0, 7); o.fill(); } txt('REC', 62, 56, 'left'); }
+      else txt(playing ? 'PLAY ▶' : 'PAUSE ❚❚', 40, 56, 'left');
+      txt(preset === 'cam' ? 'SP 0:' + this.mmss(v.currentTime) : 'CH 03', W - 40, 56, 'right');
+      if (!fx.date) txt(this.tc(v.currentTime), W - 40, H - 34, 'right');
+      if (!fx.date) txt(preset === 'vhs' ? 'SP' : preset.toUpperCase(), 40, H - 34, 'left');
+    }
+    if (fx.date) {
+      o.font = '34px VT323, monospace';
+      const d = new Date(); const mo = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][d.getMonth()];
+      txt(`${mo} ${d.getDate()} 1994`, W - 40, H - 66, 'right', '#ffb43a');
+      txt(`${((d.getHours() + 11) % 12) + 1}:${String(d.getMinutes()).padStart(2, '0')} ${d.getHours() < 12 ? 'AM' : 'PM'}`, W - 40, H - 34, 'right', '#ffb43a');
+    }
+  }
+  mmss(s) { s = Math.floor(s || 0); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
+  tc(s) { s = Math.floor(s || 0); return `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
+  flash(err) { clearTimeout(this.errT); this.setState({ err }); this.errT = setTimeout(() => this.setState({ err: '' }), 3200); }
+  ensureAudio() {
+    if (this.actx) return;
+    try {
+      const A = window.AudioContext || window.webkitAudioContext; this.actx = new A();
+      const srcNode = this.actx.createMediaElementSource(this.videoRef.current);
+      this.gain = this.actx.createGain(); this.gain.gain.value = this.state.muted ? 0 : 1;
+      this.recDest = this.actx.createMediaStreamDestination();
+      srcNode.connect(this.gain); this.gain.connect(this.actx.destination); srcNode.connect(this.recDest);
+    } catch (e) { this.actx = null; }
+  }
+  load(file) {
+    if (!file) return;
+    if (!file.type.startsWith('video')) return this.flash('NOT A VIDEO TAPE');
+    const max = this.props.maxUploadMB ?? 100;
+    if (file.size > max * 1024 * 1024) return this.flash(`TAPE TOO LONG · MAX ${max} MB`);
+    if (this.state.exporting) this.stopExport();
+    this.ensureAudio(); this.actx && this.actx.resume();
+    if (this.state.src) URL.revokeObjectURL(this.state.src);
+    const src = URL.createObjectURL(file);
+    this.setState({ src, name: file.name, t: 0 }, () => { const v = this.videoRef.current; v.src = src; v.play().catch(() => {}); });
+  }
+  startExport() {
+    const v = this.videoRef.current; if (!v || !window.MediaRecorder) return this.flash('RECORDING NOT SUPPORTED');
+    this.ensureAudio(); this.actx && this.actx.resume();
+    const stream = this.outRef.current.captureStream(30);
+    if (this.recDest) this.recDest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+    const mime = ['video/mp4;codecs=avc1,mp4a', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+    const rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 6e6 } : undefined);
+    const chunks = []; rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+    rec.onstop = () => {
+      const type = rec.mimeType || 'video/webm', ext = type.includes('mp4') ? 'mp4' : 'webm';
+      const url = URL.createObjectURL(new Blob(chunks, { type }));
+      const a = document.createElement('a'); a.href = url; a.download = `${this.state.name.replace(/\.[^.]+$/, '')}-rewind-${this.state.preset}.${ext}`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+      v.loop = true; this.setState({ exporting: false });
+    };
+    this.rec = rec; v.loop = false; v.pause(); v.currentTime = 0;
+    rec.start(500); this.setState({ exporting: true }); v.play().catch(() => {});
+  }
+  stopExport() { if (this.rec && this.rec.state !== 'inactive') this.rec.stop(); }
+  renderVals() {
+    const { src, playing, muted, t, dur, preset, fx, intensity, dark, name, fxOpen, ui, err, exporting } = this.state;
+    const ink = dark ? '#f1e6cf' : '#c4472b', ground = dark ? '#22392a' : '#f1e6cf';
+    const showUI = ui || !playing || fxOpen || exporting || !src;
+    const fade = { opacity: showUI ? 1 : 0, pointerEvents: showUI ? 'auto' : 'none', transition: 'opacity .4s' };
+    return {
+      videoRef: this.videoRef, outRef: this.outRef, blinkRef: this.blinkRef, fileRef: this.fileRef, rootRef: this.rootRef,
+      pageStyle: { height: '100vh', width: '100vw', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: ground, color: ink, transition: 'background .6s, color .6s', cursor: showUI ? 'auto' : 'none' },
+      glowStyle: { position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 45% 45% at 42% 50%, rgba(242,181,68,.22), transparent 70%)', opacity: dark && playing ? 1 : dark ? .4 : 0, transition: 'opacity .8s', pointerEvents: 'none' },
+      tvImgStyle: { width: '100%', height: '100%', display: 'block', filter: dark ? 'sepia(.6) brightness(.6) contrast(1.1)' : 'sepia(.5) contrast(1.05)', transition: 'filter .6s' },
+      navStyle: { position: 'absolute', top: 16, left: 24, right: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, ...fade },
+      dockStyle: { position: 'absolute', bottom: 18, left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 14px', background: ground, color: ink, border: `1.5px solid ${ink}`, boxShadow: `4px 4px 0 ${dark ? '#c4472b' : '#f2b544'}`, maxWidth: 'calc(100vw - 32px)', boxSizing: 'border-box', ...fade },
+      noTape: !src, maxMB: this.props.maxUploadMB ?? 100, hasErr: !!err, err,
+      fileLabel: src ? name.toLowerCase() : 'no tape loaded',
+      playLabel: playing ? 'pause' : 'play', muteLabel: muted ? 'unmute' : 'mute', lightsLabel: dark ? 'lights on' : 'lights off',
+      fxOpen, fxArrow: fxOpen ? '▾' : '▴', intensity,
+      fxBtnStyle: { ...BTN, border: '1.5px solid currentColor', boxShadow: '2px 2px 0 currentColor', padding: '7px 14px', background: fxOpen ? '#f2b544' : 'transparent', color: fxOpen ? '#22392a' : 'inherit' },
+      exportLabel: exporting ? `stop · ${dur ? Math.round(t / dur * 100) : 0}%` : 'download ↓',
+      presets: Object.entries(PRESETS).map(([id, p]) => ({ label: p.label, pick: () => this.setState({ preset: id, fx: { ...p.fx } }),
+        style: { ...BTN, border: 0, padding: '8px 12px', ...(preset === id ? { background: '#f2b544', color: '#22392a' } : { background: 'transparent', color: 'inherit' }) } })),
+      fxList: FX.map(([id, label]) => ({ label, toggle: () => this.setState(s => ({ fx: { ...s.fx, [id]: s.fx[id] ? 0 : 1 } })),
+        style: { ...BTN, border: '1.5px solid currentColor', padding: '5px 10px', ...(fx[id] ? { background: '#f2b544', color: '#22392a', borderColor: '#f2b544' } : { background: 'transparent', color: 'inherit' }) } })),
+      onIntensity: e => this.setState({ intensity: +e.target.value }),
+      poke: () => { if (!this.state.ui) this.setState({ ui: true }); clearTimeout(this.uiT); this.uiT = setTimeout(() => this.setState({ ui: false }), 2500); },
+      onTime: e => this.setState({ t: e.target.currentTime, dur: e.target.duration || 0 }),
+      onPlay: () => this.setState({ playing: true }), onPause: () => this.setState({ playing: false }),
+      onEnded: () => { if (this.state.exporting) this.stopExport(); },
+      pickFile: () => this.fileRef.current.click(),
+      onFile: e => { this.load(e.target.files[0]); e.target.value = ''; },
+      onScreenClick: () => { if (!src) return this.fileRef.current.click(); const v = this.videoRef.current; v.paused ? v.play() : v.pause(); },
+      onDragOver: e => e.preventDefault(),
+      onDrop: e => { e.preventDefault(); this.load(e.dataTransfer.files[0]); },
+      togglePlay: () => { const v = this.videoRef.current; this.actx && this.actx.resume(); v.paused ? v.play() : v.pause(); },
+      toggleMute: () => { const m = !muted; if (this.gain) this.gain.gain.value = m ? 0 : 1; else this.videoRef.current.muted = m; this.setState({ muted: m }); },
+      toggleFx: () => this.setState({ fxOpen: !fxOpen }),
+      onExport: () => exporting ? this.stopExport() : this.startExport(),
+      toggleLights: () => this.setState({ dark: !dark }),
+      goFull: () => { const r = this.rootRef.current; if (document.fullscreenElement) document.exitFullscreen(); else r && r.requestFullscreen && r.requestFullscreen().catch(() => {}); }
+    };
+  }
+}
+</script>
+</body>
+</html>

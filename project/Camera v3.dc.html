@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500&family=Figtree:wght@400;500;600&family=VT323&display=swap">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#1a120b;font-family:'Figtree',sans-serif;color:#f3e9dc}
+a{color:#f3e9dc}a:hover{color:#f6c98e}
+button:focus-visible,[tabindex]:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #f6c98e;outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</helmet>
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:90;pointer-events:none"><div style="{{ onTop }}"></div><div style="{{ onBot }}"></div><div style="{{ offLine }}"></div></div>
+<div onDragOver="{{ onDragOver }}" onDrop="{{ onDrop }}" style="position:relative;height:100vh;width:100vw;overflow:hidden">
+  <div style="{{ stageStyle }}">
+    <img src="assets/camera-room-bg.png" alt="A sunlit desk with a film camera, rolls of film and photos pinned to the wall" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none">
+  </div>
+  <input ref="{{ fileRef }}" type="file" accept="image/*" multiple="{{ true }}" onChange="{{ onFiles }}" style="display:none">
+
+  <main style="{{ panelStyle }}" aria-label="Camera Room">
+    <header style="display:flex;align-items:flex-start;gap:16px;padding:clamp(20px,3vh,34px) clamp(20px,3.4vw,52px) 0">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <h1 style="margin:0;font-family:'Caveat',cursive;font-weight:400;font-size:clamp(38px,4vw,56px);line-height:1;letter-spacing:.02em;color:#f6eee2">Camera Room</h1>
+          <svg width="44" height="40" viewBox="0 0 44 40" fill="none" stroke="#f6eee2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13h7l3-5h12l3 5h7a2 2 0 0 1 2 2v17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z"></path><circle cx="22" cy="23" r="7"></circle><circle cx="22" cy="23" r="3.5"></circle><path d="M40 6v4M38 8h4"></path></svg>
+        </div>
+        <span style="font-family:'Caveat',cursive;font-size:clamp(18px,1.6vw,23px);letter-spacing:.12em;color:rgba(246,238,226,.82)">Turn your moments into 90s keepsakes.</span>
+      </div>
+      <a href="Home.dc.html" onClick="{{ goHome }}" aria-label="Close and go back to the room" style="width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%;color:#f6eee2;text-decoration:none" style-hover="background:rgba(255,240,220,.1)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></a>
+    </header>
+
+    <nav role="tablist" aria-label="Tools" style="margin:clamp(14px,2vh,22px) clamp(20px,3.4vw,52px) 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:3px;border-radius:12px;border-top:1px solid rgba(255,240,220,.12);border-bottom:1px solid rgba(255,240,220,.12)">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+        <button role="tab" aria-selected="{{ t.on }}" onClick="{{ t.pick }}" style="{{ t.style }}" style-hover="background:rgba(255,240,220,.1)">{{ t.label }}</button>
+      </sc-for>
+    </nav>
+
+    <div style="flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;padding:clamp(14px,2.4vh,26px) clamp(20px,3.4vw,52px) clamp(18px,3vh,30px)">
+      <sc-if value="{{ empty }}" hint-placeholder-val="{{ true }}">
+        <div style="min-height:min(52vh,460px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;border-radius:18px;border:1px dashed rgba(255,240,220,.28);background:rgba(255,240,220,.04);padding:32px 20px">
+          <svg width="54" height="48" viewBox="0 0 44 40" fill="none" stroke="rgba(246,238,226,.8)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13h7l3-5h12l3 5h7a2 2 0 0 1 2 2v17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z"></path><circle cx="22" cy="23" r="7"></circle></svg>
+          <span style="font-family:'Caveat',cursive;font-size:34px;line-height:1;color:#f6eee2">Bring in your roll.</span>
+          <span style="max-width:340px;font-size:14px;line-height:1.5;color:rgba(243,233,220,.7);text-wrap:pretty">Add a few photos and give them a 90s life. Everything is developed right here on your device — nothing is uploaded.</span>
+          <button onClick="{{ pickFiles }}" style="height:46px;padding:0 26px;border-radius:12px;border:0;background:#efe3d0;color:#2a1f16;font-family:'Figtree',sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:10px" style-hover="background:#f8eedf" style-active="transform:translateY(1px)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Add Photos</button>
+          <span style="font-size:11px;letter-spacing:.08em;color:rgba(243,233,220,.5)">JPG, PNG OR WEBP · UP TO 25 MB EACH · OR DROP THEM HERE</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasPhotos }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-wrap:wrap;gap:clamp(18px,2.4vw,36px);align-items:flex-start">
+          <section style="flex:1.15 1 340px;min-width:0;display:flex;flex-direction:column;gap:12px">
+            <div style="position:relative;display:flex;align-items:center;gap:6px">
+              <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ prevPhoto }}" aria-label="Previous photo" disabled="{{ single }}" style="width:30px;height:44px;flex-shrink:0;border:0;background:transparent;color:#f6eee2;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:rgba(255,240,220,.1)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+              </sc-if>
+              <div style="{{ previewBox }}">
+                <canvas ref="{{ previewRef }}" style="{{ previewCanvas }}"></canvas>
+                <sc-if value="{{ busy }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:12px;top:10px;font-family:'VT323',monospace;font-size:16px;color:rgba(246,238,226,.75)">DEVELOPING…</span></sc-if>
+              </div>
+              <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ nextPhoto }}" aria-label="Next photo" disabled="{{ single }}" style="width:30px;height:44px;flex-shrink:0;border:0;background:transparent;color:#f6eee2;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:rgba(255,240,220,.1)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"></path></svg></button>
+              </sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+                <span style="font-size:13px;color:rgba(243,233,220,.75)">{{ rollTitle }}</span>
+                <span style="font-size:11px;color:rgba(243,233,220,.55);text-align:right">{{ rollHint }}</span>
+              </div>
+              <div style="display:flex;gap:8px;overflow-x:auto;padding:4px 2px 6px;scrollbar-width:thin">
+                <sc-for list="{{ thumbs }}" as="p" hint-placeholder-count="3">
+                  <div style="position:relative;flex-shrink:0">
+                    <button onClick="{{ p.pick }}" aria-label="{{ p.aria }}" aria-pressed="{{ p.on }}" style="{{ p.style }}"><img src="{{ p.url }}" alt="" style="{{ p.imgStyle }}"></button>
+                    <sc-if value="{{ p.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:4px;top:4px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:#efe3d0;color:#2a1f16;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;pointer-events:none">{{ p.badge }}</span></sc-if>
+                    <sc-if value="{{ p.canRemove }}" hint-placeholder-val="{{ false }}"><button onClick="{{ p.remove }}" aria-label="{{ p.removeAria }}" style="position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,240,220,.35);background:rgba(30,22,16,.85);color:#f6eee2;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:#7a3324"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></sc-if>
+                  </div>
+                </sc-for>
+                <button onClick="{{ pickFiles }}" aria-label="Add photos" style="width:60px;height:60px;flex-shrink:0;border-radius:10px;border:1px dashed rgba(255,240,220,.4);background:rgba(255,240,220,.05);color:#f6eee2;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;font-size:10px" style-hover="background:rgba(255,240,220,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Add</button>
+              </div>
+            </div>
+          </section>
+
+          <section style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:18px;padding-left:clamp(0px,1.6vw,26px);border-left:1px solid rgba(255,240,220,.12)">
+            <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:18px">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:18px;color:#f6eee2">Presets</span><span style="font-size:12px;color:rgba(243,233,220,.62)">Give your photos a 90s feel.</span></div>
+                  <div style="display:flex;gap:10px;overflow-x:auto;padding:4px 2px 6px;scrollbar-width:thin">
+                    <sc-for list="{{ presets }}" as="m" hint-placeholder-count="7">
+                      <button onClick="{{ m.pick }}" aria-pressed="{{ m.on }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;width:64px;border:0;background:transparent;padding:0;cursor:pointer;color:#f3e9dc">
+                        <span style="{{ m.frame }}"><img src="{{ m.thumb }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+                        <span style="{{ m.labelStyle }}">{{ m.label }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <sc-for list="{{ sliders }}" as="s" hint-placeholder-count="5">
+                    <div style="display:flex;align-items:center;gap:14px">
+                      <span style="width:78px;flex-shrink:0;font-size:14px;color:#f3e9dc">{{ s.label }}</span>
+                      <div role="slider" tabIndex="0" aria-label="{{ s.label }}" aria-valuemin="{{ s.min }}" aria-valuemax="100" aria-valuenow="{{ s.val }}" onPointerDown="{{ s.down }}" onKeyDown="{{ s.key }}" style="position:relative;flex:1;height:26px;cursor:pointer;touch-action:none;border-radius:4px">
+                        <div style="position:absolute;left:0;right:0;top:12px;height:2px;border-radius:1px;background:rgba(255,240,220,.2)"></div>
+                        <div style="{{ s.fill }}"></div>
+                        <div style="{{ s.thumb }}"></div>
+                      </div>
+                      <span style="width:30px;text-align:right;font-size:13px;font-variant-numeric:tabular-nums;color:#f3e9dc">{{ s.val }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="border-top:1px solid rgba(255,240,220,.12);padding-top:16px;display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;color:#f6eee2">Date Stamp</span><span style="font-size:12px;color:rgba(243,233,220,.62)">Add a classic camcorder date.</span></div>
+                    <button onClick="{{ toggleStamp }}" role="switch" aria-checked="{{ stampOn }}" aria-label="Date stamp" style="{{ stampTrack }}"><span style="{{ stampDot }}"></span></button>
+                  </div>
+                  <div style="{{ stampRow }}">
+                    <input type="date" value="{{ dateISO }}" onChange="{{ onDate }}" aria-label="Stamp date" style="flex:1 1 150px;min-width:0;height:42px;box-sizing:border-box;padding:0 12px;border-radius:10px;border:1px solid rgba(255,240,220,.25);background:rgba(20,14,9,.28);color:#f3e9dc;font-family:'Figtree',sans-serif;font-size:14px;color-scheme:dark">
+                    <div style="display:flex;gap:4px;padding:3px;border-radius:10px;border:1px solid rgba(255,240,220,.18)">
+                      <sc-for list="{{ stampStyles }}" as="ss" hint-placeholder-count="3">
+                        <button onClick="{{ ss.pick }}" aria-pressed="{{ ss.on }}" title="{{ ss.name }}" style="{{ ss.style }}">{{ ss.sample }}</button>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                  <div style="flex:1 1 120px;display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;color:#f6eee2">Border</span><span style="font-size:12px;color:rgba(243,233,220,.62)">Choose a film frame.</span></div>
+                  <div style="display:flex;gap:10px">
+                    <sc-for list="{{ borders }}" as="b" hint-placeholder-count="4">
+                      <button onClick="{{ b.pick }}" aria-pressed="{{ b.on }}" aria-label="{{ b.name }}" title="{{ b.name }}" style="{{ b.style }}"><span style="{{ b.inner }}"></span></button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:4px">
+                  <div style="display:flex;gap:4px;padding:3px;border-radius:12px;border:1px solid rgba(255,240,220,.18)">
+                    <sc-for list="{{ formats }}" as="f" hint-placeholder-count="2">
+                      <button onClick="{{ f.pick }}" aria-pressed="{{ f.on }}" style="{{ f.style }}">{{ f.label }}</button>
+                    </sc-for>
+                  </div>
+                  <button onClick="{{ downloadPhoto }}" style="flex:1 1 180px;height:46px;border-radius:12px;border:0;background:#efe3d0;color:#2a1f16;font-family:'Figtree',sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:#f8eedf" style-active="transform:translateY(1px)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"></path></svg>Download Photo</button>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isStrip }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:18px">
+                <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:18px;color:#f6eee2">Film Strip</span><span style="font-size:12px;color:rgba(243,233,220,.62)">A strip of developed 35mm frames.</span></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <span style="font-size:13px;color:rgba(243,233,220,.75)">Layout</span>
+                  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+                    <sc-for list="{{ stripLayouts }}" as="o" hint-placeholder-count="3">
+                      <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="{{ o.style }}">{{ o.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <sc-for list="{{ stripToggles }}" as="g" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;color:#f6eee2">{{ g.label }}</span><span style="font-size:12px;color:rgba(243,233,220,.62)">{{ g.desc }}</span></div>
+                      <button onClick="{{ g.toggle }}" role="switch" aria-checked="{{ g.on }}" aria-label="{{ g.label }}" style="{{ g.track }}"><span style="{{ g.dot }}"></span></button>
+                    </div>
+                  </sc-for>
+                </div>
+                <button onClick="{{ downloadCompose }}" disabled="{{ noPicks }}" style="height:46px;border-radius:12px;border:0;background:#efe3d0;color:#2a1f16;font-family:'Figtree',sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:#f8eedf" style-active="transform:translateY(1px)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"></path></svg>Download Strip · PNG</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isSheet }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:18px">
+                <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:18px;color:#f6eee2">Contact Sheet</span><span style="font-size:12px;color:rgba(243,233,220,.62)">The whole roll on one page.</span></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <span style="font-size:13px;color:rgba(243,233,220,.75)">Grid</span>
+                  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">
+                    <sc-for list="{{ sheetGrids }}" as="o" hint-placeholder-count="3">
+                      <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="{{ o.style }}">{{ o.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:14px">
+                  <span style="width:78px;flex-shrink:0;font-size:14px;color:#f3e9dc">Spacing</span>
+                  <div role="slider" tabIndex="0" aria-label="Spacing" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ gapVal }}" onPointerDown="{{ gapDown }}" onKeyDown="{{ gapKey }}" style="position:relative;flex:1;height:26px;cursor:pointer;touch-action:none;border-radius:4px">
+                    <div style="position:absolute;left:0;right:0;top:12px;height:2px;border-radius:1px;background:rgba(255,240,220,.2)"></div>
+                    <div style="{{ gapFill }}"></div>
+                    <div style="{{ gapThumb }}"></div>
+                  </div>
+                  <span style="width:30px;text-align:right;font-size:13px;color:#f3e9dc">{{ gapVal }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:14px">
+                  <span style="width:78px;flex-shrink:0;font-size:14px;color:#f3e9dc">Paper</span>
+                  <div style="display:flex;gap:10px">
+                    <sc-for list="{{ sheetBgs }}" as="c" hint-placeholder-count="3">
+                      <button onClick="{{ c.pick }}" aria-pressed="{{ c.on }}" aria-label="{{ c.name }}" title="{{ c.name }}" style="{{ c.style }}"></button>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;color:#f6eee2">Captions</span><span style="font-size:12px;color:rgba(243,233,220,.62)">Frame number and date under each shot.</span></div>
+                  <button onClick="{{ toggleCaptions }}" role="switch" aria-checked="{{ captionsOn }}" aria-label="Captions" style="{{ captionsTrack }}"><span style="{{ captionsDot }}"></span></button>
+                </div>
+                <button onClick="{{ downloadCompose }}" disabled="{{ noPicks }}" style="height:46px;border-radius:12px;border:0;background:#efe3d0;color:#2a1f16;font-family:'Figtree',sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:#f8eedf" style-active="transform:translateY(1px)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"></path></svg>Download Sheet · PNG</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isPrints }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:18px">
+                <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:18px;color:#f6eee2">Prints</span><span style="font-size:12px;color:rgba(243,233,220,.62)">Back from the one-hour photo lab.</span></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ printLayouts }}" as="o" hint-placeholder-count="3">
+                    <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="{{ o.style }}"><span style="font-size:15px">{{ o.label }}</span><span style="font-size:12px;opacity:.7">{{ o.desc }}</span></button>
+                  </sc-for>
+                </div>
+                <button onClick="{{ downloadCompose }}" disabled="{{ noPicks }}" style="height:46px;border-radius:12px;border:0;background:#efe3d0;color:#2a1f16;font-family:'Figtree',sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:#f8eedf" style-active="transform:translateY(1px)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"></path></svg>Download Print · PNG</button>
+              </div>
+            </sc-if>
+          </section>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:absolute;left:50%;bottom:24px;transform:translateX(-50%);z-index:20;max-width:calc(100vw - 32px);padding:12px 18px;border-radius:12px;background:rgba(30,22,16,.85);border:1px solid rgba(255,240,220,.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:14px;color:#f3e9dc">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PRESETS = {
+  original: { label: 'Original', grain: 0, fade: 0, vignette: 0, warmth: 0, blur: 0, tone: { con: 1, sat: 1, bright: 0, tint: [0, 0, 0], flash: 0 } },
+  film90: { label: '90s', grain: 35, fade: 20, vignette: 15, warmth: 8, blur: 8, tone: { con: .96, sat: .9, bright: 2, tint: [3, 1, -2], flash: 0 } },
+  grain: { label: 'Film Grain', grain: 60, fade: 10, vignette: 20, warmth: 2, blur: 12, tone: { con: 1.02, sat: .94, bright: 0, tint: [0, 1, 0], flash: 0 } },
+  warm: { label: 'Warm Fade', grain: 25, fade: 42, vignette: 12, warmth: 22, blur: 6, tone: { con: .92, sat: .86, bright: 4, tint: [4, 2, -3], flash: 0 } },
+  cool: { label: 'Cool Tone', grain: 25, fade: 18, vignette: 15, warmth: -24, blur: 6, tone: { con: .98, sat: .88, bright: 0, tint: [-2, 2, 5], flash: 0 } },
+  flash: { label: 'Flash', grain: 30, fade: 8, vignette: 48, warmth: 6, blur: 4, tone: { con: 1.12, sat: 1.04, bright: 10, tint: [2, 0, 0], flash: 1 } },
+  bw: { label: 'Black & White', grain: 40, fade: 14, vignette: 22, warmth: 0, blur: 8, tone: { con: 1.1, sat: 0, bright: 0, tint: [0, 0, 0], flash: 0 } }
+};
+const PKEYS = Object.keys(PRESETS);
+const SLIDERS = [['grain', 'Grain'], ['fade', 'Fade'], ['vignette', 'Vignette'], ['warmth', 'Warmth'], ['blur', 'Blur']];
+const STAMPS = { classic: { name: 'Classic orange', color: '#ff8a3c', fmt: d => `${['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][d.m]} ${d.d} ${d.y}` },
+  digital: { name: 'Digital red', color: '#ff5a32', fmt: d => `'${String(d.y).slice(2)} ${String(d.m + 1).padStart(2, '0')} ${String(d.d).padStart(2, '0')}` },
+  amber: { name: 'Amber', color: '#ffc75a', fmt: d => `${String(d.m + 1).padStart(2, '0')}.${String(d.d).padStart(2, '0')}.${String(d.y).slice(2)}` } };
+const BORDERS = [['black', 'Black film frame'], ['sprocket', '35mm with sprockets'], ['white', 'White print border'], ['none', 'No border']];
+const MAXMB = 25;
+const parseDate = iso => { const [y, m, d] = (iso || '1997-10-26').split('-').map(Number); return { y, m: (m || 10) - 1, d: d || 26 }; };
+const defEdits = () => { const p = PRESETS.film90; return { preset: 'film90', grain: p.grain, fade: p.fade, vignette: p.vignette, warmth: p.warmth, blur: p.blur, stamp: true, date: '1997-10-26', stampStyle: 'classic', border: 'none' }; };
+const mk = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; };
+
+function develop(img, ed, maxSide, withExtras = true) {
+  const s = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.round(img.naturalWidth * s), h = Math.round(img.naturalHeight * s);
+  const c = mk(w, h), x = c.getContext('2d', { willReadFrequently: true });
+  const T = PRESETS[ed.preset].tone, bl = ed.blur / 100 * 1.4 * Math.max(w, h) / 1000;
+  x.filter = bl > .05 ? `blur(${bl.toFixed(2)}px)` : 'none';
+  x.drawImage(img, 0, 0, w, h); x.filter = 'none';
+  const id = x.getImageData(0, 0, w, h), d = id.data;
+  const con = T.con, sat = T.sat, br = T.bright, [tr, tg, tb] = T.tint, W = ed.warmth, f = ed.fade / 100, V = ed.vignette / 100, G = ed.grain / 100 * 34, fl = T.flash;
+  const fA = 1 - .26 * f, fB = 36 * f;
+  for (let y = 0; y < h; y++) {
+    const dy = y / h - .5;
+    for (let xx = 0; xx < w; xx++) {
+      const i = (y * w + xx) * 4, dx = xx / w - .5, d2 = (dx * dx + dy * dy) * 2;
+      let r = d[i], g = d[i + 1], b = d[i + 2];
+      r = (r - 128) * con + 128 + br; g = (g - 128) * con + 128 + br; b = (b - 128) * con + 128 + br;
+      const l = .299 * r + .587 * g + .114 * b;
+      r = l + (r - l) * sat + W * .32 + tr; g = l + (g - l) * sat + W * .07 + tg; b = l + (b - l) * sat - W * .32 + tb;
+      if (fl) { const k = (1 - Math.min(1, d2 * 1.4)) * 26; r += k; g += k; b += k * .9; }
+      r = r * fA + fB + 3 * f; g = g * fA + fB; b = b * fA + fB - 2 * f;
+      const m = 1 - V * .75 * d2 * (.4 + .6 * d2);
+      const n = G ? (Math.random() - .5) * G * (1 - Math.abs(l - 128) / 300) : 0;
+      d[i] = r * m + n; d[i + 1] = g * m + n; d[i + 2] = b * m + n;
+    }
+  }
+  x.putImageData(id, 0, 0);
+  if (!withExtras) return c;
+  if (ed.stamp) {
+    const st = STAMPS[ed.stampStyle] || STAMPS.classic, txt = st.fmt(parseDate(ed.date)), fs = Math.max(12, Math.min(w, h) * .062);
+    x.font = `${fs}px VT323, monospace`; x.textAlign = 'right'; x.textBaseline = 'alphabetic';
+    x.shadowColor = st.color; x.shadowBlur = fs * .35; x.fillStyle = st.color; x.globalAlpha = .92;
+    x.fillText(txt, w - fs * .9, h - fs * .75); x.shadowBlur = 0; x.globalAlpha = .55; x.fillText(txt, w - fs * .9, h - fs * .75); x.globalAlpha = 1;
+  }
+  return frame(c, ed.border);
+}
+function frame(c, kind) {
+  const w = c.width, h = c.height, u = Math.max(w, h);
+  if (kind === 'white') { const p = u * .045, o = mk(w + p * 2, h + p * 2), x = o.getContext('2d'); x.fillStyle = '#f3eee4'; x.fillRect(0, 0, o.width, o.height); x.drawImage(c, p, p); x.strokeStyle = 'rgba(0,0,0,.08)'; x.strokeRect(p, p, w, h); return o; }
+  if (kind === 'black') { const p = u * .03, o = mk(w + p * 2, h + p * 2), x = o.getContext('2d'); x.fillStyle = '#141110'; x.fillRect(0, 0, o.width, o.height); x.save(); x.beginPath(); x.roundRect(p, p, w, h, u * .01); x.clip(); x.drawImage(c, p, p); x.restore(); return o; }
+  if (kind === 'sprocket') {
+    const band = h * .16, side = w * .02, o = mk(w + side * 2, h + band * 2), x = o.getContext('2d');
+    x.fillStyle = '#17120f'; x.fillRect(0, 0, o.width, o.height);
+    x.save(); x.beginPath(); x.roundRect(side, band, w, h, u * .008); x.clip(); x.drawImage(c, side, band); x.restore();
+    const n = Math.max(6, Math.round(o.width / (band * .9))), hw = band * .34, hh = band * .46;
+    x.globalCompositeOperation = 'destination-out';
+    for (let k = 0; k < n; k++) { const cx = (k + .5) * o.width / n - hw / 2; [band * .27, o.height - band * .27 - hh].forEach(cy => { x.beginPath(); x.roundRect(cx, cy, hw, hh, hw * .22); x.fill(); }); }
+    x.globalCompositeOperation = 'source-over';
+    x.fillStyle = 'rgba(224,160,70,.8)'; x.font = `${band * .2}px VT323, monospace`; x.textBaseline = 'middle';
+    x.fillText('RW 400', side * 2, band * .87); x.textAlign = 'right'; x.fillText('▸ 12A', o.width - side * 2, o.height - band * .87);
+    return o;
+  }
+  return c;
+}
+function cover(x, src, dx, dy, dw, dh, r = 0) {
+  const sw = src.width, sh = src.height, s = Math.max(dw / sw, dh / sh), cw = dw / s, ch = dh / s;
+  x.save(); if (r) { x.beginPath(); x.roundRect(dx, dy, dw, dh, r); x.clip(); }
+  x.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, dx, dy, dw, dh); x.restore();
+}
+function invertNeg(c) { const x = c.getContext('2d'), id = x.getImageData(0, 0, c.width, c.height), d = id.data; for (let i = 0; i < d.length; i += 4) { d[i] = (255 - d[i]) * .82 + 40; d[i + 1] = (255 - d[i + 1]) * .62 + 30; d[i + 2] = (255 - d[i + 2]) * .42 + 18; } x.putImageData(id, 0, 0); return c; }
+
+class Component extends DCLogic {
+  state = { photos: [], sel: null, tab: 'edit', picks: [], fmt: 'png', strip: { layout: 'horizontal', labels: true, stock: true }, sheet: { cols: 4, gap: 30, bg: 'paper', captions: true }, print: 'single', toast: '', busy: false, thumbs: {}, vw: window.innerWidth, vh: window.innerHeight };
+  els = {}; imgs = {};
+  fileRef = el => { this.els.file = el; };
+  previewRef = el => { this.els.preview = el; if (el) this.schedule(); };
+  componentDidMount() {
+    this._ps = () => this.setState({ off: 0, arrived: true }); window.addEventListener('pageshow', this._ps);
+    requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ arrived: true })));
+    this.onResize = () => this.setState({ vw: window.innerWidth, vh: window.innerHeight });
+    this.onKey = e => { if (this.state.tab !== 'edit' || !this.state.photos.length || /INPUT|SELECT/.test(e.target.tagName) || e.target.getAttribute('role') === 'slider') return; if (e.key === 'ArrowLeft') this.step(-1); if (e.key === 'ArrowRight') this.step(1); };
+    window.addEventListener('resize', this.onResize); window.addEventListener('keydown', this.onKey);
+    document.fonts && document.fonts.load('40px VT323').then(() => this.schedule());
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); window.removeEventListener('keydown', this.onKey); this.state.photos.forEach(p => URL.revokeObjectURL(p.url)); cancelAnimationFrame(this.raf); clearTimeout(this.toastT); }
+  componentDidUpdate(pp, ps) {
+    const s = this.state;
+    if (ps.photos !== s.photos || ps.sel !== s.sel || ps.tab !== s.tab || ps.picks !== s.picks || ps.strip !== s.strip || ps.sheet !== s.sheet || ps.print !== s.print) this.schedule();
+    if (ps.sel !== s.sel || ps.photos.length !== s.photos.length) this.makeThumbs();
+  }
+  say(t) { clearTimeout(this.toastT); this.setState({ toast: t }); this.toastT = setTimeout(() => this.setState({ toast: '' }), 3400); }
+  cur() { return this.state.photos.find(p => p.id === this.state.sel); }
+  schedule() { cancelAnimationFrame(this.raf); this.raf = requestAnimationFrame(() => { try { this.renderPreview(); } catch (e) { console.error(e); } }); }
+  renderPreview() {
+    const cv = this.els.preview; if (!cv) return; const s = this.state;
+    let out = null;
+    if (s.tab === 'edit') { const p = this.cur(); if (!p || !this.imgs[p.id]) return; out = develop(this.imgs[p.id], p.edits, 1100); }
+    else out = this.compose(.55);
+    const x = cv.getContext('2d');
+    if (!out) { cv.width = 600; cv.height = 400; x.clearRect(0, 0, 600, 400); x.fillStyle = 'rgba(243,233,220,.55)'; x.font = '22px Figtree, sans-serif'; x.textAlign = 'center'; x.fillText('Tap photos below to add them', 300, 205); return; }
+    cv.width = out.width; cv.height = out.height; x.clearRect(0, 0, out.width, out.height); x.drawImage(out, 0, 0);
+  }
+  pickedPhotos() { const m = new Map(this.state.photos.map(p => [p.id, p])); return this.state.picks.map(id => m.get(id)).filter(p => p && this.imgs[p.id]); }
+  compose(scale) {
+    const P = this.pickedPhotos(), s = this.state; if (!P.length) return null;
+    const dev = (p, side) => develop(this.imgs[p.id], { ...p.edits, border: 'none' }, side);
+    if (s.tab === 'strip') {
+      const L = s.strip.layout, vert = L === 'vertical', neg = L === 'negative';
+      const fw = 900 * scale, fh = fw * 2 / 3, gap = fw * .07, band = fh * .22, lead = fw * .22, n = P.length;
+      const len = lead * 2 + n * fw + (n - 1) * gap, thick = fh + band * 2;
+      const c = vert ? mk(thick, len) : mk(len, thick), x = c.getContext('2d');
+      const base = neg ? '#b0612a' : '#18130f';
+      x.fillStyle = base; x.fillRect(0, 0, c.width, c.height);
+      const g = vert ? x.createLinearGradient(0, 0, thick, 0) : x.createLinearGradient(0, 0, 0, thick);
+      g.addColorStop(0, 'rgba(255,255,255,.05)'); g.addColorStop(.5, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(255,255,255,.04)'); x.fillStyle = g; x.fillRect(0, 0, c.width, c.height);
+      const at = (along, across, w, h) => vert ? [across, along, h, w] : [along, across, w, h];
+      P.forEach((p, i) => {
+        const a = lead + i * (fw + gap); let img = dev(p, fw * 1.2);
+        if (neg) { const t = mk(fw, fh); cover(t.getContext('2d'), img, 0, 0, fw, fh); img = invertNeg(t); }
+        const [X, Y, Wd, Hd] = at(a, band, fw, fh);
+        cover(x, img, X, Y, Wd, Hd, fw * .012);
+      });
+      const pitch = (fw + gap) / 8, hw = pitch * .42, hh = band * .42; x.globalCompositeOperation = 'destination-out';
+      for (let a = pitch * .3; a < len - hw; a += pitch) [band * .29 - hh / 2, thick - band * .29 - hh / 2].forEach(ac => { const [X, Y, Wd, Hd] = at(a, ac, hw, hh); x.beginPath(); x.roundRect(X, Y, Wd, Hd, Math.min(Wd, Hd) * .25); x.fill(); });
+      x.globalCompositeOperation = 'source-over';
+      const ink = neg ? 'rgba(60,20,4,.85)' : 'rgba(226,158,64,.85)', fs = band * .22;
+      const text = (t, along, across, align) => { x.save(); x.fillStyle = ink; x.font = `${fs}px VT323, monospace`; x.textBaseline = 'middle'; x.textAlign = align || 'left';
+        if (vert) { x.translate(across, along); x.rotate(Math.PI / 2); x.fillText(t, 0, 0); } else x.fillText(t, along, across); x.restore(); };
+      P.forEach((p, i) => { const a = lead + i * (fw + gap), no = i * 2 + 1;
+        text(`${no}`, a + fw * .04, thick - band * .76); text(`▸ ${no}A`, a + fw * .52, thick - band * .76);
+        if (s.strip.stock && i % 2 === 0) text(neg ? 'RW 400 · SAFETY FILM' : 'RW 400 SAFETY FILM', a + fw * .3, band * .76);
+        if (s.strip.labels && p.edits.stamp) text(STAMPS[p.edits.stampStyle].fmt(parseDate(p.edits.date)), a + fw * .96, thick - band * .76, 'right'); });
+      return c;
+    }
+    if (s.tab === 'sheet') {
+      const cols = Math.min(s.sheet.cols, Math.max(1, P.length)), rows = Math.ceil(P.length / cols), cw = 600 * scale, ch = cw * 2 / 3, gap = (8 + s.sheet.gap * .9) * scale * 1.6, cap = s.sheet.captions ? cw * .12 : 0, m = 90 * scale, head = 80 * scale;
+      const BG = { paper: ['#f2ede3', '#2a241e'], black: ['#121010', '#e9e1d4'], kraft: ['#cdb48e', '#3a2a18'] }[s.sheet.bg];
+      const c = mk(m * 2 + cols * cw + (cols - 1) * gap, m * 2 + head + rows * (ch + cap) + (rows - 1) * gap), x = c.getContext('2d');
+      x.fillStyle = BG[0]; x.fillRect(0, 0, c.width, c.height);
+      x.fillStyle = BG[1]; x.font = `${30 * scale * 1.6}px VT323, monospace`; x.textBaseline = 'middle'; x.globalAlpha = .8;
+      x.fillText('CONTACT SHEET · ROLL 01', m, m + head * .35); x.textAlign = 'right'; x.fillText(`${P.length} EXP · RW 400`, c.width - m, m + head * .35); x.textAlign = 'left'; x.globalAlpha = 1;
+      P.forEach((p, i) => { const cx = m + (i % cols) * (cw + gap), cy = m + head + Math.floor(i / cols) * (ch + cap + gap);
+        x.fillStyle = '#0e0c0b'; x.fillRect(cx - 3 * scale, cy - 3 * scale, cw + 6 * scale, ch + 6 * scale);
+        cover(x, dev(p, cw * 1.3), cx, cy, cw, ch);
+        if (cap) { x.fillStyle = BG[1]; x.globalAlpha = .75; x.font = `${cap * .5}px VT323, monospace`; x.textBaseline = 'middle'; x.fillText(String(i + 1).padStart(2, '0'), cx, cy + ch + cap * .55); x.textAlign = 'right'; x.fillText(p.edits.stamp ? STAMPS[p.edits.stampStyle].fmt(parseDate(p.edits.date)) : '', cx + cw, cy + ch + cap * .55); x.textAlign = 'left'; x.globalAlpha = 1; } });
+      return c;
+    }
+    const paper = '#f4efe6', k = scale * 1.8;
+    if (s.print === 'booth') {
+      const Q = [0, 1, 2, 3].map(i => P[i % P.length]), w = 400 * k, side = w * .07, ph = w - side * 2, gp = side * .7, foot = w * .32;
+      const c = mk(w, side + 4 * ph + 3 * gp + foot), x = c.getContext('2d'); x.fillStyle = paper; x.fillRect(0, 0, c.width, c.height);
+      Q.forEach((p, i) => cover(x, dev(p, ph * 1.4), side, side + i * (ph + gp), ph, ph));
+      x.fillStyle = '#3a3029'; x.globalAlpha = .7; x.font = `${foot * .26}px VT323, monospace`; x.textAlign = 'center'; x.textBaseline = 'middle';
+      const p0 = Q[0]; x.fillText('PHOTO · BOOTH', w / 2, c.height - foot * .58); x.font = `${foot * .2}px VT323, monospace`; x.fillText(STAMPS.amber.fmt(parseDate(p0.edits.date)), w / 2, c.height - foot * .3); x.globalAlpha = 1; return c;
+    }
+    if (s.print === 'sheet') {
+      const Q = P.slice(0, 4), pw = 600 * k, ph = pw * 2 / 3, bd = pw * .045, gap = pw * .1, m = pw * .12;
+      const c = mk(m * 2 + 2 * (pw + bd * 2) + gap, m * 2 + 2 * (ph + bd * 2) + gap), x = c.getContext('2d'); x.fillStyle = '#e9e3d8'; x.fillRect(0, 0, c.width, c.height);
+      Q.forEach((p, i) => { const X = m + (i % 2) * (pw + bd * 2 + gap), Y = m + Math.floor(i / 2) * (ph + bd * 2 + gap);
+        x.fillStyle = 'rgba(0,0,0,.12)'; x.fillRect(X + 3 * k, Y + 4 * k, pw + bd * 2, ph + bd * 2); x.fillStyle = paper; x.fillRect(X, Y, pw + bd * 2, ph + bd * 2);
+        cover(x, develop(this.imgs[p.id], { ...p.edits, border: 'none' }, pw * 1.3), X + bd, Y + bd, pw, ph); });
+      x.strokeStyle = 'rgba(0,0,0,.25)'; x.lineWidth = 1 * k; const cm = m * .45;
+      [[m, m], [c.width - m, m], [m, c.height - m], [c.width - m, c.height - m]].forEach(([a, b]) => { x.beginPath(); x.moveTo(a - cm * Math.sign(a - c.width / 2) * -1, b); x.lineTo(a + cm * Math.sign(a - c.width / 2), b); x.moveTo(a, b + cm * Math.sign(b - c.height / 2)); x.lineTo(a, b); x.stroke(); });
+      return c;
+    }
+    const p = P.find(q => q.id === s.sel) || P[0], pw = 900 * k, ph = pw * 2 / 3, bd = pw * .05;
+    const c = mk(pw + bd * 2, ph + bd * 2), x = c.getContext('2d'); x.fillStyle = paper; x.fillRect(0, 0, c.width, c.height);
+    cover(x, develop(this.imgs[p.id], { ...p.edits, border: 'none' }, pw * 1.2), bd, bd, pw, ph); return c;
+  }
+  async makeThumbs() {
+    const p = this.cur(); if (!p || !this.imgs[p.id]) return; const key = p.id; if (this.state.thumbs[key]) return;
+    const out = {};
+    for (const k of PKEYS) { const P = PRESETS[k]; const c = develop(this.imgs[p.id], { preset: k, grain: P.grain, fade: P.fade, vignette: P.vignette, warmth: P.warmth, blur: 0, stamp: false, border: 'none' }, 140, false); out[k] = c.toDataURL('image/jpeg', .8); await new Promise(r => setTimeout(r, 0)); }
+    this.setState(s => ({ thumbs: { ...s.thumbs, [key]: out } }));
+  }
+  addFiles(list) {
+    const files = Array.from(list || []); if (!files.length) return;
+    let bad = 0, big = 0; this.setState({ busy: true });
+    const jobs = files.map(f => new Promise(res => {
+      if (!/^image\/(jpeg|png|webp|gif|bmp|avif)$/.test(f.type)) { bad++; return res(null); }
+      if (f.size > MAXMB * 1024 * 1024) { big++; return res(null); }
+      const url = URL.createObjectURL(f), img = new Image();
+      img.onload = () => { const id = Math.random().toString(36).slice(2, 9); this.imgs[id] = img; res({ id, name: f.name, url, edits: defEdits() }); };
+      img.onerror = () => { URL.revokeObjectURL(url); bad++; res(null); };
+      img.src = url;
+    }));
+    Promise.all(jobs).then(ps => {
+      const add = ps.filter(Boolean);
+      this.setState(s => ({ busy: false, photos: [...s.photos, ...add], sel: s.sel || (add[0] && add[0].id) || null, picks: [...s.picks, ...add.map(p => p.id)] }));
+      if (bad || big) this.say([bad && `${bad} file${bad > 1 ? 's' : ''} couldn't be opened (JPG, PNG or WEBP work best)`, big && `${big} over ${MAXMB} MB skipped`].filter(Boolean).join(' · '));
+    });
+  }
+  remove(id) {
+    const p = this.state.photos.find(q => q.id === id); if (p) URL.revokeObjectURL(p.url); delete this.imgs[id];
+    this.setState(s => { const photos = s.photos.filter(q => q.id !== id), i = s.photos.findIndex(q => q.id === id); const nb = photos[Math.min(i, photos.length - 1)];
+      const th = { ...s.thumbs }; delete th[id]; return { photos, picks: s.picks.filter(x => x !== id), sel: s.sel === id ? (nb ? nb.id : null) : s.sel, thumbs: th }; });
+  }
+  step(d) { const { photos, sel } = this.state; if (photos.length < 2) return; const i = photos.findIndex(p => p.id === sel); this.setState({ sel: photos[(i + d + photos.length) % photos.length].id }); }
+  setEdit(patch) { const id = this.state.sel; this.setState(s => ({ photos: s.photos.map(p => p.id === id ? { ...p, edits: { ...p.edits, ...patch } } : p) })); }
+  save(canvas, name, type) {
+    try {
+      let c = canvas;
+      if (type === 'image/jpeg') { c = mk(canvas.width, canvas.height); const x = c.getContext('2d'); x.fillStyle = '#111'; x.fillRect(0, 0, c.width, c.height); x.drawImage(canvas, 0, 0); }
+      c.toBlob(b => { if (!b) return this.say('Export failed — try a smaller photo.'); const u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); this.say('Saved ' + name); }, type, .95);
+    } catch (e) { this.say('Export failed — the image may be too large.'); }
+  }
+  renderVals() {
+    const _o = this.state.off || 0, _bar = { position: 'absolute', left: 0, right: 0, height: this.state.arrived && !_o ? 0 : '50%', background: '#000', transition: _o ? 'height .4s cubic-bezier(.7,0,.84,0)' : 'height .55s cubic-bezier(.2,.8,.3,1)' };
+    const s = this.state, p = this.cur(), ed = p ? p.edits : defEdits(), tab = s.tab;
+    const IW = 1584, IH = 993, SW = Math.max(s.vw, s.vh * IW / IH), SH = SW * IH / IW, cl = (v, a, b) => Math.max(a, Math.min(b, v));
+    const SL = cl(s.vw / 2 - .5 * SW, s.vw - SW, 0), ST = cl(s.vh / 2 - .5 * SH, s.vh - SH, 0), wide = s.vw > 1100;
+    const ink = '#f3e9dc', cream = '#efe3d0', dark = '#2a1f16';
+    const sw = on => ({ track: { position: 'relative', width: 40, height: 24, flexShrink: 0, borderRadius: 12, border: '1px solid rgba(255,240,220,.35)', background: on ? 'rgba(239,227,208,.9)' : 'rgba(255,240,220,.1)', cursor: 'pointer', padding: 0, transition: 'background .2s' }, dot: { position: 'absolute', top: 2, left: on ? 18 : 2, width: 18, height: 18, borderRadius: '50%', background: on ? dark : 'rgba(243,233,220,.75)', transition: 'left .2s' } });
+    const chip = on => ({ height: 34, padding: '0 12px', borderRadius: 9, cursor: 'pointer', fontFamily: "'Figtree',sans-serif", fontSize: 13, border: '1px solid ' + (on ? 'transparent' : 'rgba(255,240,220,.2)'), background: on ? cream : 'transparent', color: on ? dark : ink, fontWeight: on ? 600 : 400, transition: 'background .2s, color .2s' });
+    const drag = (set, min = 0) => e => { const el = e.currentTarget, r = el.getBoundingClientRect(); el.focus(); const go = ev => set(Math.round(cl((ev.clientX - r.left) / r.width, 0, 1) * (100 - min) + min)); go(e);
+      const up = () => { window.removeEventListener('pointermove', go); window.removeEventListener('pointerup', up); }; window.addEventListener('pointermove', go); window.addEventListener('pointerup', up); };
+    const keyer = (get, set, min = 0) => e => { const st = e.shiftKey ? 10 : 2; if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); set(Math.min(100, get() + st)); } if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); set(Math.max(min, get() - st)); } };
+    const pct = (v, min = 0) => (v - min) / (100 - min) * 100;
+    const fill = (v, min) => ({ position: 'absolute', left: 0, top: 12, height: 2, borderRadius: 1, width: pct(v, min) + '%', background: '#f6eee2', pointerEvents: 'none' });
+    const thumb = (v, min) => ({ position: 'absolute', top: 5, left: `calc(${pct(v, min)}% - ${pct(v, min) * .16}px)`, width: 16, height: 16, borderRadius: '50%', background: '#f6eee2', boxShadow: '0 1px 5px rgba(0,0,0,.4)', pointerEvents: 'none' });
+    const multi = tab !== 'edit', pickIdx = id => s.picks.indexOf(id);
+    const togglePick = id => this.setState(st => ({ picks: st.picks.includes(id) ? st.picks.filter(x => x !== id) : [...st.picks, id] }));
+    const st = sw(ed.stamp), ca = sw(s.sheet.captions);
+    const thumbsFor = p ? (s.thumbs[p.id] || {}) : {};
+    const prevMaxH = wide ? 'min(52vh, 480px)' : '46vh';
+    return {
+      onTop: { ..._bar, top: 0 }, onBot: { ..._bar, bottom: 0 },
+      offLine: { position: 'absolute', left: '50%', top: '50%', height: _o === 3 ? 4 : 2, width: _o >= 2 ? 4 : '100%', borderRadius: 2, transform: 'translate(-50%,-50%)', background: '#fff', boxShadow: '0 0 12px 3px rgba(210,230,255,.9), 0 0 40px 8px rgba(160,200,255,.45)', opacity: _o === 1 || _o === 2 ? 1 : 0, transition: _o === 1 ? 'opacity .12s .3s' : _o === 2 ? 'width .22s cubic-bezier(.6,0,.9,.4)' : 'opacity .2s, height .1s' },
+      goHome: e => { if (e && (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1)) return; e && e.preventDefault(); if (this.state.off) return; const href = 'Home.dc.html';
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.location.href = href; return; }
+        this.setState({ off: 1 }); setTimeout(() => { this.setState({ off: 2 }); setTimeout(() => { this.setState({ off: 3 }); setTimeout(() => { window.location.href = href; }, 200); }, 230); }, 400); },
+      fileRef: this.fileRef, previewRef: this.previewRef,
+      stageStyle: { position: 'absolute', left: SL, top: ST, width: SW, height: SH },
+      panelStyle: { position: 'absolute', zIndex: 2, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflow: 'hidden',
+        ...(wide ? { left: SL + .325 * SW, top: Math.max(16, ST + .087 * SH), width: Math.min(.632 * SW, s.vw - (SL + .325 * SW) - 24), height: Math.min(.826 * SH, s.vh - 32) } : { left: 12, right: 12, top: 12, bottom: 12 }),
+        borderRadius: 28, background: 'linear-gradient(160deg, rgba(92,70,48,.42), rgba(40,30,22,.5))', backdropFilter: 'blur(26px) saturate(1.15)', WebkitBackdropFilter: 'blur(26px) saturate(1.15)', border: '1px solid rgba(255,235,210,.24)', boxShadow: '0 40px 100px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,240,220,.16)', color: ink },
+      tabs: [['edit', 'Edit'], ['strip', 'Film Strip'], ['sheet', 'Contact Sheet'], ['prints', 'Prints']].map(([id, label]) => ({ label, on: tab === id, pick: () => this.setState({ tab: id }),
+        style: { height: 40, borderRadius: 10, border: 0, cursor: 'pointer', fontFamily: "'Figtree',sans-serif", fontSize: 'clamp(13px,1.1vw,15px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '0 6px', background: tab === id ? cream : 'transparent', color: tab === id ? dark : ink, fontWeight: tab === id ? 600 : 400, transition: 'background .25s, color .25s' } })),
+      empty: !s.photos.length, hasPhotos: !!s.photos.length, busy: s.busy,
+      pickFiles: () => this.els.file && this.els.file.click(),
+      onFiles: e => { this.addFiles(e.target.files); e.target.value = ''; },
+      onDragOver: e => e.preventDefault(), onDrop: e => { e.preventDefault(); this.addFiles(e.dataTransfer.files); },
+      isEdit: tab === 'edit', isStrip: tab === 'strip', isSheet: tab === 'sheet', isPrints: tab === 'prints',
+      single: s.photos.length < 2, prevPhoto: () => this.step(-1), nextPhoto: () => this.step(1),
+      previewBox: { position: 'relative', flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 14, overflow: 'hidden', background: multi ? 'rgba(20,14,9,.25)' : 'transparent', border: '1px solid rgba(255,240,220,.18)', minHeight: 220, padding: multi ? 14 : 0 },
+      previewCanvas: { display: 'block', maxWidth: '100%', maxHeight: prevMaxH, width: 'auto', height: 'auto', borderRadius: multi ? 4 : 12 },
+      rollTitle: multi ? `Your roll · ${s.picks.length} selected` : `Your roll · ${s.photos.length} photo${s.photos.length === 1 ? '' : 's'}`,
+      rollHint: multi ? 'Tap photos in the order you want them' : '← → to switch',
+      thumbs: s.photos.map((q, i) => { const on = multi ? pickIdx(q.id) >= 0 : q.id === s.sel; return { url: q.url, on, imgStyle: { width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: multi && !on ? .45 : 1, transition: 'opacity .2s' },
+        aria: multi ? `${on ? 'Remove' : 'Add'} photo ${i + 1}` : `Edit photo ${i + 1}`, pick: () => multi ? togglePick(q.id) : this.setState({ sel: q.id }),
+        hasBadge: multi && on, badge: pickIdx(q.id) + 1, canRemove: !multi && q.id === s.sel, remove: () => this.remove(q.id), removeAria: `Remove photo ${i + 1}`,
+        style: { width: 60, height: 60, padding: 0, borderRadius: 10, overflow: 'hidden', cursor: 'pointer', display: 'block', border: on ? '2px solid #f6eee2' : '1px solid rgba(255,240,220,.2)', boxShadow: on ? '0 0 0 3px rgba(246,238,226,.18)' : 'none', background: 'rgba(0,0,0,.2)', transition: 'border-color .2s, box-shadow .2s' } }; }),
+      presets: PKEYS.map(k => { const on = ed.preset === k; return { label: PRESETS[k].label, on, thumb: thumbsFor[k] || (p ? p.url : ''),
+        pick: () => { const P = PRESETS[k]; this.setEdit({ preset: k, grain: P.grain, fade: P.fade, vignette: P.vignette, warmth: P.warmth, blur: P.blur }); },
+        frame: { display: 'block', width: 62, height: 62, borderRadius: 8, overflow: 'hidden', border: on ? '2px solid #f6eee2' : '1px solid rgba(255,240,220,.18)', boxShadow: on ? '0 0 0 3px rgba(246,238,226,.2)' : 'none', boxSizing: 'border-box', transition: 'border-color .2s, box-shadow .2s' },
+        labelStyle: { fontSize: 11, whiteSpace: 'nowrap', color: on ? '#f6eee2' : 'rgba(243,233,220,.7)', textDecoration: on ? 'underline' : 'none', textUnderlineOffset: 4 } }; }),
+      sliders: SLIDERS.map(([k, label]) => { const min = k === 'warmth' ? -100 : 0, v = ed[k], set = n => this.setEdit({ [k]: n });
+        return { label, val: v, min, fill: fill(v, min), thumb: thumb(v, min), down: drag(set, min), key: keyer(() => this.cur().edits[k], set, min) }; }),
+      stampOn: ed.stamp, toggleStamp: () => this.setEdit({ stamp: !ed.stamp }), stampTrack: st.track, stampDot: st.dot, stampRow: { display: 'flex', gap: 8, flexWrap: 'wrap', opacity: ed.stamp ? 1 : .45, transition: 'opacity .2s' },
+      dateISO: ed.date, onDate: e => e.target.value && this.setEdit({ date: e.target.value }),
+      stampStyles: Object.entries(STAMPS).map(([k, v]) => ({ name: v.name, on: ed.stampStyle === k, sample: v.fmt(parseDate(ed.date)), pick: () => this.setEdit({ stampStyle: k }),
+        style: { height: 34, padding: '0 9px', borderRadius: 7, border: 0, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, whiteSpace: 'nowrap', color: v.color, textShadow: `0 0 6px ${v.color}66`, background: ed.stampStyle === k ? 'rgba(255,240,220,.14)' : 'transparent', boxShadow: ed.stampStyle === k ? 'inset 0 0 0 1px rgba(255,240,220,.35)' : 'none' } })),
+      borders: BORDERS.map(([k, name]) => { const on = ed.border === k; return { name, on, pick: () => this.setEdit({ border: k }),
+        style: { position: 'relative', width: 44, height: 44, borderRadius: 8, padding: 0, cursor: 'pointer', overflow: 'hidden', border: on ? '2px solid #f6eee2' : '1px solid rgba(255,240,220,.28)', background: k === 'black' ? '#141110' : k === 'white' ? '#f3eee4' : k === 'sprocket' ? 'repeating-linear-gradient(90deg,#17120f 0 5px,rgba(255,240,220,.5) 5px 8px)' : 'transparent' },
+        inner: k === 'none' ? { position: 'absolute', left: '50%', top: '-10%', width: 1, height: '120%', background: 'rgba(255,240,220,.5)', transform: 'rotate(45deg)' } : { position: 'absolute', left: k === 'sprocket' ? 3 : 6, right: k === 'sprocket' ? 3 : 6, top: k === 'sprocket' ? 10 : 6, bottom: k === 'sprocket' ? 10 : 6, borderRadius: 3, background: 'linear-gradient(160deg,#c98a5a,#5b4a6a)' } }; }),
+      formats: [['png', 'PNG'], ['jpeg', 'JPEG']].map(([k, label]) => ({ label, on: s.fmt === k, pick: () => this.setState({ fmt: k }), style: chip(s.fmt === k) })),
+      downloadPhoto: () => { const q = this.cur(); if (!q) return; this.setState({ busy: true }); setTimeout(() => { const c = develop(this.imgs[q.id], q.edits, 3200); this.setState({ busy: false }); this.save(c, q.name.replace(/\.[^.]+$/, '') + '-camera-room.' + (s.fmt === 'png' ? 'png' : 'jpg'), s.fmt === 'png' ? 'image/png' : 'image/jpeg'); }, 30); },
+      stripLayouts: [['horizontal', 'Horizontal'], ['vertical', 'Vertical'], ['negative', 'Negative']].map(([k, label]) => ({ label, on: s.strip.layout === k, pick: () => this.setState({ strip: { ...s.strip, layout: k } }), style: chip(s.strip.layout === k) })),
+      stripToggles: [['labels', 'Date labels', 'Print each date on the film edge.'], ['stock', 'Film markings', 'Stock name along the rebate.']].map(([k, label, desc]) => { const w = sw(s.strip[k]); return { label, desc, on: s.strip[k], toggle: () => this.setState({ strip: { ...s.strip, [k]: !s.strip[k] } }), track: w.track, dot: w.dot }; }),
+      sheetGrids: [[3, '3 across'], [4, '4 across'], [5, '5 across']].map(([k, label]) => ({ label, on: s.sheet.cols === k, pick: () => this.setState({ sheet: { ...s.sheet, cols: k } }), style: chip(s.sheet.cols === k) })),
+      gapVal: s.sheet.gap, gapFill: fill(s.sheet.gap, 0), gapThumb: thumb(s.sheet.gap, 0), gapDown: drag(n => this.setState(x => ({ sheet: { ...x.sheet, gap: n } }))), gapKey: keyer(() => this.state.sheet.gap, n => this.setState(x => ({ sheet: { ...x.sheet, gap: n } }))),
+      sheetBgs: [['paper', 'Paper white', '#f2ede3'], ['black', 'Darkroom black', '#121010'], ['kraft', 'Kraft', '#cdb48e']].map(([k, name, col]) => ({ name, on: s.sheet.bg === k, pick: () => this.setState({ sheet: { ...s.sheet, bg: k } }), style: { width: 32, height: 32, borderRadius: '50%', padding: 0, cursor: 'pointer', background: col, border: s.sheet.bg === k ? '2px solid #f6eee2' : '1px solid rgba(255,240,220,.3)', boxShadow: s.sheet.bg === k ? '0 0 0 3px rgba(246,238,226,.2)' : 'none' } })),
+      captionsOn: s.sheet.captions, toggleCaptions: () => this.setState({ sheet: { ...s.sheet, captions: !s.sheet.captions } }), captionsTrack: ca.track, captionsDot: ca.dot,
+      printLayouts: [['single', 'Single print', 'One photo on a 6×4 print'], ['booth', 'Photo booth', 'Four frames down a paper strip'], ['sheet', 'Print sheet', 'Four prints on one sheet']].map(([k, label, desc]) => { const on = s.print === k; return { label, desc, on, pick: () => this.setState({ print: k }),
+        style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, padding: '10px 14px', borderRadius: 12, cursor: 'pointer', textAlign: 'left', fontFamily: "'Figtree',sans-serif", border: '1px solid ' + (on ? 'transparent' : 'rgba(255,240,220,.2)'), background: on ? cream : 'transparent', color: on ? dark : ink, transition: 'background .2s, color .2s' } }; }),
+      noPicks: !s.picks.length,
+      downloadCompose: () => { this.setState({ busy: true }); setTimeout(() => { const c = this.compose(2.2); this.setState({ busy: false }); if (!c) return this.say('Pick at least one photo first.'); this.save(c, `camera-room-${tab === 'strip' ? 'film-strip' : tab === 'sheet' ? 'contact-sheet' : 'print-' + s.print}.png`, 'image/png'); }, 30); },
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

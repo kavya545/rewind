@@ -1,0 +1,3 @@
+- Homepage (Home.dc.html) uses the cinematic 90s analogue direction: blue-black shadows, slate/dusty-blue ambient, golden-amber sunlight, warm ivory type (Instrument Serif + IBM Plex Mono), film grain.
+- TV and Camera pages keep their original palette (cream, burnt orange, gold, deep green) unless the user asks to restyle them.
+- Never apply the Industry design system's steel-blue colors.

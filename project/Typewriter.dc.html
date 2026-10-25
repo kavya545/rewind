@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#0b1119;color:#efe6d4;font-family:'IBM Plex Mono',monospace}a{color:#efe6d4}a:hover{color:#f3ede4}a:focus-visible{outline:2px solid #f3ede4;outline-offset:4px}</style>
+<script src="./liquid.js"></script>
+<script src="./footer.js"></script>
+</helmet>
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:90;pointer-events:none"><div style="{{ onTop }}"></div><div style="{{ onBot }}"></div><div style="{{ offLine }}"></div></div>
+<div style="position:relative;height:100vh;width:100vw;overflow:hidden">
+  <img src="assets/room-home.png" data-liquid="" alt="" aria-hidden="true" style="position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;object-position:75% 78%;transform:scale(1.9);transform-origin:75% 78%;filter:blur(14px) brightness(.42) saturate(.85)">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(10,14,20,.2),rgba(6,9,14,.85) 85%)"></div>
+  <main style="position:relative;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center">
+    <span style="font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:#f3ede4">03 — the typewriter</span>
+    <h1 style="margin:0;font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;font-size:clamp(52px,8vw,112px);line-height:.95;color:#f3ead8;text-shadow:0 2px 30px rgba(0,0,0,.6)">Coming soon</h1>
+    <p style="margin:0;max-width:420px;font-size:13px;line-height:1.7;color:rgba(239,230,212,.72);text-wrap:pretty">The ribbon is being re-inked and the keys oiled. Soon you'll be able to type letters, notes and zines on it.</p>
+    <a href="Home.dc.html" onClick="{{ goHome }}" style="margin-top:14px;font-size:11px;letter-spacing:.3em;text-transform:uppercase;text-decoration:none;padding:12px 20px;border-radius:12px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)" style-hover="background:rgba(255,255,255,.17)">← back to the room</a>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { arrived: false, off: 0 };
+  componentDidMount() {
+    requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ arrived: true })));
+    this._ps = () => this.setState({ off: 0, arrived: true }); window.addEventListener('pageshow', this._ps);
+  }
+  componentWillUnmount() { window.removeEventListener('pageshow', this._ps); clearTimeout(this.t); }
+  renderVals() {
+    const o = this.state.off, bar = { position: 'absolute', left: 0, right: 0, height: this.state.arrived && !o ? 0 : '50%', background: '#000', transition: o ? 'height .4s cubic-bezier(.7,0,.84,0)' : 'height .55s cubic-bezier(.2,.8,.3,1)' };
+    return {
+      onTop: { ...bar, top: 0 }, onBot: { ...bar, bottom: 0 },
+      offLine: { position: 'absolute', left: '50%', top: '50%', height: o === 3 ? 4 : 2, width: o >= 2 ? 4 : '100%', borderRadius: 2, transform: 'translate(-50%,-50%)', background: '#fff', boxShadow: '0 0 12px 3px rgba(210,230,255,.9), 0 0 40px 8px rgba(160,200,255,.45)', opacity: o === 1 || o === 2 ? 1 : 0, transition: o === 1 ? 'opacity .12s .3s' : o === 2 ? 'width .22s cubic-bezier(.6,0,.9,.4)' : 'opacity .2s, height .1s' },
+      goHome: e => { if (e && (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1)) return; e && e.preventDefault(); if (o) return; const href = 'Home.dc.html';
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.location.href = href; return; }
+        this.setState({ off: 1 }); this.t = setTimeout(() => { this.setState({ off: 2 }); this.t = setTimeout(() => { this.setState({ off: 3 }); this.t = setTimeout(() => { window.location.href = href; }, 200); }, 230); }, 400); }
+    };
+  }
+}
+</script>
+</body>
+</html>
