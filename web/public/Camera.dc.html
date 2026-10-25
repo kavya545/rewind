@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500&family=Figtree:wght@400;500;600&family=VT323&family=Courier+Prime&display=swap">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#1a120b;font-family:'VT323',monospace;letter-spacing:.04em;color:#f3e9dc}
+a{color:#f3e9dc}a:hover{color:#f6c98e}
+button:focus-visible,[tabindex]:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #f6c98e;outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed}
+select option{background:#2a1f16;color:#f3e9dc}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+<script src="./liquid.js"></script>
+<script src="./footer.js"></script>
+</helmet>
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:90;pointer-events:none"><div style="{{ onTop }}"></div><div style="{{ onBot }}"></div><div style="{{ offLine }}"></div></div>
+<div onDragOver="{{ onDragOver }}" onDrop="{{ onDropFiles }}" style="position:relative;height:100vh;width:100vw;overflow:hidden">
+  <div style="{{ stageStyle }}">
+    <img src="assets/camera-room-bg3.png" data-liquid="" alt="A sunlit desk with a film camera, rolls of film and photos pinned to the wall" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none">
+  </div>
+  <div style="position:absolute;inset:clamp(12px,2.6vw,30px);pointer-events:none;z-index:3;font-family:'VT323',monospace;color:#f6efe4;text-shadow:0 0 8px rgba(0,0,0,.5)">
+    <span style="position:absolute;left:0;top:0;width:70px;height:70px;border-left:1.5px solid rgba(246,239,228,.8);border-top:1.5px solid rgba(246,239,228,.8)"></span>
+    <span style="position:absolute;right:0;top:0;width:70px;height:70px;border-right:1.5px solid rgba(246,239,228,.8);border-top:1.5px solid rgba(246,239,228,.8)"></span>
+    <span style="position:absolute;left:0;bottom:0;width:70px;height:70px;border-left:1.5px solid rgba(246,239,228,.8);border-bottom:1.5px solid rgba(246,239,228,.8)"></span>
+    <span style="position:absolute;right:0;bottom:0;width:70px;height:70px;border-right:1.5px solid rgba(246,239,228,.8);border-bottom:1.5px solid rgba(246,239,228,.8)"></span>
+    <a href="Home.dc.html" onClick="{{ goHome }}" aria-label="Back to the room" style="position:absolute;left:clamp(14px,2vw,28px);top:clamp(14px,2.4vh,26px);display:flex;align-items:center;gap:10px;font-size:clamp(22px,2vw,30px);letter-spacing:.06em;color:#f6efe4;text-decoration:none;pointer-events:auto;padding:2px 6px;margin:-2px -6px;border-radius:6px" style-hover="background:rgba(255,255,255,.1)"><svg width="18" height="20" viewBox="0 0 18 20"><path d="M16 1L1 10l15 9z" fill="#f6efe4"></path></svg>BACK</a>
+    <svg style="position:absolute;right:clamp(14px,2vw,28px);top:clamp(16px,2.6vh,28px)" width="46" height="22" viewBox="0 0 46 22" fill="none"><rect x="1" y="1" width="40" height="20" rx="3" stroke="#f6efe4" stroke-width="2"></rect><rect x="42" y="7" width="3" height="8" fill="#f6efe4"></rect><rect x="5" y="5" width="8" height="12" fill="#f6efe4"></rect><rect x="15" y="5" width="8" height="12" fill="#f6efe4"></rect><rect x="25" y="5" width="8" height="12" fill="#f6efe4"></rect></svg>
+    
+  </div>
+  <input ref="{{ fileRef }}" type="file" accept="image/*" multiple="{{ true }}" onChange="{{ onFiles }}" style="display:none">
+  <video ref="{{ videoRef }}" playsInline="{{ true }}" muted="{{ true }}" style="position:absolute;width:2px;height:2px;opacity:0;pointer-events:none"></video>
+
+  <main style="{{ panelStyle }}" aria-label="Camera Room">
+    <header style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:16px 24px;padding:clamp(18px,3vh,32px) clamp(20px,3.4vw,56px) 0">
+      <div style="display:flex;align-items:center;gap:10px">
+        <nav role="tablist" aria-label="Tools" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;padding:3px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+            <button role="tab" aria-selected="{{ t.on }}" onClick="{{ t.pick }}" style="{{ t.style }}" style-hover="background:rgba(255,255,255,.14)">{{ t.label }}</button>
+          </sc-for>
+        </nav>
+      </div>
+    </header>
+
+    <div style="{{ bodyStyle }}">
+      <div style="{{ gridStyle }}">
+
+        <section style="flex:1 1 360px;min-width:0;min-height:0;display:flex;flex-direction:column;gap:clamp(8px,1.4vh,14px)">
+          <div style="{{ previewBox }}">
+            <sc-if value="{{ showPreviewLabel }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:18px;top:14px;font-size:18px;color:rgba(243,233,220,.85)">{{ previewLabel }}</span></sc-if>
+            <canvas ref="{{ previewRef }}" style="{{ previewCanvas }}"></canvas>
+            <sc-if value="{{ showEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px">
+                <span style="font-family:'Caveat',cursive;font-size:42px;line-height:1;color:#f6eee2">{{ emptyTitle }}</span>
+                <span style="max-width:300px;font-size:17px;line-height:1.5;color:rgba(243,233,220,.7);text-wrap:pretty">{{ emptyText }}</span>
+                <button onClick="{{ emptyAction }}" style="height:44px;padding:0 22px;border-radius:12px;border:0;background:#f3ede4;color:#1e1a16;font-family:'VT323',monospace;font-size:18px;letter-spacing:.05em;font-weight:600;cursor:pointer" style-hover="background:#ffffff">{{ emptyBtn }}</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ liveFrame }}">
+                <span style="position:absolute;left:5%;top:7%;width:9%;aspect-ratio:1;border-left:1.5px solid rgba(255,250,240,.9);border-top:1.5px solid rgba(255,250,240,.9)"></span>
+                <span style="position:absolute;right:5%;top:7%;width:9%;aspect-ratio:1;border-right:1.5px solid rgba(255,250,240,.9);border-top:1.5px solid rgba(255,250,240,.9)"></span>
+                <span style="position:absolute;left:5%;bottom:7%;width:9%;aspect-ratio:1;border-left:1.5px solid rgba(255,250,240,.9);border-bottom:1.5px solid rgba(255,250,240,.9)"></span>
+                <span style="position:absolute;right:5%;bottom:7%;width:9%;aspect-ratio:1;border-right:1.5px solid rgba(255,250,240,.9);border-bottom:1.5px solid rgba(255,250,240,.9)"></span>
+                <span style="{{ flashStyle }}"></span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasReelToggle }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;right:12px;top:12px;display:flex;gap:2px;padding:3px;border-radius:10px;background:rgba(20,14,9,.5);border:1px solid rgba(255,240,220,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">
+                <sc-for list="{{ liveViews }}" as="v" hint-placeholder-count="2">
+                  <button onClick="{{ v.pick }}" aria-pressed="{{ v.on }}" style="{{ v.style }}">{{ v.label }}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:0 8px">
+              <sc-if value="{{ reviewing }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ retake }}" style="justify-self:center;height:44px;padding:0 20px;border-radius:12px;border:1px solid rgba(255,240,220,.3);background:transparent;color:#f3e9dc;font-family:'VT323',monospace;font-size:18px;letter-spacing:.05em;cursor:pointer" style-hover="background:rgba(255,240,220,.1)">Retake</button>
+              </sc-if>
+              <sc-if value="{{ notReviewing }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ switchCam }}" disabled="{{ camOff }}" style="justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:transparent;color:#f3e9dc;cursor:pointer;font-family:'VT323',monospace;font-size:16px;letter-spacing:.05em;line-height:1.2;padding:0">
+                  <span style="width:clamp(38px,5.4vh,50px);height:clamp(38px,5.4vh,50px);border-radius:50%;border:1px solid rgba(255,240,220,.35);display:flex;align-items:center;justify-content:center;background:rgba(255,240,220,.05)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"></path><circle cx="12" cy="13" r="3.2"></circle></svg></span>Switch Camera</button>
+              </sc-if>
+              <button onClick="{{ shutter }}" disabled="{{ shutterOff }}" aria-label="{{ shutterLabel }}" style="width:clamp(56px,8vh,78px);height:clamp(56px,8vh,78px);border-radius:50%;border:3px solid #f3e9dc;background:transparent;padding:5px;cursor:pointer;box-sizing:border-box" style-active="transform:scale(.95)"><span style="{{ shutterInner }}"></span></button>
+              <sc-if value="{{ reviewing }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ keep }}" style="justify-self:center;height:44px;padding:0 22px;border-radius:12px;border:0;background:#f3ede4;color:#1e1a16;font-family:'VT323',monospace;font-size:18px;letter-spacing:.05em;font-weight:600;cursor:pointer" style-hover="background:#ffffff">Keep</button>
+              </sc-if>
+              <sc-if value="{{ notReviewing }}" hint-placeholder-val="{{ true }}">
+                <div style="justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px">
+                  <span style="width:clamp(40px,5.8vh,56px);height:clamp(40px,5.8vh,56px);border-radius:10px;overflow:hidden;border:1px solid rgba(255,240,220,.35);background:rgba(255,240,220,.06)"><sc-if value="{{ hasLast }}" hint-placeholder-val="{{ false }}"><img src="{{ lastUrl }}" alt="Last photo" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if></span>Last Photo
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </section>
+
+        <section style="flex:1 1 360px;min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;gap:0;border-top:1px solid rgba(255,240,220,.12)">
+          <sc-if value="{{ notLive }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(7px,1.5vh,16px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
+              <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Your Photos ({{ count }}/8)</span>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <sc-for list="{{ thumbs }}" as="p" hint-placeholder-count="0">
+                  <div draggable="true" onDragStart="{{ p.dragStart }}" onDragOver="{{ p.dragOver }}" onDrop="{{ p.drop }}" style="position:relative;width:clamp(64px,5.6vw,84px);height:clamp(72px,9.4vh,96px);flex-shrink:0;cursor:grab">
+                    <button onKeyDown="{{ p.key }}" aria-label="{{ p.aria }}" style="width:100%;height:100%;padding:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,240,220,.25);background:rgba(0,0,0,.2);cursor:grab;display:block"><img src="{{ p.url }}" alt="" draggable="false" style="width:100%;height:100%;object-fit:cover;display:block"></button>
+                    <button onClick="{{ p.remove }}" aria-label="{{ p.removeAria }}" style="position:absolute;right:5px;top:5px;width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.7);background:rgba(20,14,9,.65);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:#7a3324"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ canAdd }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ pickFiles }}" aria-label="Add photos" style="width:clamp(64px,5.6vw,84px);height:clamp(72px,9.4vh,96px);flex-shrink:0;border-radius:10px;border:1px dashed rgba(255,255,255,.45);background:rgba(255,255,255,.04);color:#f3e9dc;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0;font-family:'VT323',monospace;font-size:16px;letter-spacing:.05em;line-height:1.25" style-hover="background:rgba(255,240,220,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Add<br>Photos</button>
+                </sc-if>
+              </div>
+              <sc-if value="{{ hasThumbs }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:rgba(243,233,220,.55)">Drag to reorder · or focus a photo and use ← →</span></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isStrip }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;gap:clamp(6px,1vh,10px);padding:clamp(7px,1.5vh,16px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
+              <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Two Columns</span><span style="font-size:16px;color:rgba(243,233,220,.6)">Arrange photos in two parallel strips.</span></div>
+              <button onClick="{{ toggleCols }}" role="switch" aria-checked="{{ twoCols }}" aria-label="Two columns" style="{{ colsSw.track }}"><span style="{{ colsSw.dot }}"></span></button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isSheet }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(7px,1.5vh,16px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
+              <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Columns</span>
+              <div style="display:flex;gap:8px">
+                <sc-for list="{{ colOpts }}" as="o" hint-placeholder-count="2">
+                  <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="{{ o.style }}">{{ o.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(7px,1.5vh,16px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
+            <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Photo Effects</span>
+            <sc-if value="{{ notLive }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <sc-for list="{{ effects }}" as="m" hint-placeholder-count="7">
+                  <button onClick="{{ m.pick }}" aria-pressed="{{ m.on }}" style="{{ m.chip }}" style-hover="background:rgba(255,240,220,.1)">{{ m.label }}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:8px;overflow-x:auto;padding:3px 2px 6px;scrollbar-width:thin">
+                <sc-for list="{{ effects }}" as="m" hint-placeholder-count="7">
+                  <button onClick="{{ m.pick }}" aria-pressed="{{ m.on }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;width:62px;border:0;background:transparent;padding:0;cursor:pointer;color:#f3e9dc;font-family:'VT323',monospace">
+                    <span style="{{ m.frame }}"><sc-if value="{{ m.hasThumb }}" hint-placeholder-val="{{ false }}"><img src="{{ m.thumb }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if></span>
+                    <span style="font-size:14px;white-space:nowrap">{{ m.label }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(7px,1.5vh,16px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
+              <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Options</span>
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px">
+                <sc-for list="{{ optToggles }}" as="g" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <button onClick="{{ g.toggle }}" role="switch" aria-checked="{{ g.on }}" aria-label="{{ g.label }}" style="{{ g.track }}"><span style="{{ g.dot }}"></span></button>
+                    <span style="font-size:17px;color:#f3e9dc;white-space:nowrap">{{ g.short }}</span>
+                  </div>
+                </sc-for>
+                <select value="{{ stampStyle }}" onChange="{{ onStamp }}" aria-label="Date stamp style" style="flex:1 1 100%;max-width:320px;min-width:0;height:clamp(34px,4.6vh,40px);border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#f3e9dc;padding:0 12px;font-family:'VT323',monospace;font-size:19px;letter-spacing:.04em;cursor:pointer">
+                  <sc-for list="{{ stampOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                </select>
+              </div>
+            </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:12px;padding-top:clamp(8px,1.6vh,16px);margin-top:auto">
+            <button onClick="{{ download }}" disabled="{{ cantExport }}" style="flex:1.4 1 200px;height:clamp(40px,5.6vh,50px);border-radius:12px;border:0;background:#f3ede4;color:#1e1a16;font-family:'VT323',monospace;font-size:21px;letter-spacing:.05em;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:#ffffff" style-active="transform:translateY(1px)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"></path></svg>{{ dlLabel }}</button>
+            <div style="position:relative;flex:1 1 150px">
+              <button onClick="{{ toggleShare }}" disabled="{{ cantExport }}" aria-expanded="{{ shareOpen }}" style="width:100%;height:clamp(40px,5.6vh,50px);border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);color:#f3e9dc;font-family:'VT323',monospace;font-size:21px;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:rgba(255,240,220,.08)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg>Share<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="margin-left:6px"><path d="m6 9 6 6 6-6"></path></svg></button>
+              <sc-if value="{{ shareOpen }}" hint-placeholder-val="{{ false }}">
+                <div role="menu" style="position:absolute;right:0;bottom:calc(100% + 8px);min-width:100%;z-index:5;display:flex;flex-direction:column;padding:6px;border-radius:12px;background:rgba(36,26,18,.92);border:1px solid rgba(255,240,220,.2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,.45)">
+                  <button role="menuitem" onClick="{{ shareNative }}" style="height:40px;border:0;border-radius:8px;background:transparent;color:#f3e9dc;text-align:left;padding:0 12px;font-family:'VT323',monospace;font-size:18px;letter-spacing:.05em;cursor:pointer;white-space:nowrap" style-hover="background:rgba(255,240,220,.1)">Share to an app…</button>
+                  <button role="menuitem" onClick="{{ shareCopy }}" style="height:40px;border:0;border-radius:8px;background:transparent;color:#f3e9dc;text-align:left;padding:0 12px;font-family:'VT323',monospace;font-size:18px;letter-spacing:.05em;cursor:pointer;white-space:nowrap" style-hover="background:rgba(255,240,220,.1)">Copy image</button>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+          <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px;padding-top:clamp(8px,1.6vh,16px)">
+              <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Your Photos ({{ count }}/8)</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ thumbs }}" as="p" hint-placeholder-count="0">
+                  <span style="width:clamp(40px,4vw,54px);height:clamp(44px,6vh,60px);border-radius:8px;overflow:hidden;border:1px solid rgba(255,240,220,.25)"><img src="{{ p.url }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:absolute;left:50%;bottom:24px;transform:translateX(-50%);z-index:20;max-width:calc(100vw - 32px);padding:12px 18px;border-radius:12px;background:rgba(30,22,16,.88);border:1px solid rgba(255,240,220,.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:18px;color:#f3e9dc">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PRESETS = {
+  original: { label: 'Original', grain: 0, fade: 0, vignette: 0, warmth: 0, con: 1, sat: 1, bright: 0, tint: [0, 0, 0], flash: 0 },
+  film90: { label: '90s Film', grain: 35, fade: 20, vignette: 15, warmth: 8, con: .96, sat: .9, bright: 2, tint: [3, 1, -2], flash: 0 },
+  grain: { label: 'Film Grain', grain: 60, fade: 10, vignette: 20, warmth: 2, con: 1.02, sat: .94, bright: 0, tint: [0, 1, 0], flash: 0 },
+  warm: { label: 'Warm Fade', grain: 25, fade: 42, vignette: 12, warmth: 22, con: .92, sat: .86, bright: 4, tint: [4, 2, -3], flash: 0 },
+  cool: { label: 'Cool Tone', grain: 25, fade: 18, vignette: 15, warmth: -24, con: .98, sat: .88, bright: 0, tint: [-2, 2, 5], flash: 0 },
+  flash: { label: 'Flash', grain: 30, fade: 8, vignette: 48, warmth: 6, con: 1.12, sat: 1.04, bright: 10, tint: [2, 0, 0], flash: 1 },
+  bw: { label: 'B&W', grain: 40, fade: 14, vignette: 22, warmth: 0, con: 1.1, sat: 0, bright: 0, tint: [0, 0, 0], flash: 0 }
+};
+const PKEYS = Object.keys(PRESETS);
+const MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const STAMPS = {
+  classic: { label: 'OCT 26 1997', color: '#ff8a3c', text: () => 'OCT 26 1997' },
+  digital: { label: "'97 10 26", color: '#ff5a32', text: () => "'97 10 26" },
+  amber: { label: '10.26.97', color: '#ffc75a', text: () => '10.26.97' },
+  today: { label: 'Today (90s style)', color: '#ff8a3c', text: () => { const d = new Date(); return `${MON[d.getMonth()]} ${d.getDate()} ${d.getFullYear()}`; } },
+  none: { label: 'No date stamp', color: '', text: () => '' }
+};
+const MAX = 8, MAXMB = 25, ORANGE = '#ff9a2e';
+const mk = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; };
+const dims = s => [s.videoWidth || s.naturalWidth || s.width, s.videoHeight || s.naturalHeight || s.height];
+
+function develop(src, key, maxSide, stamp, mirror) {
+  const [iw, ih] = dims(src), s = Math.min(1, maxSide / Math.max(iw, ih)), w = Math.round(iw * s), h = Math.round(ih * s);
+  const c = mk(w, h), x = c.getContext('2d', { willReadFrequently: true }), P = PRESETS[key] || PRESETS.original;
+  if (mirror) { x.translate(w, 0); x.scale(-1, 1); }
+  x.drawImage(src, 0, 0, w, h); x.setTransform(1, 0, 0, 1, 0, 0);
+  if (key !== 'original') {
+    const id = x.getImageData(0, 0, w, h), d = id.data, f = P.fade / 100, V = P.vignette / 100, G = P.grain / 100 * 34, W = P.warmth, fA = 1 - .26 * f, fB = 36 * f, [tr, tg, tb] = P.tint;
+    for (let y = 0; y < h; y++) { const dy = y / h - .5;
+      for (let xx = 0; xx < w; xx++) { const i = (y * w + xx) * 4, dx = xx / w - .5, d2 = (dx * dx + dy * dy) * 2;
+        let r = (d[i] - 128) * P.con + 128 + P.bright, g = (d[i + 1] - 128) * P.con + 128 + P.bright, b = (d[i + 2] - 128) * P.con + 128 + P.bright;
+        const l = .299 * r + .587 * g + .114 * b;
+        r = l + (r - l) * P.sat + W * .32 + tr; g = l + (g - l) * P.sat + W * .07 + tg; b = l + (b - l) * P.sat - W * .32 + tb;
+        if (P.flash) { const k = (1 - Math.min(1, d2 * 1.4)) * 26; r += k; g += k; b += k * .9; }
+        r = r * fA + fB + 3 * f; g = g * fA + fB; b = b * fA + fB - 2 * f;
+        const m = 1 - V * .75 * d2 * (.4 + .6 * d2), n = G ? (Math.random() - .5) * G * (1 - Math.abs(l - 128) / 300) : 0;
+        d[i] = r * m + n; d[i + 1] = g * m + n; d[i + 2] = b * m + n; } }
+    x.putImageData(id, 0, 0);
+  }
+  const st = STAMPS[stamp];
+  if (st && st.color) { const t = st.text(), fs = Math.max(11, Math.min(w, h) * .075);
+    x.font = `${fs}px VT323, monospace`; x.textAlign = 'right'; x.shadowColor = st.color; x.shadowBlur = fs * .35; x.fillStyle = st.color; x.globalAlpha = .92;
+    x.fillText(t, w - fs * .8, h - fs * .7); x.shadowBlur = 0; x.globalAlpha = .5; x.fillText(t, w - fs * .8, h - fs * .7); x.globalAlpha = 1; }
+  return c;
+}
+function cover(x, src, dx, dy, dw, dh, r = 0) {
+  const [sw, sh] = dims(src), s = Math.max(dw / sw, dh / sh), cw = dw / s, ch = dh / s;
+  x.save(); if (r) { x.beginPath(); x.roundRect(dx, dy, dw, dh, r); x.clip(); }
+  x.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, dx, dy, dw, dh); x.restore();
+}
+function rotText(x, t, cx, cy, fs, color, ang = -Math.PI / 2) { x.save(); x.translate(cx, cy); x.rotate(ang); x.font = `${fs}px VT323, monospace`; x.fillStyle = color; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(t, 0, 0); x.restore(); }
+function stripCanvas(frames, sc, o, horizontal) {
+  const fw = 560 * sc, fh = fw * .75, reb = fw * .17, gap = fw * .05, lead = fw * .14, n = frames.length;
+  const len = lead * 2 + n * fh + (n - 1) * gap, th = fw + reb * 2;
+  const c = horizontal ? mk(len * (fw / fh) * 0 + (lead * 2 + n * fw + (n - 1) * gap), fh + reb * 2) : mk(th, len), x = c.getContext('2d');
+  x.fillStyle = '#0f0c0a'; x.fillRect(0, 0, c.width, c.height);
+  const g = horizontal ? x.createLinearGradient(0, 0, 0, c.height) : x.createLinearGradient(0, 0, c.width, 0);
+  g.addColorStop(0, 'rgba(255,255,255,.05)'); g.addColorStop(.5, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(255,255,255,.04)'); x.fillStyle = g; x.fillRect(0, 0, c.width, c.height);
+  const ink = ORANGE, fs = reb * .3;
+  frames.forEach((im, i) => {
+    if (horizontal) { const a = lead + i * (fw + gap); cover(x, im, a, reb, fw, fh, fw * .01); }
+    else { const a = lead + i * (fh + gap); cover(x, im, reb, a, fw, fh, fw * .01); }
+  });
+  const along = horizontal ? c.width : c.height, pitch = ((horizontal ? fw : fh) + gap) / 5, hw = reb * .34, hl = pitch * .52;
+  x.globalCompositeOperation = 'destination-out';
+  for (let a = pitch * .5; a < along - hl; a += pitch) [reb * .5, (horizontal ? c.height : c.width) - reb * .5].forEach(ac => {
+    x.beginPath(); if (horizontal) x.roundRect(a, ac - hw / 2, hl, hw, hw * .2); else x.roundRect(ac - hw / 2, a, hw, hl, hw * .2); x.fill(); });
+  x.globalCompositeOperation = 'source-over';
+  frames.forEach((im, i) => { const unit = horizontal ? fw : fh, a = lead + i * (unit + gap), no = (i + (o.offset || 0)) * 2 + 1;
+    const put = (t, t0, side) => { const ac = side ? (horizontal ? c.height : c.width) - reb * .5 : reb * .5;
+      if (horizontal) { x.font = `${fs}px VT323, monospace`; x.fillStyle = ink; x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillText(t, a + unit * t0, side ? c.height - reb * .13 : reb * .13 + 0); }
+      else rotText(x, t, side ? c.width - reb * .14 : reb * .14, a + unit * t0, fs, ink); };
+    if (o.markings && i % 2 === 0) put('RW 400', .3, false);
+    if (o.markings) put('◂ SAFETY', .78, false);
+    if (o.frames) { put(String(no), .2, true); put(`▸${no}A`, .65, true); } });
+  return c;
+}
+
+class Component extends DCLogic {
+  state = { photos: [], tab: 'strip', fx: 'film90', markings: true, frames: true, stamp: 'classic', twoCols: false, cols: 2, toast: '', shareOpen: false, cam: 'off', facing: 'user', review: null, liveView: 'cam', flash: 0, lastUrl: '', camThumbs: {}, clock: '', arrived: false, off: 0, vw: window.innerWidth, vh: window.innerHeight };
+  els = {}; imgs = {};
+  fileRef = el => { this.els.file = el; }; videoRef = el => { this.els.video = el; };
+  previewRef = el => { this.els.preview = el; if (el) this.schedule(); };
+  componentDidMount() {
+    requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ arrived: true })));
+    this._ps = () => this.setState({ off: 0, arrived: true }); window.addEventListener('pageshow', this._ps);
+    this.onResize = () => this.setState({ vw: window.innerWidth, vh: window.innerHeight }); window.addEventListener('resize', this.onResize);
+    this.onVis = () => { if (document.hidden) this.stopCam(); else if (this.state.tab === 'live' && !this.state.review) this.startCam(); }; document.addEventListener('visibilitychange', this.onVis);
+    this.onDoc = e => { if (this.state.shareOpen && !e.target.closest('[role=menu]') && !e.target.closest('[aria-expanded]')) this.setState({ shareOpen: false }); }; document.addEventListener('pointerdown', this.onDoc);
+    const tick = () => { const d = new Date(), h = d.getHours(); this.setState({ clock: `${h < 12 ? 'AM' : 'PM'} ${String(((h + 11) % 12) + 1).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` }); };
+    tick(); this.clockT = setInterval(tick, 15000);
+    document.fonts && document.fonts.load('40px VT323').then(() => this.schedule());
+  }
+  componentWillUnmount() { this.stopCam(); clearInterval(this.clockT); clearTimeout(this.toastT); cancelAnimationFrame(this.raf); window.removeEventListener('pageshow', this._ps); window.removeEventListener('resize', this.onResize); document.removeEventListener('visibilitychange', this.onVis); document.removeEventListener('pointerdown', this.onDoc); this.state.photos.forEach(p => URL.revokeObjectURL(p.url)); }
+  componentDidUpdate(pp, ps) {
+    const s = this.state;
+    if (ps.tab !== s.tab) { if (s.tab === 'live') this.startCam(); else this.stopCam(); }
+    if (ps.photos !== s.photos || ps.tab !== s.tab || ps.fx !== s.fx || ps.markings !== s.markings || ps.frames !== s.frames || ps.stamp !== s.stamp || ps.twoCols !== s.twoCols || ps.cols !== s.cols || ps.review !== s.review || ps.liveView !== s.liveView) this.schedule();
+  }
+  say(t) { clearTimeout(this.toastT); this.setState({ toast: t }); this.toastT = setTimeout(() => this.setState({ toast: '' }), 3600); }
+  schedule() { cancelAnimationFrame(this.raf); this.raf = requestAnimationFrame(() => { try { this.paint(); } catch (e) { console.error(e); } }); }
+  paint() {
+    const cv = this.els.preview; if (!cv) return; const s = this.state;
+    if (s.tab === 'live' && s.liveView === 'cam') { if (s.review) this.blit(develop(s.review.img, s.fx, 1000, s.stamp, false)); else if (s.cam !== 'on') { cv.width = 4; cv.height = 3; cv.getContext('2d').clearRect(0, 0, 4, 3); } return; }
+    const out = this.compose(.5); if (!out) { cv.width = 4; cv.height = 3; cv.getContext('2d').clearRect(0, 0, 4, 3); return; }
+    this.blit(out);
+  }
+  blit(out) { const cv = this.els.preview; if (!cv) return; if (cv.width !== out.width || cv.height !== out.height) { cv.width = out.width; cv.height = out.height; } const x = cv.getContext('2d'); x.clearRect(0, 0, cv.width, cv.height); x.drawImage(out, 0, 0); }
+  list(onlyCam) { return this.state.photos.filter(p => this.imgs[p.id] && (!onlyCam || p.cam)); }
+  compose(sc) {
+    const s = this.state, o = { markings: s.markings, frames: s.frames };
+    if (s.tab === 'live') { const P = this.list(true); if (!P.length) return null; return stripCanvas(P.map(p => develop(this.imgs[p.id], s.fx, 900 * sc * 1.4, s.stamp)), sc, o, true); }
+    const P = this.list(false); if (!P.length) return null;
+    const dev = P.map(p => develop(this.imgs[p.id], s.fx, 900 * sc * 1.4, s.stamp));
+    if (s.tab === 'strip') {
+      if (!s.twoCols || dev.length < 2) return stripCanvas(dev, sc, o, false);
+      const h = Math.ceil(dev.length / 2), a = stripCanvas(dev.slice(0, h), sc, o, false), b = stripCanvas(dev.slice(h), sc, { ...o, offset: h }, false), gp = a.width * .14;
+      const c = mk(a.width * 2 + gp, Math.max(a.height, b.height)), x = c.getContext('2d'); x.drawImage(a, 0, 0); x.drawImage(b, a.width + gp, 0); return c;
+    }
+    const cols = s.cols, rows = Math.ceil(dev.length / cols), cw = 520 * sc, ch = cw * .75, gap = cw * .07, cap = s.frames ? cw * .1 : 0, m = cw * .2, ml = m * 1.25;
+    const c = mk(ml + m + cols * cw + (cols - 1) * gap, m * 2 + rows * (ch + cap) + (rows - 1) * gap), x = c.getContext('2d');
+    x.fillStyle = '#f1ebdf'; x.fillRect(0, 0, c.width, c.height);
+    const ng = x.getImageData(0, 0, c.width, c.height); for (let i = 0; i < ng.data.length; i += 4) { const n = (Math.random() - .5) * 8; ng.data[i] += n; ng.data[i + 1] += n; ng.data[i + 2] += n; } x.putImageData(ng, 0, 0);
+    dev.forEach((im, i) => { const cx = ml + (i % cols) * (cw + gap), cy = m + Math.floor(i / cols) * (ch + cap + gap);
+      x.fillStyle = 'rgba(0,0,0,.18)'; x.fillRect(cx + 2 * sc, cy + 3 * sc, cw, ch); cover(x, im, cx, cy, cw, ch);
+      if (cap) { x.fillStyle = '#7a4a22'; x.font = `${cap * .62}px VT323, monospace`; x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillText(`${i * 2 + 1}  ▸${i * 2 + 1}A`, cx, cy + ch + cap * .55); } });
+    if (s.markings) { rotText(x, 'RW 400 · 35MM · ROLL 01', ml * .5, c.height - m - (rows * (ch + cap)) * .22, ml * .3, '#b0662a'); rotText(x, 'SAFETY FILM', ml * .5, m + ch * .6, ml * .3, '#b0662a'); }
+    return c;
+  }
+  addFiles(list) {
+    const room = MAX - this.state.photos.length; let files = Array.from(list || []); if (!files.length) return;
+    if (room <= 0) return this.say('Your roll is full — 8 photos max. Remove one to add another.');
+    let skipped = files.length > room ? files.length - room : 0; files = files.slice(0, room); let bad = 0, big = 0;
+    Promise.all(files.map(f => new Promise(res => {
+      if (!/^image\/(jpeg|png|webp|gif|bmp|avif)$/.test(f.type)) { bad++; return res(null); }
+      if (f.size > MAXMB * 1048576) { big++; return res(null); }
+      const url = URL.createObjectURL(f), img = new Image();
+      img.onload = () => { const id = Math.random().toString(36).slice(2, 9); this.imgs[id] = img; res({ id, url, name: f.name }); };
+      img.onerror = () => { URL.revokeObjectURL(url); bad++; res(null); }; img.src = url; })))
+      .then(ps => { this.setState(s => ({ photos: [...s.photos, ...ps.filter(Boolean)] }));
+        const msg = [skipped && `${skipped} left out — 8 photos max`, bad && `${bad} couldn't be opened (try JPG or PNG)`, big && `${big} over ${MAXMB} MB`].filter(Boolean).join(' · '); if (msg) this.say(msg); });
+  }
+  remove(id) { const p = this.state.photos.find(q => q.id === id); if (p) URL.revokeObjectURL(p.url); delete this.imgs[id]; this.setState(s => ({ photos: s.photos.filter(q => q.id !== id) })); }
+  move(from, to) { this.setState(s => { const a = [...s.photos]; if (to < 0 || to >= a.length) return null; const [it] = a.splice(from, 1); a.splice(to, 0, it); return { photos: a }; }); }
+  async startCam() {
+    if (this.stream || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { if (!navigator.mediaDevices) this.setState({ cam: 'unsupported' }); return; }
+    this.setState({ cam: 'asking' });
+    try {
+      const st = await navigator.mediaDevices.getUserMedia({ video: { facingMode: this.state.facing, width: { ideal: 1600 }, height: { ideal: 1200 } }, audio: false });
+      if (this.state.tab !== 'live') { st.getTracks().forEach(t => t.stop()); return; }
+      this.stream = st; const v = this.els.video; v.srcObject = st; await v.play().catch(() => {});
+      this.setState({ cam: 'on' }); this.liveLoop(); setTimeout(() => this.makeCamThumbs(), 600);
+    } catch (e) { this.setState({ cam: e && e.name === 'NotAllowedError' ? 'denied' : 'error' }); }
+  }
+  stopCam() { cancelAnimationFrame(this.liveRaf); if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; } if (this.els.video) this.els.video.srcObject = null; if (this.state.cam === 'on' || this.state.cam === 'asking') this.setState({ cam: 'off' }); }
+  liveLoop() {
+    let last = 0; const loop = now => { this.liveRaf = requestAnimationFrame(loop); const s = this.state, v = this.els.video;
+      if (s.tab !== 'live' || s.liveView !== 'cam' || s.review || !v || v.readyState < 2 || now - last < 40) return; last = now;
+      const t = mk(640, 480); cover(t.getContext('2d'), v, 0, 0, 640, 480); this.blit(develop(t, s.fx, 640, s.stamp, s.facing === 'user')); };
+    this.liveRaf = requestAnimationFrame(loop);
+  }
+  grab(side) { const v = this.els.video, [vw, vh] = dims(v), s = Math.min(1, side / Math.max(vw, vh)), w = Math.round(Math.min(vw, vh * 4 / 3) * s), h = Math.round(w * .75), c = mk(w, h), x = c.getContext('2d');
+    if (this.state.facing === 'user') { x.translate(w, 0); x.scale(-1, 1); } cover(x, v, 0, 0, w, h); return c; }
+  makeCamThumbs() { const v = this.els.video; if (!v || v.readyState < 2) return; const base = this.grab(160), out = {}; PKEYS.forEach(k => { out[k] = develop(base, k, 120, 'none').toDataURL('image/jpeg', .8); }); this.setState({ camThumbs: out }); }
+  async exportCanvas() { this.say('Developing…'); await new Promise(r => setTimeout(r, 30)); const c = this.compose(2); if (!c) { this.say('Add photos first.'); return null; } return c; }
+  name() { return { strip: 'film-strip', sheet: 'contact-sheet', live: 'film-reel' }[this.state.tab]; }
+  renderVals() {
+    const s = this.state, tab = s.tab, ink = '#f3e9dc', cream = '#f3ede4', dark = '#1e1a16';
+    const _o = s.off || 0, _bar = { position: 'absolute', left: 0, right: 0, height: s.arrived && !_o ? 0 : '50%', background: '#000', transition: _o ? 'height .4s cubic-bezier(.7,0,.84,0)' : 'height .55s cubic-bezier(.2,.8,.3,1)' };
+    const IW = 1584, IH = 993, SW = Math.max(s.vw, s.vh * IW / IH), SH = SW * IH / IW, cl = (v, a, b) => Math.max(a, Math.min(b, v));
+    const SL = cl(s.vw / 2 - .5 * SW, s.vw - SW, 0), ST = cl(s.vh / 2 - .5 * SH, s.vh - SH, 0), wide = s.vw > 1100 && s.vh > 640;
+    const sw = on => ({ track: { position: 'relative', width: 44, height: 26, flexShrink: 0, borderRadius: 4, boxShadow: on ? '0 0 10px rgba(255,255,255,.25)' : 'none', border: '1px solid rgba(255,240,220,.4)', background: on ? 'rgba(255,255,255,.64)' : 'rgba(255,240,220,.1)', cursor: 'pointer', padding: 0, transition: 'background .2s' }, dot: { position: 'absolute', top: 2, left: on ? 20 : 2, width: 20, height: 20, borderRadius: 2, background: on ? dark : 'rgba(243,233,220,.75)', transition: 'left .2s' } });
+    const chip = on => ({ height: 'clamp(30px,4.4vh,38px)', padding: '0 12px', borderRadius: 4, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8, border: '1px solid ' + (on ? '#f3ede4' : 'rgba(255,255,255,.28)'), background: on ? '#f3ede4' : 'rgba(255,255,255,.04)', color: on ? '#1e1a16' : ink, transition: 'background .2s, border-color .2s, color .2s' });
+    const live = tab === 'live', camOn = s.cam === 'on', camList = this.list(true), allList = this.list(false);
+    const empty = live ? (s.liveView === 'cam' ? !camOn && !s.review : !camList.length) : !allList.length;
+    const camMsg = { off: ['Live Cam', 'Starting the camera…', 'Start camera'], asking: ['Live Cam', 'Allow camera access to start shooting. Nothing leaves your device.', 'Start camera'], denied: ['Camera blocked', 'Camera access was declined. Allow it in your browser settings, then try again.', 'Try again'], error: ['No camera found', "We couldn't open a camera on this device.", 'Try again'], unsupported: ['Not supported', "This browser can't open the camera here.", 'Back to Film Strip'] }[s.cam] || ['', '', ''];
+    const [eT, eX, eB] = live ? (s.liveView === 'cam' ? camMsg : ['Your reel is empty', 'Capture a few frames and they’ll appear here on a 35mm reel.', 'Back to camera']) : ['Load your roll', 'Add up to 8 photos. Everything is developed right here on your device.', 'Add Photos'];
+    const dragIdx = this.dragIdx;
+    return {
+      onTop: { ..._bar, top: 0 }, onBot: { ..._bar, bottom: 0 },
+      offLine: { position: 'absolute', left: '50%', top: '50%', height: _o === 3 ? 4 : 2, width: _o >= 2 ? 4 : '100%', borderRadius: 2, transform: 'translate(-50%,-50%)', background: '#fff', boxShadow: '0 0 12px 3px rgba(210,230,255,.9), 0 0 40px 8px rgba(160,200,255,.45)', opacity: _o === 1 || _o === 2 ? 1 : 0, transition: _o === 1 ? 'opacity .12s .3s' : _o === 2 ? 'width .22s cubic-bezier(.6,0,.9,.4)' : 'opacity .2s, height .1s' },
+      goHome: e => { if (e && (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1)) return; e && e.preventDefault(); if (_o) return; this.stopCam(); const href = 'Home.dc.html';
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.location.href = href; return; }
+        this.setState({ off: 1 }); setTimeout(() => { this.setState({ off: 2 }); setTimeout(() => { this.setState({ off: 3 }); setTimeout(() => { window.location.href = href; }, 200); }, 230); }, 400); },
+      fileRef: this.fileRef, videoRef: this.videoRef, previewRef: this.previewRef, clock: s.clock,
+      bodyStyle: { flex: 1, minHeight: 0, overflowY: wide ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', padding: 'clamp(10px,2vh,24px) clamp(20px,3vw,48px) clamp(14px,2.4vh,28px)' },
+      gridStyle: { display: 'flex', flexWrap: wide ? 'nowrap' : 'wrap', gap: 'clamp(18px,2.2vw,32px)', alignItems: 'stretch', flex: 1, minHeight: 0 },
+      stageStyle: { position: 'absolute', left: SL, top: ST, width: SW, height: SH },
+      panelStyle: { position: 'absolute', zIndex: 2, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflow: 'hidden',
+        ...(wide ? { left: Math.max(24, SL + .295 * SW), top: Math.max(16, ST + .09 * SH), width: Math.min(.672 * SW, s.vw - Math.max(24, SL + .295 * SW) - 36), height: Math.min(.8 * SH, s.vh - 32) } : { left: 10, right: 10, top: 10, bottom: 10 }),
+        borderRadius: 18, background: 'linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.04))', backdropFilter: 'blur(26px) brightness(.72) saturate(1.05)', WebkitBackdropFilter: 'blur(26px) brightness(.72) saturate(1.05)', border: '1px solid rgba(255,255,255,.18)', boxShadow: '0 40px 100px rgba(0,0,0,.45), 0 0 60px rgba(255,255,255,.04), inset 0 1px 0 rgba(255,255,255,.18)', color: ink },
+      tabs: [['strip', 'Film Strip'], ['sheet', 'Contact Sheet'], ['live', 'Live Cam']].map(([id, label]) => ({ label, on: tab === id, pick: () => this.setState({ tab: id, shareOpen: false, review: null }),
+        style: { height: 32, minWidth: 'clamp(84px,7vw,116px)', padding: '0 12px', borderRadius: 9, border: 0, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', background: tab === id ? '#f3ede4' : 'transparent', color: tab === id ? '#1e1a16' : ink, fontWeight: tab === id ? 600 : 400, boxShadow: tab === id ? 'inset 0 1px 0 rgba(255,255,255,.3), 0 0 16px rgba(255,255,255,.22)' : 'none', transition: 'background .3s, color .3s' } })),
+      isStrip: tab === 'strip', isSheet: tab === 'sheet', isLive: live, notLive: !live,
+      previewBox: { position: 'relative', flex: 1, minHeight: wide ? 0 : (live ? '46vh' : '52vh'), borderRadius: 18, border: '1px solid rgba(255,240,220,.16)', background: live ? '#0d0a08' : 'rgba(20,14,9,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: live && s.liveView === 'cam' ? 0 : '40px 18px 16px', boxSizing: 'border-box' },
+      showPreviewLabel: !live, previewLabel: 'Preview',
+      previewCanvas: { display: empty ? 'none' : 'block', position: 'absolute', ...(live && s.liveView === 'cam' ? { inset: 0, width: '100%', height: '100%' } : { left: 18, top: 40, width: 'calc(100% - 36px)', height: 'calc(100% - 56px)' }), objectFit: live && s.liveView === 'cam' ? 'cover' : 'contain', borderRadius: live && s.liveView === 'cam' ? 0 : 2, filter: live || tab === 'sheet' ? 'none' : 'drop-shadow(0 18px 30px rgba(0,0,0,.45))' },
+      showEmpty: empty, emptyTitle: eT, emptyText: eX, emptyBtn: eB,
+      emptyAction: () => { if (!live) return this.els.file.click(); if (s.liveView === 'reel') return this.setState({ liveView: 'cam' }); if (s.cam === 'unsupported') return this.setState({ tab: 'strip' }); this.startCam(); },
+      liveFrame: { position: 'absolute', inset: 0, pointerEvents: 'none', display: s.liveView === 'cam' && (camOn || s.review) ? 'block' : 'none' },
+      flashStyle: { position: 'absolute', inset: 0, background: '#fff', opacity: s.flash ? .85 : 0, transition: s.flash ? 'none' : 'opacity .45s ease-out' },
+      hasReelToggle: live, liveViews: [['cam', 'Camera'], ['reel', `Reel · ${camList.length}`]].map(([k, label]) => ({ label, on: s.liveView === k, pick: () => this.setState({ liveView: k, review: null }), style: { height: 30, padding: '0 12px', borderRadius: 7, border: 0, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 16, letterSpacing: '.06em', textTransform: 'uppercase', background: s.liveView === k ? cream : 'transparent', color: s.liveView === k ? dark : ink } })),
+      reviewing: !!s.review, notReviewing: !s.review, camOff: !camOn,
+      switchCam: () => { this.stopCam(); this.setState({ facing: s.facing === 'user' ? 'environment' : 'user' }, () => this.startCam()); },
+      shutterOff: s.liveView !== 'cam' || (!camOn && !s.review) || s.photos.length >= MAX, shutterLabel: s.photos.length >= MAX ? 'Roll full' : 'Take photo',
+      shutterInner: { display: 'block', width: '100%', height: '100%', borderRadius: '50%', background: s.photos.length >= MAX ? 'rgba(243,233,220,.3)' : '#f3e9dc' },
+      shutter: () => { if (s.review || !camOn) return; const c = this.grab(1800); this.setState({ flash: 1, review: { img: c } }); setTimeout(() => this.setState({ flash: 0 }), 60); },
+      retake: () => this.setState({ review: null }),
+      keep: () => { const c = s.review && s.review.img; if (!c) return; if (s.photos.length >= MAX) return this.say('Your roll is full — 8 photos max.');
+        c.toBlob(b => { const url = URL.createObjectURL(b), img = new Image(); img.onload = () => { const id = Math.random().toString(36).slice(2, 9); this.imgs[id] = img;
+          this.setState(st => ({ photos: [...st.photos, { id, url, name: 'live-cam', cam: true }], review: null, lastUrl: url })); setTimeout(() => this.makeCamThumbs(), 300); }; img.src = url; }, 'image/jpeg', .94); },
+      hasLast: !!s.lastUrl, lastUrl: s.lastUrl,
+      count: s.photos.length, canAdd: s.photos.length < MAX, hasThumbs: s.photos.length > 1,
+      pickFiles: () => this.els.file.click(), onFiles: e => { this.addFiles(e.target.files); e.target.value = ''; },
+      onDragOver: e => e.preventDefault(), onDropFiles: e => { e.preventDefault(); if (e.dataTransfer.files && e.dataTransfer.files.length) this.addFiles(e.dataTransfer.files); },
+      thumbs: s.photos.map((p, i) => ({ url: p.url, aria: `Photo ${i + 1} of ${s.photos.length}. Use left and right arrows to move it.`, removeAria: `Remove photo ${i + 1}`, remove: () => this.remove(p.id),
+        key: e => { if (e.key === 'ArrowLeft') { e.preventDefault(); this.move(i, i - 1); } if (e.key === 'ArrowRight') { e.preventDefault(); this.move(i, i + 1); } },
+        dragStart: e => { this.dragIdx = i; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', String(i)); } catch (er) {} },
+        dragOver: e => { e.preventDefault(); }, drop: e => { if (this.dragIdx == null) return; e.preventDefault(); e.stopPropagation(); this.move(this.dragIdx, i); this.dragIdx = null; } })),
+      twoCols: s.twoCols, toggleCols: () => this.setState({ twoCols: !s.twoCols }), colsSw: sw(s.twoCols),
+      colOpts: [[2, '2 Columns'], [3, '3 Columns']].map(([k, label]) => ({ label, on: s.cols === k, pick: () => this.setState({ cols: k }), style: { flex: '0 1 160px', height: 40, borderRadius: 9, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.06em', textTransform: 'uppercase', border: s.cols === k ? 0 : '1px solid rgba(255,240,220,.22)', background: s.cols === k ? cream : 'transparent', color: s.cols === k ? dark : ink, fontWeight: s.cols === k ? 600 : 400 } })),
+      effects: PKEYS.map(k => ({ label: PRESETS[k].label, on: s.fx === k, pick: () => this.setState({ fx: k }), chip: chip(s.fx === k), hasThumb: !!s.camThumbs[k], thumb: s.camThumbs[k] || '',
+        frame: { display: 'block', width: 54, height: 'clamp(46px,7vh,66px)', borderRadius: 8, overflow: 'hidden', boxSizing: 'border-box', background: 'rgba(255,240,220,.08)', border: s.fx === k ? '2px solid #f3ede4' : '1px solid rgba(255,240,220,.2)', transition: 'border-color .2s' } })),
+      optToggles: [['markings', 'Show Film Markings', 'Markings'], ['frames', 'Show Frame Numbers', 'Frame no.']].map(([k, label, short]) => { const w = sw(s[k]); return { label, short, on: s[k], toggle: () => this.setState({ [k]: !s[k] }), track: w.track, dot: w.dot }; }),
+      stampStyle: s.stamp, onStamp: e => this.setState({ stamp: e.target.value }), stampOpts: Object.entries(STAMPS).map(([value, v]) => ({ value, label: value === 'none' ? 'No date stamp' : 'Date · ' + v.label })),
+      cantExport: live ? !camList.length : !allList.length,
+      dlLabel: { strip: 'Download Film Strip', sheet: 'Download Contact Sheet', live: 'Download Film Reel' }[tab],
+      download: async () => { const c = await this.exportCanvas(); if (!c) return; c.toBlob(b => { if (!b) return this.say('Export failed — try fewer or smaller photos.'); const u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `camera-room-${this.name()}.png`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); this.say(`Saved camera-room-${this.name()}.png`); }, 'image/png'); },
+      shareOpen: s.shareOpen, toggleShare: () => this.setState({ shareOpen: !s.shareOpen }),
+      shareNative: async () => { this.setState({ shareOpen: false }); const c = await this.exportCanvas(); if (!c) return; const b = await new Promise(r => c.toBlob(r, 'image/png')); const f = new File([b], `camera-room-${this.name()}.png`, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: 'Camera Room' }); this.say('Shared.'); } catch (e) { if (e.name !== 'AbortError') this.say('Sharing failed.'); } }
+        else this.say("This browser can't share files — use Download or Copy image instead."); },
+      shareCopy: async () => { this.setState({ shareOpen: false }); const c = await this.exportCanvas(); if (!c) return; try { const b = await new Promise(r => c.toBlob(r, 'image/png')); await navigator.clipboard.write([new ClipboardItem({ 'image/png': b })]); this.say('Copied to clipboard.'); } catch (e) { this.say("Couldn't copy here — use Download instead."); } },
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:wght@400;700&family=Rammetto+One&family=Lexend:wght@400;600;800&family=Instrument+Serif&display=swap">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;font-family:'Lexend',sans-serif;background:#16110b}
+a{color:inherit}a:hover{color:#dcb85a}
+button:focus-visible{outline:2px solid #dcb85a;outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed}
+</style>
+<script src="./liquid.js"></script>
+<script src="./footer.js"></script>
+</helmet>
+<div aria-hidden="true" style="position:fixed;inset:0;z-index:90;pointer-events:none"><div style="{{ onTop }}"></div><div style="{{ onBot }}"></div><div style="{{ offLine }}"></div></div>
+<div style="{{ pageStyle }}" onDragOver="{{ onDragOver }}" onDrop="{{ onDrop }}">
+  <div style="{{ stageStyle }}">
+    <img src="assets/tv-room-plate.png" data-liquid="" alt="A sunlit room with a wooden dresser" draggable="false" style="{{ bgFullStyle }}">
+    <div style="{{ tvStyle }}">
+    <div style="{{ glowStyle }}"></div>
+    <div onClick="{{ onScreenClick }}" style="{{ scrBox }}">
+      <video ref="{{ videoRef }}" playsInline="{{ true }}" loop="{{ true }}" onTimeUpdate="{{ onTime }}" onPlay="{{ onPlay }}" onPause="{{ onPause }}" onEnded="{{ onEnded }}" style="position:absolute;width:2px;height:2px;opacity:0;pointer-events:none"></video>
+      <canvas ref="{{ outRef }}" width="640" height="480" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 30% 20%,rgba(255,255,255,.07),transparent 60%);box-shadow:inset 0 0 60px rgba(0,0,0,.85);pointer-events:none"></div>
+      <sc-if value="{{ showInsert }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;font-family:'VT323',monospace;color:#e9f4ea;text-shadow:2px 0 rgba(255,0,60,.55),-2px 0 rgba(0,200,255,.55);pointer-events:none;text-align:center">
+          <span ref="{{ blinkRef }}" style="font-size:9cqw;line-height:1">INSERT TAPE</span>
+          <span style="font-size:3.2cqw">USE THE SLOT · OR DROP A VIDEO · MAX {{ maxMB }} MB</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasErr }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:0;right:0;top:42%;text-align:center;font-family:'VT323',monospace;font-size:5cqw;color:#2a2016;background:#dcb85a;padding:6px 0;pointer-events:none">{{ err }}</div>
+      </sc-if>
+    </div>
+    <button onClick="{{ stepVolume }}" onWheel="{{ wheelVolume }}" onMouseEnter="{{ hint_vhf }}" onMouseLeave="{{ unhint }}" aria-label="Volume" style="{{ volBox }}" style-hover="box-shadow:0 0 0 1.5px rgba(220,184,90,.8),0 0 14px rgba(220,184,90,.5)"></button>
+    <button onClick="{{ togglePower }}" onWheel="{{ wheelPreset }}" onMouseEnter="{{ hint_power }}" onMouseLeave="{{ unhint }}" aria-label="Power" style="{{ knobStyle }}" style-hover="box-shadow:0 0 0 1.5px #dcb85a,0 0 14px #dcb85a" style-active="transform:scale(.92)"></button>
+    <button onClick="{{ stepIntensity }}" onWheel="{{ wheelIntensity }}" onMouseEnter="{{ hint_uhf }}" onMouseLeave="{{ unhint }}" aria-label="Effect intensity" style="{{ intBox }}" style-hover="box-shadow:0 0 0 1.5px rgba(220,184,90,.8),0 0 14px rgba(220,184,90,.5)"></button>
+    <button onClick="{{ pickFile }}" onMouseEnter="{{ hint_slot }}" onMouseLeave="{{ unhint }}" aria-label="Insert tape" style="{{ slotBox }}" style-hover="background:rgba(220,184,90,.3);box-shadow:inset 0 0 10px #dcb85a"></button>
+    <button onClick="{{ togglePower }}" onMouseEnter="{{ hint_power }}" onMouseLeave="{{ unhint }}" aria-label="Power" style="{{ powBox }}" style-hover="box-shadow:0 0 0 1.5px #dcb85a,0 0 12px #dcb85a" style-active="transform:scale(.9)"></button>
+    <span style="{{ ledStyle }}"></span>
+    </div>
+  </div>
+  <input ref="{{ fileRef }}" type="file" accept="video/*" onChange="{{ onFile }}" style="display:none">
+
+  <nav style="position:absolute;top:20px;left:24px;display:flex;flex-direction:column;gap:6px;z-index:2">
+    <a href="Home.dc.html" onClick="{{ goHome }}" aria-label="Back to the room" style="display:flex;align-items:center;gap:10px;font-family:'VT323',monospace;font-size:clamp(22px,2vw,30px);letter-spacing:.06em;color:#f6efe4;text-decoration:none;text-shadow:0 0 8px rgba(0,0,0,.5);padding:2px 6px;margin:-2px -6px;border-radius:6px;width:max-content" style-hover="background:rgba(255,255,255,.1)"><svg width="18" height="20" viewBox="0 0 18 20"><path d="M16 1L1 10l15 9z" fill="#f6efe4"></path></svg>BACK</a>
+    <span style="font-family:'VT323',monospace;font-size:22px;letter-spacing:.04em;color:#dcb85a;text-shadow:0 1px 8px rgba(0,0,0,.7)">{{ hint }}</span>
+  </nav>
+
+  <button onClick="{{ toggleDrawer }}" aria-label="Open tv lab" style="{{ handleStyle }}" style-hover="background:rgba(255,255,255,.18)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3ede4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
+    <span style="writing-mode:vertical-rl;transform:rotate(180deg);font-family:'VT323',monospace;font-size:20px;letter-spacing:.14em;color:#f1e6cf;white-space:nowrap">OPEN TV LAB</span>
+  </button>
+
+  <aside style="{{ drawerStyle }}">
+    <div style="display:flex;align-items:center;gap:12px;padding:16px 18px 12px">
+      <span style="flex:1;font-family:'VT323',monospace;font-size:28px;letter-spacing:.02em;line-height:1;color:#f1e6cf">control panel</span>
+      <span style="font-family:'VT323',monospace;font-size:12px;letter-spacing:.08em;color:rgba(241,230,207,.6);font-size:13px">NO. 094</span>
+      <button onClick="{{ toggleDrawer }}" aria-label="Collapse panel" style="width:30px;height:30px;flex-shrink:0;border-radius:6px;border:1px solid rgba(241,230,207,.6);background:transparent;color:#f1e6cf;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:rgba(241,230,207,.1)" style-active="transform:scale(.94)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+    </div>
+    <div style="margin:0 18px;border-top:1px solid rgba(241,230,207,.14);padding:12px 0;display:flex;flex-direction:column;gap:9px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span style="font-family:'VT323',monospace;font-size:16px;letter-spacing:.08em;color:#f1e6cf">PICTURE TUBE</span><span style="font-family:'VT323',monospace;font-size:12px;letter-spacing:.08em;color:rgba(241,230,207,.6)">CHOOSE THE LOOK</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+        <sc-for list="{{ presets }}" as="m" hint-placeholder-count="3">
+          <button onClick="{{ m.pick }}" style="{{ m.style }}"><span style="{{ m.led }}"></span>{{ m.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="margin:0 18px;border-top:1px solid rgba(241,230,207,.14);padding:12px 0;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-family:'VT323',monospace;font-size:16px;letter-spacing:.08em;color:#f1e6cf;width:72px;flex-shrink:0">VOLUME</span>
+        <div onPointerDown="{{ volDown }}" style="position:relative;flex:1;height:24px;cursor:pointer;touch-action:none">
+          <div style="position:absolute;left:0;right:0;top:10px;height:4px;border-radius:2px;background:rgba(241,230,207,.16)"></div>
+          <div style="{{ volFill }}"></div>
+          <div style="{{ volThumb }}"></div>
+        </div>
+        <span style="width:34px;height:22px;flex-shrink:0;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:1px solid rgba(241,230,207,.3);border-radius:4px;font-family:'VT323',monospace;font-size:16px;color:#f1e6cf">{{ volume }}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-family:'VT323',monospace;font-size:16px;letter-spacing:.08em;color:#f1e6cf;width:72px;flex-shrink:0">INTENSITY</span>
+        <div onPointerDown="{{ intDown }}" style="position:relative;flex:1;height:24px;cursor:pointer;touch-action:none">
+          <div style="position:absolute;left:0;right:0;top:10px;height:4px;border-radius:2px;background:rgba(241,230,207,.16)"></div>
+          <div style="{{ intFill }}"></div>
+          <div style="{{ intThumb }}"></div>
+        </div>
+        <span style="width:34px;height:22px;flex-shrink:0;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:1px solid rgba(241,230,207,.3);border-radius:4px;font-family:'VT323',monospace;font-size:16px;color:#f1e6cf">{{ intensity }}</span>
+      </div>
+    </div>
+    <div style="margin:0 18px;border-top:1px solid rgba(241,230,207,.14);padding:10px 0 12px;display:flex;flex-direction:column;gap:8px">
+      <button onClick="{{ toggleFxOpen }}" aria-expanded="{{ fxOpen }}" style="display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:transparent;padding:4px 0;cursor:pointer;color:#f1e6cf">
+        <span style="font-family:'VT323',monospace;font-size:16px;letter-spacing:.08em;color:#f1e6cf">EFFECTS</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="{{ chevStyle }}"><path d="m6 15 6-6 6 6"></path></svg>
+      </button>
+      <sc-if value="{{ fxOpen }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">
+          <sc-for list="{{ fxList }}" as="f" hint-placeholder-count="5">
+            <button onClick="{{ f.toggle }}" aria-pressed="{{ f.on }}" title="{{ f.descU }}" style="{{ f.track }}"><span style="{{ f.dot }}"></span><span>{{ f.label }}</span></button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+    <div style="margin:0 18px;border-top:1px solid rgba(241,230,207,.14);padding:12px 0 0">
+      <button onClick="{{ mainAction }}" style="width:100%;height:40px;border-radius:6px;border:1px solid rgba(255,255,255,.38);background:rgba(255,255,255,.06);color:#f1e6cf;display:flex;align-items:center;gap:16px;padding:0 18px 0 22px;cursor:pointer" style-hover="background:rgba(255,255,255,.14);border-color:#f3ede4" style-active="transform:translateY(1px)">
+        <span style="{{ recDotBig }}"></span>
+        <span style="flex:1;text-align:left;font-family:'VT323',monospace;font-size:19px;letter-spacing:.04em">{{ mainLabel }}</span>
+        <sc-if value="{{ noTape }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5M4 20h16"></path></svg></sc-if>
+        <sc-if value="{{ hasTape }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"></path></svg></sc-if>
+      </button>
+    </div>
+    <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:6px;padding:9px 18px 14px;font-family:'VT323',monospace;font-size:12px;letter-spacing:.08em;color:rgba(241,230,207,.6)">
+      <span>RECORDS IN REAL TIME, WITH EFFECTS · WEBM / MP4</span>
+      <sc-if value="{{ hasTape }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pickFile }}" style="border:0;padding:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px" style-hover="color:#f3ede4">SWAP TAPE</button></sc-if>
+      <button onClick="{{ toggleLights }}" style="border:0;padding:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px" style-hover="color:#f3ede4">{{ lightsLabel }}</button>
+    </div>
+  </aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;maxUploadMB&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:100,&quot;min&quot;:10,&quot;max&quot;:1000,&quot;step&quot;:10,&quot;unit&quot;:&quot;MB&quot;,&quot;tsType&quot;:&quot;number&quot;},&quot;defaultPreset&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;vhs&quot;,&quot;crt&quot;,&quot;bw&quot;],&quot;default&quot;:&quot;vhs&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const W = 640, H = 480;
+const PRESETS = {
+  vhs:   { label: 'vhs', grade: 'saturate(1.35) contrast(1.1) sepia(.15) brightness(1.04) blur(.7px)', chroma: 3, grain: .12, fx: { chroma: 1, static: 1, scan: 1, tracking: 1, vignette: 1, flicker: 1, weave: 0, dust: 0, date: 0, osd: 1 } },
+  crt:   { label: 'crt', grade: 'contrast(1.2) saturate(1.15) brightness(1.06) blur(.3px)', chroma: 1, grain: .05, fx: { chroma: 1, static: 1, scan: 1, tracking: 0, vignette: 1, flicker: 1, weave: 0, dust: 0, date: 0, osd: 1 } },
+  bw:    { label: 'b&w', grade: 'grayscale(1) contrast(1.35) brightness(1.08) blur(.5px)', chroma: 0, grain: .15, fx: { chroma: 0, static: 1, scan: 1, tracking: 0, vignette: 1, flicker: 1, weave: 0, dust: 0, date: 0, osd: 1 } },
+};
+const FXDESC = { chroma: 'red & blue drift', static: 'snow on the line', scan: 'tube lines', tracking: 'rolling bar', flicker: 'unsteady light' };
+const FX = [['chroma','colour bleed'],['static','static'],['scan','scanlines'],['tracking','tracking'],['flicker','flicker']];
+const BTN = { fontFamily: "'Lexend',sans-serif", fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' };
+
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    const preset = this.props.defaultPreset ?? 'vhs';
+    this.state = { src: null, name: '', playing: false, muted: false, t: 0, dur: 0, preset, fx: { ...PRESETS[preset].fx }, intensity: 50, volume: 80, dark: false, on: true, hint: '', drawer: true, fxOpen: true, vw: window.innerWidth, vh: window.innerHeight, err: '', exporting: false };
+  }
+  videoRef = React.createRef(); outRef = React.createRef(); blinkRef = React.createRef(); fileRef = React.createRef(); rootRef = React.createRef();
+  componentDidMount() {
+    this._ps = () => this.setState({ off: 0, arrived: true }); window.addEventListener('pageshow', this._ps);
+    requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ arrived: true })));
+    this.srcC = document.createElement('canvas'); this.srcC.width = W; this.srcC.height = H;
+    this.sctx = this.srcC.getContext('2d', { willReadFrequently: true });
+    this.octx = this.outRef.current.getContext('2d');
+    this.outImg = this.octx.createImageData(W, H);
+    this.vig = new Float32Array(W * H);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const dx = (x / W - .5) * 1.25, dy = (y / H - .5) * 1.25, d = Math.sqrt(dx * dx + dy * dy);
+      this.vig[y * W + x] = Math.max(0, Math.min(1, 1.25 - d * d * 1.6));
+    }
+    document.fonts && document.fonts.load('28px VT323');
+    this.trackY = -40; this.frame = 0; this.wx = 0; this.wy = 0;
+    const loop = () => { try { this.draw(); if (this.state.on) this.drawOverlay(); } catch (e) {} this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+    this.onResize = () => this.setState({ vw: window.innerWidth, vh: window.innerHeight }); window.addEventListener('resize', this.onResize);
+    this.onFirst = () => { this.initSfx(); }; window.addEventListener('pointerdown', this.onFirst); window.addEventListener('keydown', this.onFirst);
+  }
+  initSfx() {
+    if (this.ax) { this.ax.state === 'suspended' && this.ax.resume(); return; }
+    try {
+      const A = window.AudioContext || window.webkitAudioContext; const ax = this.ax = new A();
+      this.master = ax.createGain(); this.master.connect(ax.destination);
+      const len = ax.sampleRate * 2, buf = this.noiseBuf = ax.createBuffer(1, len, ax.sampleRate), d = buf.getChannelData(0);
+      let b0 = 0; for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; b0 = .6 * b0 + .4 * w; d[i] = w * .55 + b0 * .45; }
+      const src = ax.createBufferSource(); src.buffer = buf; src.loop = true;
+      const hp = ax.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 300;
+      const lp = ax.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7000;
+      this.staticGain = ax.createGain(); this.staticGain.gain.value = 0;
+      src.connect(hp); hp.connect(lp); lp.connect(this.staticGain); this.staticGain.connect(this.master); src.start();
+      const hum = ax.createOscillator(); hum.frequency.value = 60; this.humGain = ax.createGain(); this.humGain.gain.value = 0; hum.connect(this.humGain); this.humGain.connect(this.master); hum.start();
+      const whine = ax.createOscillator(); whine.frequency.value = 15734; this.whineGain = ax.createGain(); this.whineGain.gain.value = 0; whine.connect(this.whineGain); this.whineGain.connect(this.master); whine.start();
+    } catch (e) { this.ax = null; }
+    this.updateSfx();
+  }
+  updateSfx() {
+    if (!this.ax) return; const { on, src, volume } = this.state, t = this.ax.currentTime, v = volume / 100;
+    const snow = on && !src;
+    this.staticGain.gain.setTargetAtTime(snow ? .09 * v : 0, t, .08);
+    this.humGain.gain.setTargetAtTime(on ? .012 * v : 0, t, .15);
+    this.whineGain.gain.setTargetAtTime(on ? .0025 * v : 0, t, .2);
+  }
+  powerSound(turnOn) {
+    if (!this.ax) return; const ax = this.ax, t = ax.currentTime, v = Math.max(.25, this.state.volume / 100);
+    const clk = ax.createBufferSource(); clk.buffer = this.noiseBuf; const cg = ax.createGain(), cf = ax.createBiquadFilter(); cf.type = 'bandpass'; cf.frequency.value = 2400; cf.Q.value = .8;
+    cg.gain.setValueAtTime(.5 * v, t); cg.gain.exponentialRampToValueAtTime(.001, t + .05); clk.connect(cf); cf.connect(cg); cg.connect(this.master); clk.start(t, Math.random()); clk.stop(t + .07);
+    const o = ax.createOscillator(), og = ax.createGain(); o.type = 'sine';
+    if (turnOn) { o.frequency.setValueAtTime(48, t + .04); o.frequency.exponentialRampToValueAtTime(90, t + .5); og.gain.setValueAtTime(.0001, t + .04); og.gain.exponentialRampToValueAtTime(.28 * v, t + .1); og.gain.exponentialRampToValueAtTime(.001, t + .7); }
+    else { o.frequency.setValueAtTime(900, t + .02); o.frequency.exponentialRampToValueAtTime(60, t + .35); og.gain.setValueAtTime(.12 * v, t + .02); og.gain.exponentialRampToValueAtTime(.001, t + .4); }
+    o.connect(og); og.connect(this.master); o.start(t); o.stop(t + .8);
+  }
+  componentDidUpdate(pp, ps) { if (ps.on !== this.state.on || ps.src !== this.state.src || ps.volume !== this.state.volume) this.updateSfx(); }
+  componentWillUnmount() { window.removeEventListener('pointerdown', this.onFirst); window.removeEventListener('keydown', this.onFirst); this.ax && this.ax.close(); cancelAnimationFrame(this.raf); window.removeEventListener('resize', this.onResize); clearTimeout(this.errT); if (this.state.src) URL.revokeObjectURL(this.state.src); }
+  draw() {
+    const { fx, preset, intensity, src, playing } = this.state, P = PRESETS[preset], k = intensity / 50;
+    const v = this.videoRef.current, s = this.sctx, o = this.octx;
+    this.frame++;
+    const now = performance.now(), pe = now - (this.powerT || -1e4);
+    if (!this.state.on) {
+      o.fillStyle = '#050505'; o.fillRect(0, 0, W, H);
+      if (pe < 220) { const hh = Math.max(2, H * (1 - pe / 220)); o.fillStyle = '#e9f4ea'; o.fillRect(0, (H - hh) / 2, W, hh); }
+      else if (pe < 700) { const r = 14 * (1 - (pe - 220) / 480); o.fillStyle = '#ffffff'; o.shadowColor = '#fff'; o.shadowBlur = 24; o.beginPath(); o.arc(W / 2, H / 2, Math.max(r, 0.5), 0, 7); o.fill(); o.shadowBlur = 0; }
+      return;
+    }
+    const b = this.blinkRef.current; if (b) b.style.visibility = Math.floor(this.frame / 40) % 2 ? 'hidden' : 'visible';
+    if (!src || !v || v.readyState < 2) {
+      const d = this.outImg.data;
+      for (let i = 0; i < d.length; i += 4) { const n = Math.random() * 200; d[i] = d[i + 1] = d[i + 2] = n; d[i + 3] = 255; }
+      o.putImageData(this.outImg, 0, 0); return;
+    }
+    if (fx.weave) { this.wx += ((Math.random() - .5) * 3 * k - this.wx) * .3; this.wy += ((Math.random() - .5) * 4 * k - this.wy) * .3; } else { this.wx = this.wy = 0; }
+    const vw = v.videoWidth, vh = v.videoHeight, ar = vw / vh;
+    let cw = vw, chh = vh, cx = 0, cy = 0;
+    if (ar > W / H) { cw = vh * W / H; cx = (vw - cw) / 2; } else { chh = vw * H / W; cy = (vh - chh) / 2; }
+    s.filter = P.grade; s.fillStyle = '#000'; s.fillRect(0, 0, W, H);
+    s.drawImage(v, cx, cy, cw, chh, this.wx - 2, this.wy - 2, W + 4, H + 4);
+    s.filter = 'none';
+    const sd = s.getImageData(0, 0, W, H).data, od = this.outImg.data, vig = this.vig;
+    const ch = fx.chroma ? Math.round(Math.max(1, P.chroma) * k) : 0;
+    const grain = fx.static ? P.grain * k * 255 : 0;
+    const flick = fx.flicker ? 1 + (Math.random() - .5) * .08 * k : 1;
+    const scanMul = fx.scan ? Math.max(.4, 1 - .26 * k) : 1;
+    if (fx.tracking) { this.trackY += 1.6; if (this.trackY > H + 60) this.trackY = -60 - Math.random() * 300; }
+    const tt = this.frame * .2;
+    for (let y = 0; y < H; y++) {
+      let shift = 0, glow = 0;
+      if (fx.tracking) {
+        const dd = y - this.trackY;
+        if (dd >= 0 && dd < 40) { shift = Math.round(Math.sin(dd * .35 + tt) * 7 * k); glow = 28 * k * (1 - dd / 40); }
+        if (Math.random() < .0015 * k) shift += (Math.random() * 14 - 7) | 0;
+      }
+      const sl = (y & 1) ? scanMul : 1, row = y * W;
+      for (let x = 0; x < W; x++) {
+        let sx = x + shift; sx = sx < 0 ? 0 : sx >= W ? W - 1 : sx;
+        const xr = sx + ch >= W ? W - 1 : sx + ch, xb = sx - ch < 0 ? 0 : sx - ch;
+        const m = sl * flick * (fx.vignette ? vig[row + x] : 1), n = grain ? (Math.random() - .5) * grain : 0, i = (row + x) * 4;
+        od[i] = sd[(row + xr) * 4] * m + n + glow;
+        od[i + 1] = sd[(row + sx) * 4 + 1] * m + n + glow;
+        od[i + 2] = sd[(row + xb) * 4 + 2] * m + n + glow;
+        od[i + 3] = 255;
+      }
+    }
+    o.putImageData(this.outImg, 0, 0);
+    if (fx.dust) {
+      const cnt = Math.random() < .5 ? 0 : Math.ceil(Math.random() * 3 * k);
+      for (let j = 0; j < cnt; j++) {
+        o.fillStyle = Math.random() < .5 ? 'rgba(15,10,5,.75)' : 'rgba(255,250,235,.7)';
+        o.beginPath(); o.ellipse(Math.random() * W, Math.random() * H, 1 + Math.random() * 2.5, 1 + Math.random() * 2, Math.random() * 3, 0, 7); o.fill();
+      }
+      if (Math.random() < .04 * k) {
+        o.strokeStyle = 'rgba(15,10,5,.6)'; o.lineWidth = 1; o.beginPath();
+        const hx = Math.random() * W, hy = Math.random() * H; o.moveTo(hx, hy);
+        o.bezierCurveTo(hx + 20, hy + 10, hx - 10, hy + 30, hx + 15, hy + 45); o.stroke();
+      }
+      if (Math.random() < .02 * k) { o.fillStyle = 'rgba(255,250,235,.18)'; o.fillRect(Math.random() * W, 0, 1, H); }
+    }
+    const txt = (t, x, y, align, color) => {
+      o.textAlign = align; o.fillStyle = 'rgba(255,0,60,.55)'; o.fillText(t, x + 2, y); o.fillStyle = 'rgba(0,200,255,.55)'; o.fillText(t, x - 2, y);
+      o.fillStyle = color || '#e9f4ea'; o.fillText(t, x, y);
+    };
+    o.font = '30px VT323, monospace'; o.textBaseline = 'alphabetic';
+    if (fx.osd) {
+      if (preset === 'cam') { if (Math.floor(this.frame / 30) % 2) { o.fillStyle = '#ff2a2a'; o.beginPath(); o.arc(48, 46, 8, 0, 7); o.fill(); } txt('REC', 62, 56, 'left'); }
+      else txt(playing ? 'PLAY ▶' : 'PAUSE ❚❚', 40, 56, 'left');
+      txt(preset === 'cam' ? 'SP 0:' + this.mmss(v.currentTime) : 'CH 03', W - 40, 56, 'right');
+      if (!fx.date) txt(this.tc(v.currentTime), W - 40, H - 34, 'right');
+      if (!fx.date) txt(preset === 'vhs' ? 'SP' : preset.toUpperCase(), 40, H - 34, 'left');
+    }
+    if (fx.date) {
+      o.font = '34px VT323, monospace';
+      const d = new Date(); const mo = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][d.getMonth()];
+      txt(`${mo} ${d.getDate()} 1994`, W - 40, H - 66, 'right', '#ffb43a');
+      txt(`${((d.getHours() + 11) % 12) + 1}:${String(d.getMinutes()).padStart(2, '0')} ${d.getHours() < 12 ? 'AM' : 'PM'}`, W - 40, H - 34, 'right', '#ffb43a');
+    }
+  }
+  drawOverlay() {
+    const o = this.octx, now = performance.now(), pe = now - (this.powerT || -1e4);
+    if (this.osd && now - this.osd.t < 1600) {
+      o.font = '40px VT323, monospace'; o.textAlign = 'center'; o.textBaseline = 'middle';
+      o.fillStyle = 'rgba(0,0,0,.35)'; o.fillRect(0, H / 2 - 30, W, 60);
+      o.fillStyle = 'rgba(255,0,60,.55)'; o.fillText(this.osd.text, W / 2 + 2, H / 2);
+      o.fillStyle = 'rgba(0,200,255,.55)'; o.fillText(this.osd.text, W / 2 - 2, H / 2);
+      o.fillStyle = '#7dff8a'; o.fillText(this.osd.text, W / 2, H / 2); o.textBaseline = 'alphabetic';
+    }
+    if (this.state.on && pe < 380) {
+      const p = pe / 380, hh = H * p * p;
+      o.save(); o.globalCompositeOperation = 'destination-in'; o.fillStyle = '#000'; o.fillRect(0, (H - hh) / 2, W, Math.max(2, hh)); o.restore();
+      o.globalCompositeOperation = 'destination-over'; o.fillStyle = '#050505'; o.fillRect(0, 0, W, H); o.globalCompositeOperation = 'source-over';
+      o.fillStyle = `rgba(255,255,255,${.5 * (1 - p)})`; o.fillRect(0, 0, W, H);
+    }
+  }
+  say(text) { this.osd = { text, t: performance.now() }; }
+  mmss(s) { s = Math.floor(s || 0); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
+  tc(s) { s = Math.floor(s || 0); return `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }
+  flash(err) { clearTimeout(this.errT); this.setState({ err }); this.errT = setTimeout(() => this.setState({ err: '' }), 3200); }
+  ensureAudio() {
+    if (this.actx) return;
+    try {
+      const A = window.AudioContext || window.webkitAudioContext; this.actx = new A();
+      const srcNode = this.actx.createMediaElementSource(this.videoRef.current);
+      this.gain = this.actx.createGain(); this.gain.gain.value = this.state.volume / 100;
+      this.recDest = this.actx.createMediaStreamDestination();
+      srcNode.connect(this.gain); this.gain.connect(this.actx.destination); srcNode.connect(this.recDest);
+    } catch (e) { this.actx = null; }
+  }
+  load(file) {
+    if (!file) return;
+    if (!file.type.startsWith('video')) return this.flash('NOT A VIDEO TAPE');
+    const max = this.props.maxUploadMB ?? 100;
+    if (file.size > max * 1024 * 1024) return this.flash(`TAPE TOO LONG · MAX ${max} MB`);
+    if (this.state.exporting) this.stopExport();
+    this.ensureAudio(); this.actx && this.actx.resume();
+    if (this.state.src) URL.revokeObjectURL(this.state.src);
+    const src = URL.createObjectURL(file);
+    this.setState({ src, name: file.name, t: 0 }, () => { const v = this.videoRef.current; v.src = src; v.play().catch(() => {}); });
+  }
+  startExport() {
+    const v = this.videoRef.current; if (!v || !window.MediaRecorder) return this.flash('RECORDING NOT SUPPORTED');
+    this.ensureAudio(); this.actx && this.actx.resume();
+    const stream = this.outRef.current.captureStream(30);
+    if (this.recDest) this.recDest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+    const mime = ['video/mp4;codecs=avc1,mp4a', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+    const rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 6e6 } : undefined);
+    const chunks = []; rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+    rec.onstop = () => {
+      const type = rec.mimeType || 'video/webm', ext = type.includes('mp4') ? 'mp4' : 'webm';
+      const url = URL.createObjectURL(new Blob(chunks, { type }));
+      const a = document.createElement('a'); a.href = url; a.download = `${this.state.name.replace(/\.[^.]+$/, '')}-rewind-${this.state.preset}.${ext}`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+      v.loop = true; this.setState({ exporting: false });
+    };
+    this.rec = rec; v.loop = false; v.pause(); v.currentTime = 0;
+    rec.start(500); this.setState({ exporting: true }); v.play().catch(() => {});
+  }
+  stopExport() { if (this.rec && this.rec.state !== 'inactive') this.rec.stop(); }
+  renderVals() {
+    const _o = this.state.off || 0, _bar = { position: 'absolute', left: 0, right: 0, height: this.state.arrived && !_o ? 0 : '50%', background: '#000', transition: _o ? 'height .4s cubic-bezier(.7,0,.84,0)' : 'height .55s cubic-bezier(.2,.8,.3,1)' };
+    const { src, playing, volume, t, dur, preset, fx, intensity, dark, name, err, exporting, on, hint, drawer, vw, vh } = this.state;
+    const IW = 1536, IH = 1024, SW = Math.max(vw, vh * IW / IH), SH = SW * IH / IW, cl = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const full = true, open = drawer && vw > 900, fx0 = .5, SL = cl(vw / 2 - fx0 * SW, vw - SW, 0), ST = cl(vh / 2 - .5 * SH, vh - SH, 0);
+    const gold = '#f3ede4', ivory = '#f1e6cf', stg = exporting ? 2 : src ? 1 : 0;
+    const ink = dark ? '#f1e6cf' : '#c4472b', ground = dark ? '#22392a' : '#f1e6cf';
+    const keys = Object.keys(PRESETS), pi = keys.indexOf(preset);
+    const knobBg = (L, T, Wd, Hd) => ({ backgroundImage: 'url(assets/tv.jpg)', backgroundSize: `${10000 / Wd}% ${10000 / Hd}%`, backgroundPosition: `${L / (100 - Wd) * 100}% ${T / (100 - Hd) * 100}%` });
+    const tvFilter = dark ? 'sepia(.6) brightness(.6) contrast(1.1)' : 'sepia(.5) contrast(1.05)';
+    const knob = { position: 'absolute', borderRadius: '50%', border: 0, padding: 0, cursor: 'pointer', filter: tvFilter, transition: 'transform .35s cubic-bezier(.3,1.4,.5,1), filter .6s' };
+    const hints = { vhf: 'VHF · VOLUME ' + volume, colour: 'COLOUR · LOOK · ' + PRESETS[preset].label.toUpperCase(), uhf: 'UHF · INTENSITY ' + intensity, togglePlay: playing ? 'PAUSE' : 'PLAY', cycleFxView: drawer ? 'CLOSE TV LAB' : 'OPEN TV LAB', slot: src ? 'EJECT · INSERT NEW TAPE' : 'INSERT TAPE', rec: exporting ? 'STOP RECORDING' : 'REC · DOWNLOAD WITH EFFECTS', power: on ? 'POWER OFF' : 'POWER ON' };
+    const H = k => () => this.setState({ hint: k });
+    const step = d => { const n = keys[(pi + d + keys.length) % keys.length]; this.setState({ preset: n, fx: { ...PRESETS[n].fx }, hint: 'colour' }); this.say('CH 0' + (keys.indexOf(n) + 1) + ' · ' + PRESETS[n].label.toUpperCase()); };
+    const setI = v => { v = Math.max(0, Math.min(100, v)); this.setState({ intensity: v, hint: 'uhf' }); this.say('INTENSITY ' + '▮'.repeat(Math.round(v / 10)) + '▯'.repeat(10 - Math.round(v / 10))); };
+    const setV = v => { v = Math.max(0, Math.min(100, v)); if (this.gain) this.gain.gain.value = v / 100; else if (this.videoRef.current) this.videoRef.current.volume = v / 100; this.setState({ volume: v, hint: 'vhf' }); this.say(v ? 'VOLUME ' + '▮'.repeat(Math.round(v / 10)) + '▯'.repeat(10 - Math.round(v / 10)) : 'MUTE'); };
+    const fill = v => ({ position: 'absolute', left: 0, top: 13, height: 4, borderRadius: 2, width: v + '%', background: 'linear-gradient(90deg,rgba(255,255,255,.55),#f3ede4)', pointerEvents: 'none' });
+    const thumb = v => ({ position: 'absolute', top: 3, left: `calc(${v}% - ${v * .18}px)`, width: 18, height: 18, borderRadius: 4, background: '#f6eedc', boxShadow: '0 2px 6px rgba(0,0,0,.35)', pointerEvents: 'none' });
+    const drag = set => e => {
+      const el = e.currentTarget, r = el.getBoundingClientRect();
+      const go = ev => set(Math.round((ev.clientX - r.left) / r.width * 100));
+      go(e);
+      const up = () => { window.removeEventListener('pointermove', go); window.removeEventListener('pointerup', up); };
+      window.addEventListener('pointermove', go); window.addEventListener('pointerup', up);
+    };
+    return {
+      onTop: { ..._bar, top: 0 }, onBot: { ..._bar, bottom: 0 },
+      offLine: { position: 'absolute', left: '50%', top: '50%', height: _o === 3 ? 4 : 2, width: _o >= 2 ? 4 : '100%', borderRadius: 2, transform: 'translate(-50%,-50%)', background: '#fff', boxShadow: '0 0 12px 3px rgba(210,230,255,.9), 0 0 40px 8px rgba(160,200,255,.45)', opacity: _o === 1 || _o === 2 ? 1 : 0, transition: _o === 1 ? 'opacity .12s .3s' : _o === 2 ? 'width .22s cubic-bezier(.6,0,.9,.4)' : 'opacity .2s, height .1s' },
+      goHome: e => { if (e && (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1)) return; e && e.preventDefault(); if (this.state.off) return; const href = 'Home.dc.html';
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.location.href = href; return; }
+        this.setState({ off: 1 }); setTimeout(() => { this.setState({ off: 2 }); setTimeout(() => { this.setState({ off: 3 }); setTimeout(() => { window.location.href = href; }, 200); }, 230); }, 400); },
+      videoRef: this.videoRef, outRef: this.outRef, blinkRef: this.blinkRef, fileRef: this.fileRef,
+      pageStyle: { height: '100vh', width: '100vw', position: 'relative', overflow: 'hidden', background: '#16110b', color: ivory },
+      stageStyle: { position: 'absolute', left: SL, top: ST, width: SW, height: SH },
+      ...(() => { const cx = SL + .5013 * SW, target = (vw - 360) / 2, dx = open ? target - cx : 0, k = open ? .9 : 1;
+        return { tvStyle: { position: 'absolute', left: '22.46%', top: '17.38%', width: '55.34%', height: '62.9%', borderRadius: '2.4% / 3.2%', backgroundImage: 'url(assets/tv-room-full.png)', backgroundSize: '180.7% auto', backgroundPosition: '50.29% 46.84%', transformOrigin: '50% 100%', transform: `translate3d(${dx}px,0,0) scale(${k})`, transition: 'transform .8s cubic-bezier(.65,0,.35,1)', willChange: 'transform', filter: `drop-shadow(0 ${open ? 10 : 14}px 22px rgba(0,0,0,.45))` + (dark ? ' brightness(.55) saturate(.9)' : '') } }; })(),
+      bgFullStyle: { position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block', userSelect: 'none', filter: dark ? 'brightness(.55) saturate(.9)' : 'none', transition: 'filter .6s', boxShadow: '0 0 80px 40px rgba(10,7,4,.6)' },
+      glowStyle: { position: 'absolute', left: '-6%', top: '-6%', width: '94%', height: '100%', background: 'radial-gradient(ellipse at 50% 50%, rgba(170,210,255,.18), transparent 65%)', mixBlendMode: 'screen', opacity: on && playing ? 1 : 0, transition: 'opacity .8s', pointerEvents: 'none' },
+      ...(() => { const L = full ? { scr: [7.66, 9.57, 74.63, 77.27], vol: [86.27, 6.23, 10.3, 38.31], knob: [88.07, 47.57, 6.6, 8.74], int: [86.27, 59.33, 10.3, 28.3], slot: [34.77, 93.2, 31.8, 3.66], pow: [69.82, 93.2, 4.34, 3.5], led: [82.65, 94.47] } : { scr: [21.1, 28.3, 34.3, 41.9], vol: [57.9, 27.9, 4.4, 20], knob: [58.4, 49.2, 3.3, 5], int: [57.9, 55.6, 4.4, 15.6], slot: [31.7, 74.2, 16.5, 2.6], pow: [49.7, 74.3, 2.5, 2.5], led: [59.1, 75.1] };
+        const EX = {"scrBox":{"borderRadius":"7% / 9%","overflow":"hidden","background":"#0b0d0e","cursor":"pointer","boxShadow":"0 0 0 2px rgba(0,0,0,.55)","containerType":"inline-size"},"volBox":{"border":"0","padding":"0","borderRadius":"4px","background":"transparent","cursor":"pointer"},"intBox":{"border":"0","padding":"0","borderRadius":"4px","background":"transparent","cursor":"pointer"},"slotBox":{"border":"0","padding":"0","borderRadius":"2px","background":"transparent","cursor":"pointer"},"powBox":{"border":"0","padding":"0","borderRadius":"3px","background":"transparent","cursor":"pointer"}};
+        const box = (k, e) => ({ ...e, position: 'absolute', left: L[k][0] + '%', top: L[k][1] + '%', width: L[k][2] + '%', height: L[k][3] + '%', transition: 'box-shadow .2s, background .2s' });
+        this._L = L; return { scrBox: box('scr', EX.scrBox), volBox: box('vol', EX.volBox), intBox: box('int', EX.intBox), slotBox: box('slot', EX.slotBox), powBox: box('pow', EX.powBox) }; })(),
+      knobStyle: { position: 'absolute', left: '88.07%', top: '47.57%', width: '6.6%', height: '8.74%', borderRadius: '50%', border: 0, padding: 0, background: 'transparent', cursor: 'pointer', transition: 'transform .2s' },
+      ledStyle: { position: 'absolute', left: '82.65%', top: '94.47%', width: '.76%', height: '1%', borderRadius: '50%', background: on ? '#ff3b2a' : '#3a1a14', boxShadow: on ? '0 0 8px #ff3b2a' : 'none', transition: 'all .3s', pointerEvents: 'none' },
+      steps: ['UPLOAD', 'EDIT', 'DOWNLOAD'].map((label, i) => ({ label: (i === stg ? '◆ ' : '') + label,
+        style: { textAlign: 'center', color: i === stg ? ivory : 'rgba(241,230,207,.55)', whiteSpace: 'nowrap' },
+        dot: { position: 'absolute', top: 2, left: `calc(${(i + .5) / 3 * 100}% - 5px)`, width: 10, height: 10, borderRadius: '50%', background: i <= stg ? gold : 'rgba(241,230,207,.35)', boxShadow: i === stg ? '0 0 8px rgba(220,184,90,.7)' : 'none', transition: 'background .3s' } })),
+      stepFill: { position: 'absolute', left: 0, top: 6, height: 2, marginTop: -.5, width: `${(stg + .5) / 3 * 100}%`, background: gold, transition: 'width .5s' },
+      upTitle: src ? name : 'upload your tape', upSub: src ? 'tap to swap tape · or drop a new one' : `MP4, MOV or WEBM · MAX ${this.props.maxUploadMB ?? 100} MB`,
+      showInsert: on && !src, maxMB: this.props.maxUploadMB ?? 100, hasErr: !!err, err,
+      hint: hint ? hints[hint] : exporting ? `● REC ${dur ? Math.round(t / dur * 100) : 0}%` : (src ? name.toUpperCase() : 'TURN THE KNOBS'),
+      lightsLabel: dark ? 'LIGHTS ON' : 'LIGHTS OFF',
+      fxList: FX.map(([id, label]) => { const on = !!fx[id]; return { label: label.toUpperCase(), descU: FXDESC[id].toUpperCase(), on, toggle: () => this.setState(s => ({ fx: { ...s.fx, [id]: s.fx[id] ? 0 : 1 } })),
+        track: { display: 'flex', alignItems: 'center', gap: 8, height: 28, padding: '0 10px', borderRadius: 3, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 15, letterSpacing: '.08em', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', border: '1px solid ' + (on ? 'rgba(255,255,255,.45)' : 'rgba(241,230,207,.22)'), background: on ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.18)', color: on ? ivory : 'rgba(241,230,207,.55)', boxShadow: on ? 'inset 0 1px 0 rgba(255,255,255,.15)' : 'inset 0 1px 3px rgba(0,0,0,.4)', transition: 'all .15s' },
+        dot: { width: 7, height: 7, flexShrink: 0, borderRadius: '50%', background: on ? '#ffffff' : 'rgba(241,230,207,.2)', boxShadow: on ? '0 0 6px #f3ede4, 0 0 2px #fff inset' : 'none', transition: 'all .15s' } }; }),
+      fxOpen: this.state.fxOpen, toggleFxOpen: () => this.setState({ fxOpen: !this.state.fxOpen }),
+      chevStyle: { transform: this.state.fxOpen ? 'none' : 'rotate(180deg)', transition: 'transform .25s' },
+      hasTape: !!src,
+      mainLabel: exporting ? `recording ${dur ? Math.round(t / dur * 100) : 0}% · stop` : src ? 'record & download' : 'upload a video',
+      mainAction: () => { if (!on) return; if (!src) return this.fileRef.current.click(); exporting ? this.stopExport() : this.startExport(); },
+      unhint: () => this.setState({ hint: '' }),
+      hint_vhf: H('vhf'), hint_uhf: H('uhf'), hint_togglePlay: H('togglePlay'), hint_colour: H('colour'), hint_cycleFxView: H('cycleFxView'), hint_slot: H('slot'), hint_rec: H('rec'), hint_power: H('power'),
+      nextPreset: () => step(1),
+      wheelPreset: e => step(e.deltaY > 0 ? 1 : -1),
+      stepIntensity: () => setI(intensity >= 100 ? 0 : intensity + 10),
+      wheelIntensity: e => setI(intensity + (e.deltaY > 0 ? -5 : 5)),
+      cycleFxView: () => this.setState({ drawer: !drawer }),
+      toggleDrawer: () => this.setState({ drawer: !drawer }),
+      volDown: drag(setV), intDown: drag(setI),
+      volFill: fill(volume), intFill: fill(intensity), volThumb: thumb(volume), intThumb: thumb(intensity),
+      recDotBig: { width: 10, height: 10, flexShrink: 0, borderRadius: '50%', background: exporting ? '#ff3b2a' : '#d8452b', boxShadow: exporting ? '0 0 12px #ff3b2a' : 'none' },
+      volume, intensity, onVolume: e => setV(+e.target.value), onIntensity: e => setI(+e.target.value),
+      handleStyle: { position: 'absolute', right: 0, top: '50%', transform: `translateY(-50%) translateX(${drawer ? '100%' : '0'})`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '20px 11px', borderRadius: '12px 0 0 12px', border: '1px solid rgba(255,255,255,.26)', borderRight: 0, background: 'rgba(255,255,255,.1)', backdropFilter: 'blur(14px) saturate(1.2)', WebkitBackdropFilter: 'blur(14px) saturate(1.2)', boxShadow: '0 14px 40px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.18)', cursor: 'pointer', opacity: drawer ? 0 : 1, pointerEvents: drawer ? 'none' : 'auto', transition: 'opacity .35s, transform .45s cubic-bezier(.2,.9,.25,1), background .2s', zIndex: 3 },
+      drawerStyle: { position: 'absolute', right: 'clamp(12px,2vw,28px)', top: '50%', width: 320, maxWidth: 'calc(100vw - 24px)', maxHeight: Math.min(vh - 24, .629 * SH * (vw > 900 ? .9 : 1)), overflowY: 'auto', boxSizing: 'border-box', borderRadius: 16, background: 'linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.04))', backdropFilter: 'blur(20px) brightness(.72) saturate(1.05)', WebkitBackdropFilter: 'blur(20px) brightness(.72) saturate(1.05)', border: '1px solid rgba(255,255,255,.26)', boxShadow: '0 30px 80px rgba(0,0,0,.5), 0 0 40px rgba(255,255,255,.06), inset 0 1px 0 rgba(255,255,255,.12)', color: ivory, scrollbarWidth: 'none', transform: `translateY(-50%) translateX(${drawer ? '0' : 'calc(100% + 60px)'})`, opacity: drawer ? 1 : 0, transition: 'transform .5s cubic-bezier(.2,.9,.25,1), opacity .35s', zIndex: 4 },
+      presets: keys.map(id => { const on = preset === id; return { label: PRESETS[id].label.toUpperCase(), pick: () => { this.setState({ preset: id, fx: { ...PRESETS[id].fx } }); this.say('LOOK · ' + PRESETS[id].label.toUpperCase()); },
+        led: { width: 4, height: 4, borderRadius: '50%', background: on ? '#2a2016' : 'transparent' },
+        style: { height: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, borderRadius: 4, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 16, letterSpacing: '.08em', border: '1px solid ' + (on ? gold : 'rgba(241,230,207,.45)'), background: on ? gold : 'transparent', color: on ? '#2a2016' : ivory, fontWeight: on ? 600 : 400, transition: 'all .15s' } }; }),
+      onTime: e => this.setState({ t: e.target.currentTime, dur: e.target.duration || 0 }),
+      onPlay: () => this.setState({ playing: true }), onPause: () => this.setState({ playing: false }),
+      onEnded: () => { if (this.state.exporting) this.stopExport(); },
+      pickFile: () => { if (!on) return; this.fileRef.current.click(); },
+      onFile: e => { this.load(e.target.files[0]); e.target.value = ''; },
+      onScreenClick: () => { if (!on) return; if (!src) return this.fileRef.current.click(); const v = this.videoRef.current; v.paused ? v.play() : v.pause(); },
+      onDragOver: e => e.preventDefault(),
+      onDrop: e => { e.preventDefault(); if (on) this.load(e.dataTransfer.files[0]); },
+      togglePlay: () => { if (!on || !src) return; const v = this.videoRef.current; this.actx && this.actx.resume(); v.paused ? v.play() : v.pause(); },
+      stepVolume: () => setV(volume >= 100 ? 0 : volume + 10),
+      wheelVolume: e => setV(volume + (e.deltaY > 0 ? -5 : 5)),
+      noTape: !src,
+      dlLabel: exporting ? `recording ${dur ? Math.round(t / dur * 100) : 0}% · stop` : (src ? 'generate & download' : 'insert a tape first'),
+      onExport: () => { if (!on || !src) return this.flash(on ? 'INSERT A TAPE FIRST' : ''); exporting ? this.stopExport() : this.startExport(); },
+      togglePower: () => {
+        const n = !on; this.powerT = performance.now(); this.initSfx(); this.powerSound(n);
+        const v = this.videoRef.current;
+        if (!n) { if (exporting) this.stopExport(); this.wasPlaying = v && !v.paused; v && v.pause(); }
+        else if (this.wasPlaying && src) v.play().catch(() => {});
+        this.setState({ on: n });
+      },
+      toggleLights: () => this.setState({ dark: !dark })
+    };
+  }
+}
+</script>
+</body>
+</html>
