@@ -966,6 +966,8 @@
       }
       __setLogicState(update, cb) {
         const prev = this.logic.state;
+        // Remember the state as of the last commit so componentDidUpdate can receive it as prevState.
+        if (!this.__prevLogicState) this.__prevLogicState = prev;
         const patch = typeof update === "function" ? update(prev) : update;
         this.logic.state = { ...prev, ...patch };
         this.setState((s) => ({ __v: s.__v + 1 }), cb);
@@ -1003,14 +1005,17 @@
         if (this.__needsDidMount) {
           if (this.state.__err || !registry.get(this.__name).tpl) return;
           this.__needsDidMount = false;
+          this.__prevLogicState = null;
           try {
             this.logic.componentDidMount();
           } catch (e) {
             console.error(e);
           }
         } else {
+          const prevState = this.__prevLogicState || this.logic.state;
+          this.__prevLogicState = null;
           try {
-            this.logic.componentDidUpdate(prevProps);
+            this.logic.componentDidUpdate(prevProps, prevState);
           } catch (e) {
             console.error(e);
           }
