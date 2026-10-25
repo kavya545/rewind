@@ -193,9 +193,11 @@ class Component extends DCLogic {
   }
   componentDidUpdate(pp, ps) { if (ps.on !== this.state.on || ps.src !== this.state.src || ps.volume !== this.state.volume) this.updateSfx(); }
   componentWillUnmount() { window.removeEventListener('pointerdown', this.onFirst); window.removeEventListener('keydown', this.onFirst); this.ax && this.ax.close(); cancelAnimationFrame(this.raf); window.removeEventListener('resize', this.onResize); clearTimeout(this.errT); if (this.state.src) URL.revokeObjectURL(this.state.src); }
+  // The runtime can swap the screen <canvas> after mount, so always draw to the one currently on the page.
+  outCtx() { const c = this.outRef.current; if (c && this.octx.canvas !== c) this.octx = c.getContext('2d'); return this.octx; }
   draw() {
     const { fx, preset, intensity, src, playing } = this.state, P = PRESETS[preset], k = intensity / 50;
-    const v = this.videoRef.current, s = this.sctx, o = this.octx;
+    const v = this.videoRef.current, s = this.sctx, o = this.outCtx();
     this.frame++;
     const now = performance.now(), pe = now - (this.powerT || -1e4);
     if (!this.state.on) {
@@ -276,7 +278,7 @@ class Component extends DCLogic {
     }
   }
   drawOverlay() {
-    const o = this.octx, now = performance.now(), pe = now - (this.powerT || -1e4);
+    const o = this.outCtx(), now = performance.now(), pe = now - (this.powerT || -1e4);
     if (this.osd && now - this.osd.t < 1600) {
       o.font = '40px VT323, monospace'; o.textAlign = 'center'; o.textBaseline = 'middle';
       o.fillStyle = 'rgba(0,0,0,.35)'; o.fillRect(0, H / 2 - 30, W, 60);
