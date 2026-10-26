@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { COUNT, INTRO, clamp, ease } from './data';
+import { COUNT, INTRO, STEP, STEPS, clamp, ease } from './data';
 import { Grain } from './Grain';
 
 type Props = {
@@ -8,14 +8,10 @@ type Props = {
   onDone: () => void;
 };
 
-/** One line per count, typed out in pink: what you can do in the room. */
-const LINES = [
-  "Tune in · play your own tapes on a '90s TV",
-  'Shoot · turn your photos into film strips',
-  'Step inside · tap anything in the room',
-];
+/** Typed out in pink under PLAY, once: what you can do in the room. */
+const LINE = "Play your tapes · shoot film strips · step into the room";
 
-/** Camcorder viewfinder opening: PLAY ▶, battery, corner brackets, and a glitchy 3 · 2 · 1 over black. */
+/** Camcorder viewfinder opening: PLAY ▶, battery, corner brackets, and a glitchy 5 · 4 · 3 · 2 · 1 over black. */
 export function Intro({ onReveal, onDone }: Props) {
   const [t, setT] = useState(0);
   const done = useRef(onDone); done.current = onDone;
@@ -39,8 +35,8 @@ export function Intro({ onReveal, onDone }: Props) {
   const r = ease(clamp((t - COUNT) / (INTRO - COUNT)));
   useEffect(() => { reveal.current(r); }, [r]);
 
-  const step = Math.min(2, Math.floor(t / 1000)), n = 3 - step, f = (t % 1000) / 1000;
-  const line = LINES[step], typed = t >= COUNT ? line.length : Math.round(clamp(f / .45) * line.length);
+  const n = STEPS - Math.min(STEPS - 1, Math.floor(t / STEP));
+  const typed = Math.round(clamp(t / 1600) * LINE.length);
 
   return (
     <div className="rw-intro" style={{ opacity: 1 - r, pointerEvents: r > .6 ? 'none' : 'auto' }}>
@@ -56,7 +52,7 @@ export function Intro({ onReveal, onDone }: Props) {
       </svg>
 
       <div className="rw-vf-center" style={{ opacity: 1 - r }}>
-        <p className="rw-vf-line">{line.slice(0, typed)}<span className="rw-vf-caret">_</span></p>
+        <p className="rw-vf-line">{LINE.slice(0, typed)}<span className="rw-vf-caret">_</span></p>
         <span key={n} className="rw-vf-digit">{n}</span>
       </div>
       <Grain opacity={.16} />
