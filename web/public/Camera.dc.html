@@ -18,6 +18,10 @@ a{color:#f3e9dc}a:hover{color:#f6c98e}
 button:focus-visible,[tabindex]:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #f6c98e;outline-offset:2px}
 button:disabled{opacity:.45;cursor:not-allowed}
 select option{background:#2a1f16;color:#f3e9dc}
+@keyframes cr-booth{0%{opacity:0}7%{opacity:1}91%{opacity:1}100%{opacity:0}}
+@keyframes cr-feed{0%{transform:translate(-50%,-100%)}14%{transform:translate(-50%,-86%)}18%{transform:translate(-50%,-85.4%)}42%{transform:translate(-50%,-55%)}46%{transform:translate(-50%,-54.4%)}72%{transform:translate(-50%,-21%)}76%{transform:translate(-50%,-20.4%)}100%{transform:translate(-50%,0)}}
+@keyframes cr-hum{0%,100%{transform:translate(0,0)}50%{transform:translate(.5px,-.4px)}}
+@keyframes cr-glow{0%{opacity:0}35%{opacity:.9}100%{opacity:0}}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 <script src="./liquid.js"></script>
@@ -41,9 +45,9 @@ select option{background:#2a1f16;color:#f3e9dc}
   <video ref="{{ videoRef }}" playsInline="{{ true }}" muted="{{ true }}" style="position:absolute;width:2px;height:2px;opacity:0;pointer-events:none"></video>
 
   <main style="{{ panelStyle }}" aria-label="Camera Room">
-    <header style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:16px 24px;padding:clamp(18px,3vh,32px) clamp(20px,3.4vw,56px) 0">
-      <div style="display:flex;align-items:center;gap:10px">
-        <nav role="tablist" aria-label="Tools" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;padding:3px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)">
+    <header style="{{ headStyle }}">
+      <div style="display:flex;align-items:center;gap:10px;max-width:100%">
+        <nav role="tablist" aria-label="Tools" style="display:grid;grid-template-columns:repeat(3,auto);gap:2px;padding:3px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)">
           <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
             <button role="tab" aria-selected="{{ t.on }}" onClick="{{ t.pick }}" style="{{ t.style }}" style-hover="background:rgba(255,255,255,.14)">{{ t.label }}</button>
           </sc-for>
@@ -74,11 +78,16 @@ select option{background:#2a1f16;color:#f3e9dc}
                 <span style="{{ flashStyle }}"></span>
               </div>
             </sc-if>
-            <sc-if value="{{ hasReelToggle }}" hint-placeholder-val="{{ false }}">
-              <div style="position:absolute;right:12px;top:12px;display:flex;gap:2px;padding:3px;border-radius:10px;background:rgba(20,14,9,.5);border:1px solid rgba(255,240,220,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)">
-                <sc-for list="{{ liveViews }}" as="v" hint-placeholder-count="2">
-                  <button onClick="{{ v.pick }}" aria-pressed="{{ v.on }}" style="{{ v.style }}">{{ v.label }}</button>
-                </sc-for>
+            <sc-if value="{{ isPrinting }}" hint-placeholder-val="{{ false }}">
+              <div aria-hidden="true" style="position:absolute;inset:0;z-index:4;overflow:hidden;animation:cr-booth 3800ms ease forwards">
+                <div style="position:absolute;left:0;right:0;top:12%;bottom:0;overflow:hidden">
+                  <img src="{{ printSrc }}" alt="" style="{{ printImg }}">
+                  <div style="position:absolute;left:0;right:0;top:0;height:26px;background:linear-gradient(180deg,rgba(0,0,0,.5),transparent)"></div>
+                </div>
+                <div style="position:absolute;left:14%;right:14%;top:7%;height:7%;min-height:18px;border-radius:999px;background:linear-gradient(180deg,#3d3d3d,#0b0b0b 45%,#262626 78%,#0e0e0e);box-shadow:0 6px 14px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.18);animation:cr-hum 120ms linear 250ms 20"></div>
+                <div style="position:absolute;left:10.5%;width:4.5%;top:7.8%;height:5.4%;min-height:14px;border-radius:4px;background:linear-gradient(180deg,#d9d4cc,#8b857c 55%,#bdb6ab);box-shadow:0 3px 6px rgba(0,0,0,.5)"></div>
+                <div style="position:absolute;right:10.5%;width:4.5%;top:7.8%;height:5.4%;min-height:14px;border-radius:4px;background:linear-gradient(180deg,#d9d4cc,#8b857c 55%,#bdb6ab);box-shadow:0 3px 6px rgba(0,0,0,.5)"></div>
+                <div style="position:absolute;inset:0;opacity:0;mix-blend-mode:screen;background:radial-gradient(ellipse 70% 60% at 50% 45%,rgba(255,232,190,.75),rgba(255,160,70,.35) 50%,transparent 80%);animation:cr-glow 900ms ease-out 2700ms forwards"></div>
               </div>
             </sc-if>
           </div>
@@ -106,34 +115,36 @@ select option{background:#2a1f16;color:#f3e9dc}
         </section>
 
         <section style="flex:1 1 360px;min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;gap:0;border-top:1px solid rgba(255,240,220,.12)">
-          <sc-if value="{{ notLive }}" hint-placeholder-val="{{ true }}">
-            <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(7px,1.5vh,16px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
+            <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(5px,1.1vh,14px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
               <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Your Photos ({{ count }}/8)</span>
-              <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <div style="display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;padding:2px 2px 4px;scrollbar-width:thin">
                 <sc-for list="{{ thumbs }}" as="p" hint-placeholder-count="0">
-                  <div draggable="true" onDragStart="{{ p.dragStart }}" onDragOver="{{ p.dragOver }}" onDrop="{{ p.drop }}" style="position:relative;width:clamp(64px,5.6vw,84px);height:clamp(72px,9.4vh,96px);flex-shrink:0;cursor:grab">
+                  <div draggable="true" onDragStart="{{ p.dragStart }}" onDragOver="{{ p.dragOver }}" onDrop="{{ p.drop }}" style="position:relative;width:clamp(54px,4.6vw,72px);height:clamp(60px,8vh,82px);flex-shrink:0;cursor:grab">
                     <button onKeyDown="{{ p.key }}" aria-label="{{ p.aria }}" style="width:100%;height:100%;padding:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,240,220,.25);background:rgba(0,0,0,.2);cursor:grab;display:block"><img src="{{ p.url }}" alt="" draggable="false" style="width:100%;height:100%;object-fit:cover;display:block"></button>
                     <button onClick="{{ p.remove }}" aria-label="{{ p.removeAria }}" style="position:absolute;right:5px;top:5px;width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.7);background:rgba(20,14,9,.65);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0" style-hover="background:#7a3324"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
                   </div>
                 </sc-for>
                 <sc-if value="{{ canAdd }}" hint-placeholder-val="{{ true }}">
-                  <button onClick="{{ pickFiles }}" aria-label="Add photos" style="width:clamp(64px,5.6vw,84px);height:clamp(72px,9.4vh,96px);flex-shrink:0;border-radius:10px;border:1px dashed rgba(255,255,255,.45);background:rgba(255,255,255,.04);color:#f3e9dc;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0;font-family:'VT323',monospace;font-size:16px;letter-spacing:.05em;line-height:1.25" style-hover="background:rgba(255,240,220,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Add<br>Photos</button>
+                  <button onClick="{{ pickFiles }}" aria-label="Add photos" style="width:clamp(54px,4.6vw,72px);height:clamp(60px,8vh,82px);flex-shrink:0;border-radius:10px;border:1px dashed rgba(255,255,255,.45);background:rgba(255,255,255,.04);color:#f3e9dc;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0;font-family:'VT323',monospace;font-size:16px;letter-spacing:.05em;line-height:1.25" style-hover="background:rgba(255,240,220,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Add<br>Photos</button>
                 </sc-if>
               </div>
-              <sc-if value="{{ hasThumbs }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:rgba(243,233,220,.55)">Drag to reorder · or focus a photo and use ← →</span></sc-if>
+              <sc-if value="{{ showReorderHint }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:rgba(243,233,220,.55)">Drag to reorder · or focus a photo and use ← →</span></sc-if>
             </div>
-          </sc-if>
 
-          <sc-if value="{{ isStrip }}" hint-placeholder-val="{{ true }}">
-            <div style="display:flex;align-items:center;gap:clamp(6px,1vh,10px);padding:clamp(7px,1.5vh,16px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
-              <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Two Columns</span><span style="font-size:16px;color:rgba(243,233,220,.6)">Arrange photos in two parallel strips.</span></div>
-              <button onClick="{{ toggleCols }}" role="switch" aria-checked="{{ twoCols }}" aria-label="Two columns" style="{{ colsSw.track }}"><span style="{{ colsSw.dot }}"></span></button>
+          <sc-if value="{{ isStrip }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding:clamp(5px,1.1vh,14px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
+              <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Frame Shape</span>
+              <div style="display:flex;gap:8px;flex:0 1 300px">
+                <sc-for list="{{ shapeOpts }}" as="o" hint-placeholder-count="2">
+                  <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="{{ o.style }}">{{ o.label }}</button>
+                </sc-for>
+              </div>
             </div>
           </sc-if>
           <sc-if value="{{ isSheet }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(7px,1.5vh,16px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
-              <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Columns</span>
-              <div style="display:flex;gap:8px">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding:clamp(5px,1.1vh,14px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
+              <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Frames per Row</span>
+              <div style="display:flex;gap:8px;flex:0 1 300px">
                 <sc-for list="{{ colOpts }}" as="o" hint-placeholder-count="2">
                   <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="{{ o.style }}">{{ o.label }}</button>
                 </sc-for>
@@ -141,7 +152,7 @@ select option{background:#2a1f16;color:#f3e9dc}
             </div>
           </sc-if>
 
-          <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(7px,1.5vh,16px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
+          <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(5px,1.1vh,14px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
             <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Photo Effects</span>
             <sc-if value="{{ notLive }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -153,16 +164,16 @@ select option{background:#2a1f16;color:#f3e9dc}
             <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;gap:8px;overflow-x:auto;padding:3px 2px 6px;scrollbar-width:thin">
                 <sc-for list="{{ effects }}" as="m" hint-placeholder-count="7">
-                  <button onClick="{{ m.pick }}" aria-pressed="{{ m.on }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;width:62px;border:0;background:transparent;padding:0;cursor:pointer;color:#f3e9dc;font-family:'VT323',monospace">
+                  <button onClick="{{ m.pick }}" aria-pressed="{{ m.on }}" style="display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;width:66px;border:0;background:transparent;padding:0;cursor:pointer;color:#f3e9dc;font-family:'VT323',monospace">
                     <span style="{{ m.frame }}"><sc-if value="{{ m.hasThumb }}" hint-placeholder-val="{{ false }}"><img src="{{ m.thumb }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if></span>
-                    <span style="font-size:14px;white-space:nowrap">{{ m.label }}</span>
+                    <span style="font-size:14px;line-height:1.05;text-align:center;min-height:2.1em">{{ m.label }}</span>
                   </button>
                 </sc-for>
               </div>
             </sc-if>
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(7px,1.5vh,16px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
+          <div style="display:flex;flex-direction:column;gap:clamp(6px,1vh,10px);padding:clamp(5px,1.1vh,14px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
               <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Options</span>
               <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px">
                 <sc-for list="{{ optToggles }}" as="g" hint-placeholder-count="2">
@@ -177,6 +188,10 @@ select option{background:#2a1f16;color:#f3e9dc}
               </div>
             </div>
 
+          <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
+            <p style="margin:0;padding-top:clamp(8px,1.4vh,14px);font-size:17px;line-height:1.35;color:rgba(243,233,220,.78);text-wrap:pretty">Shots land on your roll. Open <span style="color:#f6eee2">Film Strip</span> or <span style="color:#f6eee2">Contact Sheet</span> to develop them with 90s effects and download.</p>
+          </sc-if>
+          <sc-if value="{{ notLive }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;flex-wrap:wrap;gap:12px;padding-top:clamp(8px,1.6vh,16px);margin-top:auto">
             <button onClick="{{ download }}" disabled="{{ cantExport }}" style="flex:1.4 1 200px;height:clamp(40px,5.6vh,50px);border-radius:12px;border:0;background:#f3ede4;color:#1e1a16;font-family:'VT323',monospace;font-size:21px;letter-spacing:.05em;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:#ffffff" style-active="transform:translateY(1px)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"></path></svg>{{ dlLabel }}</button>
             <div style="position:relative;flex:1 1 150px">
@@ -189,15 +204,6 @@ select option{background:#2a1f16;color:#f3e9dc}
               </sc-if>
             </div>
           </div>
-          <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex;flex-direction:column;gap:10px;padding-top:clamp(8px,1.6vh,16px)">
-              <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Your Photos ({{ count }}/8)</span>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <sc-for list="{{ thumbs }}" as="p" hint-placeholder-count="0">
-                  <span style="width:clamp(40px,4vw,54px);height:clamp(44px,6vh,60px);border-radius:8px;overflow:hidden;border:1px solid rgba(255,240,220,.25)"><img src="{{ p.url }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></span>
-                </sc-for>
-              </div>
-            </div>
           </sc-if>
         </section>
       </div>
@@ -210,14 +216,17 @@ select option{background:#2a1f16;color:#f3e9dc}
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
+// Each look is a small grading recipe: exposure (ev, in stops), contrast, saturation, split toning (shadow/highlight tints),
+// black lift and white gain per channel (fade / colour cast), grain and vignette. Light Leak adds a burned edge on top.
 const PRESETS = {
-  original: { label: 'Original', grain: 0, fade: 0, vignette: 0, warmth: 0, con: 1, sat: 1, bright: 0, tint: [0, 0, 0], flash: 0 },
-  film90: { label: '90s Film', grain: 35, fade: 20, vignette: 15, warmth: 8, con: .96, sat: .9, bright: 2, tint: [3, 1, -2], flash: 0 },
-  grain: { label: 'Film Grain', grain: 60, fade: 10, vignette: 20, warmth: 2, con: 1.02, sat: .94, bright: 0, tint: [0, 1, 0], flash: 0 },
-  warm: { label: 'Warm Fade', grain: 25, fade: 42, vignette: 12, warmth: 22, con: .92, sat: .86, bright: 4, tint: [4, 2, -3], flash: 0 },
-  cool: { label: 'Cool Tone', grain: 25, fade: 18, vignette: 15, warmth: -24, con: .98, sat: .88, bright: 0, tint: [-2, 2, 5], flash: 0 },
-  flash: { label: 'Flash', grain: 30, fade: 8, vignette: 48, warmth: 6, con: 1.12, sat: 1.04, bright: 10, tint: [2, 0, 0], flash: 1 },
-  bw: { label: 'B&W', grain: 40, fade: 14, vignette: 22, warmth: 0, con: 1.1, sat: 0, bright: 0, tint: [0, 0, 0], flash: 0 }
+  original: { label: 'Original' },
+  film90: { label: '90s Film', ev: .08, con: 1.14, sat: 1.18, sh: [-.04, .05, .09], hi: [.09, .04, -.08], lift: [.06, .07, .08], gain: [1, .96, .86], grain: 32, vig: .3 },
+  leak: { label: 'Light Leak', ev: .12, con: 1.02, sat: 1.06, sh: [.02, 0, -.02], hi: [.05, .02, -.05], lift: [.06, .03, .02], gain: [1, .96, .9], grain: 30, vig: .14, leak: 1 },
+  cross: { label: 'Cross Process', ev: .05, con: 1.3, sat: 1.25, sh: [-.1, .15, .06], hi: [.04, .1, -.14], lift: [0, .09, .06], gain: [.94, 1, .78], grain: 30, vig: .26 },
+  blue: { label: 'Expired Blue', ev: -.05, con: .9, sat: .6, sh: [-.03, .02, .09], hi: [-.05, .02, .07], lift: [.08, .12, .21], gain: [.8, .92, 1], grain: 36, vig: .3 },
+  pink: { label: 'Pink Haze', ev: .38, con: .78, sat: .78, sh: [.1, -.05, .06], hi: [.07, -.04, .03], lift: [.18, .06, .13], gain: [1, .88, .97], grain: 24, vig: .1 },
+  faded: { label: 'Faded Print', ev: .12, con: .7, sat: .4, sh: [.05, .01, -.02], hi: [.03, .01, -.04], lift: [.25, .2, .15], gain: [.96, .9, .81], grain: 20, vig: .12 },
+  bw: { label: 'B&W', ev: 0, con: 1.38, sat: 0, lift: [.03, .03, .03], gain: [.97, .97, .97], grain: 55, vig: .38 }
 };
 const PKEYS = Object.keys(PRESETS);
 const MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -228,27 +237,37 @@ const STAMPS = {
   today: { label: 'Today (90s style)', color: '#ff8a3c', text: () => { const d = new Date(); return `${MON[d.getMonth()]} ${d.getDate()} ${d.getFullYear()}`; } },
   none: { label: 'No date stamp', color: '', text: () => '' }
 };
-const MAX = 8, MAXMB = 25, ORANGE = '#ff9a2e';
+const MAX = 8, MAXMB = 25, PRINT_MS = 3800;
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; };
 const dims = s => [s.videoWidth || s.naturalWidth || s.width, s.videoHeight || s.naturalHeight || s.height];
 
-function develop(src, key, maxSide, stamp, mirror) {
-  const [iw, ih] = dims(src), s = Math.min(1, maxSide / Math.max(iw, ih)), w = Math.round(iw * s), h = Math.round(ih * s);
+function develop(src, key, maxSide, stamp, mirror, seed = 0) {
+  const [iw, ih] = dims(src), sc = Math.min(1, maxSide / Math.max(iw, ih)), w = Math.round(iw * sc), h = Math.round(ih * sc);
   const c = mk(w, h), x = c.getContext('2d', { willReadFrequently: true }), P = PRESETS[key] || PRESETS.original;
   if (mirror) { x.translate(w, 0); x.scale(-1, 1); }
   x.drawImage(src, 0, 0, w, h); x.setTransform(1, 0, 0, 1, 0, 0);
   if (key !== 'original') {
-    const id = x.getImageData(0, 0, w, h), d = id.data, f = P.fade / 100, V = P.vignette / 100, G = P.grain / 100 * 34, W = P.warmth, fA = 1 - .26 * f, fB = 36 * f, [tr, tg, tb] = P.tint;
+    const id = x.getImageData(0, 0, w, h), d = id.data, E = Math.pow(2, P.ev || 0), C = P.con ?? 1, S = P.sat ?? 1, V = P.vig || 0, G = (P.grain || 0) / 255 * .9;
+    const sh = P.sh || [0, 0, 0], hi = P.hi || [0, 0, 0], lo = P.lift || [0, 0, 0], gn = P.gain || [1, 1, 1];
     for (let y = 0; y < h; y++) { const dy = y / h - .5;
       for (let xx = 0; xx < w; xx++) { const i = (y * w + xx) * 4, dx = xx / w - .5, d2 = (dx * dx + dy * dy) * 2;
-        let r = (d[i] - 128) * P.con + 128 + P.bright, g = (d[i + 1] - 128) * P.con + 128 + P.bright, b = (d[i + 2] - 128) * P.con + 128 + P.bright;
-        const l = .299 * r + .587 * g + .114 * b;
-        r = l + (r - l) * P.sat + W * .32 + tr; g = l + (g - l) * P.sat + W * .07 + tg; b = l + (b - l) * P.sat - W * .32 + tb;
-        if (P.flash) { const k = (1 - Math.min(1, d2 * 1.4)) * 26; r += k; g += k; b += k * .9; }
-        r = r * fA + fB + 3 * f; g = g * fA + fB; b = b * fA + fB - 2 * f;
-        const m = 1 - V * .75 * d2 * (.4 + .6 * d2), n = G ? (Math.random() - .5) * G * (1 - Math.abs(l - 128) / 300) : 0;
-        d[i] = r * m + n; d[i + 1] = g * m + n; d[i + 2] = b * m + n; } }
+        let r = (d[i] / 255 * E - .5) * C + .5, g = (d[i + 1] / 255 * E - .5) * C + .5, b = (d[i + 2] / 255 * E - .5) * C + .5;
+        let l = .299 * r + .587 * g + .114 * b;
+        r = l + (r - l) * S; g = l + (g - l) * S; b = l + (b - l) * S;
+        l = Math.max(0, Math.min(1, l)); const ws = (1 - l) * (1 - l), wh = l * l;
+        r += sh[0] * ws + hi[0] * wh; g += sh[1] * ws + hi[1] * wh; b += sh[2] * ws + hi[2] * wh;
+        r = lo[0] + r * (gn[0] - lo[0]); g = lo[1] + g * (gn[1] - lo[1]); b = lo[2] + b * (gn[2] - lo[2]);
+        const m = 1 - V * Math.pow(d2, 1.5) * 1.6, n = G ? (Math.random() - .5) * G * (1 - Math.abs(l - .5) * .7) : 0;
+        d[i] = (r * m + n) * 255; d[i + 1] = (g * m + n) * 255; d[i + 2] = (b * m + n) * 255; } }
     x.putImageData(id, 0, 0);
+    if (P.leak) { // burned film edge: an orange-red flare from one side plus a blown-out hot spot
+      const right = seed % 2 === 1, L = x.createLinearGradient(right ? w : 0, 0, right ? 0 : w, 0);
+      L.addColorStop(0, 'rgba(255,70,18,.92)'); L.addColorStop(.2, 'rgba(255,118,40,.58)'); L.addColorStop(.48, 'rgba(255,170,90,.14)'); L.addColorStop(.72, 'rgba(255,170,90,0)');
+      x.globalCompositeOperation = 'screen'; x.fillStyle = L; x.fillRect(0, 0, w, h);
+      const cy = h * (.22 + ((seed * 37) % 10) / 20), R = x.createRadialGradient(right ? w * .94 : w * .06, cy, 0, right ? w * .94 : w * .06, cy, Math.max(w, h) * .55);
+      R.addColorStop(0, 'rgba(255,246,228,.95)'); R.addColorStop(.25, 'rgba(255,212,150,.55)'); R.addColorStop(.6, 'rgba(255,190,120,0)');
+      x.fillStyle = R; x.fillRect(0, 0, w, h); x.globalCompositeOperation = 'source-over';
+    }
   }
   const st = STAMPS[stamp];
   if (st && st.color) { const t = st.text(), fs = Math.max(11, Math.min(w, h) * .075);
@@ -256,41 +275,50 @@ function develop(src, key, maxSide, stamp, mirror) {
     x.fillText(t, w - fs * .8, h - fs * .7); x.shadowBlur = 0; x.globalAlpha = .5; x.fillText(t, w - fs * .8, h - fs * .7); x.globalAlpha = 1; }
   return c;
 }
+// Centre-crop a photo to the frame's shape before developing, so the date stamp lands inside the visible frame.
+function cropTo(src, ar) { const [sw, sh] = dims(src), w = sw / sh > ar ? sh * ar : sw, h = sw / sh > ar ? sh : sw / ar, c = mk(w, h); c.getContext('2d').drawImage(src, (sw - w) / 2, (sh - h) / 2, w, h, 0, 0, c.width, c.height); return c; }
 function cover(x, src, dx, dy, dw, dh, r = 0) {
   const [sw, sh] = dims(src), s = Math.max(dw / sw, dh / sh), cw = dw / s, ch = dh / s;
   x.save(); if (r) { x.beginPath(); x.roundRect(dx, dy, dw, dh, r); x.clip(); }
   x.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, dx, dy, dw, dh); x.restore();
 }
 function rotText(x, t, cx, cy, fs, color, ang = -Math.PI / 2) { x.save(); x.translate(cx, cy); x.rotate(ang); x.font = `${fs}px VT323, monospace`; x.fillStyle = color; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(t, 0, 0); x.restore(); }
+const rng = seed => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+// A strip of 35mm film: black base, light sprocket blocks along both edges, slightly rounded frames, orange edge print and dust.
+// o.tall makes each frame longer along the strip (portrait), otherwise frames are the classic 4:3.
 function stripCanvas(frames, sc, o, horizontal) {
-  const fw = 560 * sc, fh = fw * .75, reb = fw * .17, gap = fw * .05, lead = fw * .14, n = frames.length;
-  const len = lead * 2 + n * fh + (n - 1) * gap, th = fw + reb * 2;
-  const c = horizontal ? mk(len * (fw / fh) * 0 + (lead * 2 + n * fw + (n - 1) * gap), fh + reb * 2) : mk(th, len), x = c.getContext('2d');
-  x.fillStyle = '#0f0c0a'; x.fillRect(0, 0, c.width, c.height);
+  const A = (horizontal ? 420 : 560) * sc, Lf = horizontal ? 560 * sc : A * (o.tall ? 1.32 : .75);
+  const reb = A * .2, gap = A * .055, lead = A * .2, n = frames.length, len = lead * 2 + n * Lf + (n - 1) * gap, thick = A + reb * 2;
+  const c = horizontal ? mk(len, thick) : mk(thick, len), x = c.getContext('2d'), rnd = rng(n * 7919 + (o.offset || 0) * 31 + (o.tall ? 3 : 0));
+  // (across, along) → canvas coordinates, so one layout serves vertical and horizontal strips
+  const R = (ac, al, aw, alw) => horizontal ? [al, ac, alw, aw] : [ac, al, aw, alw];
+  x.fillStyle = '#13100e'; x.fillRect(0, 0, c.width, c.height);
   const g = horizontal ? x.createLinearGradient(0, 0, 0, c.height) : x.createLinearGradient(0, 0, c.width, 0);
-  g.addColorStop(0, 'rgba(255,255,255,.05)'); g.addColorStop(.5, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(255,255,255,.04)'); x.fillStyle = g; x.fillRect(0, 0, c.width, c.height);
-  const ink = ORANGE, fs = reb * .3;
-  frames.forEach((im, i) => {
-    if (horizontal) { const a = lead + i * (fw + gap); cover(x, im, a, reb, fw, fh, fw * .01); }
-    else { const a = lead + i * (fh + gap); cover(x, im, reb, a, fw, fh, fw * .01); }
-  });
-  const along = horizontal ? c.width : c.height, pitch = ((horizontal ? fw : fh) + gap) / 5, hw = reb * .34, hl = pitch * .52;
-  x.globalCompositeOperation = 'destination-out';
-  for (let a = pitch * .5; a < along - hl; a += pitch) [reb * .5, (horizontal ? c.height : c.width) - reb * .5].forEach(ac => {
-    x.beginPath(); if (horizontal) x.roundRect(a, ac - hw / 2, hl, hw, hw * .2); else x.roundRect(ac - hw / 2, a, hw, hl, hw * .2); x.fill(); });
-  x.globalCompositeOperation = 'source-over';
-  frames.forEach((im, i) => { const unit = horizontal ? fw : fh, a = lead + i * (unit + gap), no = (i + (o.offset || 0)) * 2 + 1;
-    const put = (t, t0, side) => { const ac = side ? (horizontal ? c.height : c.width) - reb * .5 : reb * .5;
-      if (horizontal) { x.font = `${fs}px VT323, monospace`; x.fillStyle = ink; x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillText(t, a + unit * t0, side ? c.height - reb * .13 : reb * .13 + 0); }
-      else rotText(x, t, side ? c.width - reb * .14 : reb * .14, a + unit * t0, fs, ink); };
-    if (o.markings && i % 2 === 0) put('RW 400', .3, false);
-    if (o.markings) put('◂ SAFETY', .78, false);
-    if (o.frames) { put(String(no), .2, true); put(`▸${no}A`, .65, true); } });
+  g.addColorStop(0, 'rgba(255,255,255,.06)'); g.addColorStop(.5, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(255,255,255,.05)'); x.fillStyle = g; x.fillRect(0, 0, c.width, c.height);
+  frames.forEach((im, i) => { const [fx, fy, fw, fh] = R(reb, lead + i * (Lf + gap), A, Lf); cover(x, im, fx, fy, fw, fh, A * .028);
+    x.save(); x.beginPath(); x.roundRect(fx, fy, fw, fh, A * .028); x.strokeStyle = 'rgba(0,0,0,.55)'; x.lineWidth = Math.max(1, A * .006); x.stroke(); x.restore(); });
+  // sprocket blocks (35mm perforations are wider across the film than along it)
+  const hA = reb * .4, hL = reb * .3, pitch = hL * 2.35; x.fillStyle = '#f1ece3';
+  for (let al = pitch * .55; al < len - hL; al += pitch) [reb * .38, thick - reb * .38].forEach(mid => { const [hx, hy, hw, hh] = R(mid - hA / 2, al, hA, hL); x.beginPath(); x.roundRect(hx, hy, hw, hh, hL * .22); x.fill(); });
+  // dust, specks and a few scratches
+  for (let k = 0, N = Math.round(len / A * 34); k < N; k++) { const [px, py] = R(rnd() * thick, rnd() * len, 0, 0), r = A * (.0015 + rnd() * .004);
+    x.fillStyle = `rgba(245,240,230,${(.12 + rnd() * .45).toFixed(2)})`; x.beginPath(); x.arc(px, py, r, 0, 7); x.fill(); }
+  x.lineWidth = Math.max(1, A * .0018);
+  for (let k = 0, N = 3 + Math.round(rnd() * 4); k < N; k++) { const ac = reb + rnd() * A, a0 = rnd() * len, a1 = a0 + A * (.3 + rnd() * 1.2), [x0, y0] = R(ac, a0, 0, 0), [x1, y1] = R(ac + (rnd() - .5) * A * .04, a1, 0, 0);
+    x.strokeStyle = `rgba(240,235,225,${(.08 + rnd() * .14).toFixed(2)})`; x.beginPath(); x.moveTo(x0, y0); x.lineTo(x1, y1); x.stroke(); }
+  // edge print between the perforations and the picture
+  const ink = '#ffab3d', fs = reb * .24, textAc = [reb * .82, thick - reb * .82];
+  const put = (t, al, side) => { const ac = textAc[side ? 1 : 0];
+    if (horizontal) { x.save(); x.font = `${fs}px VT323, monospace`; x.fillStyle = ink; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(t, al, ac); x.restore(); }
+    else rotText(x, t, ac, al, fs, ink, side ? Math.PI / 2 : -Math.PI / 2); };
+  frames.forEach((im, i) => { const a = lead + i * (Lf + gap), no = (i + (o.offset || 0)) * 2 + 1;
+    if (o.markings && i % 2 === 0) put('RW 400', a + Lf * .28, false);
+    if (o.markings) put('◂ SAFETY FILM', a + Lf * .76, false);
+    if (o.frames) { put(String(no), a + Lf * .22, true); put(`▸${no}A`, a + Lf * .7, true); } });
   return c;
 }
-
 class Component extends DCLogic {
-  state = { photos: [], tab: 'strip', fx: 'film90', markings: true, frames: true, stamp: 'classic', twoCols: false, cols: 2, toast: '', shareOpen: false, cam: 'off', facing: 'user', review: null, liveView: 'cam', flash: 0, lastUrl: '', camThumbs: {}, clock: '', arrived: false, off: 0, vw: window.innerWidth, vh: window.innerHeight };
+  state = { photos: [], tab: 'live', fx: 'film90', markings: true, frames: true, stamp: 'classic', tall: false, cols: 2, toast: '', shareOpen: false, cam: 'off', facing: 'user', review: null, printing: null, flash: 0, lastUrl: '', camThumbs: {}, clock: '', arrived: false, off: 0, vw: window.innerWidth, vh: window.innerHeight };
   els = {}; imgs = {};
   fileRef = el => { this.els.file = el; }; videoRef = el => { this.els.video = el; };
   previewRef = el => { this.els.preview = el; if (el) this.schedule(); };
@@ -303,41 +331,40 @@ class Component extends DCLogic {
     const tick = () => { const d = new Date(), h = d.getHours(); this.setState({ clock: `${h < 12 ? 'AM' : 'PM'} ${String(((h + 11) % 12) + 1).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` }); };
     tick(); this.clockT = setInterval(tick, 15000);
     document.fonts && document.fonts.load('40px VT323').then(() => this.schedule());
+    if (this.state.tab === 'live') this.startCam();
   }
-  componentWillUnmount() { this.stopCam(); clearInterval(this.clockT); clearTimeout(this.toastT); cancelAnimationFrame(this.raf); window.removeEventListener('pageshow', this._ps); window.removeEventListener('resize', this.onResize); document.removeEventListener('visibilitychange', this.onVis); document.removeEventListener('pointerdown', this.onDoc); this.state.photos.forEach(p => URL.revokeObjectURL(p.url)); }
+  componentWillUnmount() { this.stopCam(); (this.printT || []).forEach(clearTimeout); clearInterval(this.clockT); clearTimeout(this.toastT); cancelAnimationFrame(this.raf); window.removeEventListener('pageshow', this._ps); window.removeEventListener('resize', this.onResize); document.removeEventListener('visibilitychange', this.onVis); document.removeEventListener('pointerdown', this.onDoc); this.state.photos.forEach(p => URL.revokeObjectURL(p.url)); }
   componentDidUpdate(pp, ps) {
     const s = this.state;
     if (ps.tab !== s.tab) { if (s.tab === 'live') this.startCam(); else this.stopCam(); }
-    if (ps.photos !== s.photos || ps.tab !== s.tab || ps.fx !== s.fx || ps.markings !== s.markings || ps.frames !== s.frames || ps.stamp !== s.stamp || ps.twoCols !== s.twoCols || ps.cols !== s.cols || ps.review !== s.review || ps.liveView !== s.liveView) this.schedule();
+    if (ps.photos !== s.photos || ps.tab !== s.tab || ps.fx !== s.fx || ps.markings !== s.markings || ps.frames !== s.frames || ps.stamp !== s.stamp || ps.tall !== s.tall || ps.cols !== s.cols || ps.review !== s.review) this.schedule();
   }
   say(t) { clearTimeout(this.toastT); this.setState({ toast: t }); this.toastT = setTimeout(() => this.setState({ toast: '' }), 3600); }
   schedule() { cancelAnimationFrame(this.raf); this.raf = requestAnimationFrame(() => { try { this.paint(); } catch (e) { console.error(e); } }); }
   paint() {
     const cv = this.els.preview; if (!cv) return; const s = this.state;
-    if (s.tab === 'live' && s.liveView === 'cam') { if (s.review) this.blit(develop(s.review.img, s.fx, 1000, s.stamp, false)); else if (s.cam !== 'on') { cv.width = 4; cv.height = 3; cv.getContext('2d').clearRect(0, 0, 4, 3); } return; }
+    if (s.tab === 'live') { if (s.review) this.blit(develop(s.review.img, s.fx, 1000, s.stamp, false)); else if (s.cam !== 'on') { cv.width = 4; cv.height = 3; cv.getContext('2d').clearRect(0, 0, 4, 3); } return; }
     const out = this.compose(.5); if (!out) { cv.width = 4; cv.height = 3; cv.getContext('2d').clearRect(0, 0, 4, 3); return; }
     this.blit(out);
   }
   blit(out) { const cv = this.els.preview; if (!cv) return; if (cv.width !== out.width || cv.height !== out.height) { cv.width = out.width; cv.height = out.height; } const x = cv.getContext('2d'); x.clearRect(0, 0, cv.width, cv.height); x.drawImage(out, 0, 0); }
-  list(onlyCam) { return this.state.photos.filter(p => this.imgs[p.id] && (!onlyCam || p.cam)); }
+  list() { return this.state.photos.filter(p => this.imgs[p.id]); }
   compose(sc) {
     const s = this.state, o = { markings: s.markings, frames: s.frames };
-    if (s.tab === 'live') { const P = this.list(true); if (!P.length) return null; return stripCanvas(P.map(p => develop(this.imgs[p.id], s.fx, 900 * sc * 1.4, s.stamp)), sc, o, true); }
-    const P = this.list(false); if (!P.length) return null;
-    const dev = P.map(p => develop(this.imgs[p.id], s.fx, 900 * sc * 1.4, s.stamp));
-    if (s.tab === 'strip') {
-      if (!s.twoCols || dev.length < 2) return stripCanvas(dev, sc, o, false);
-      const h = Math.ceil(dev.length / 2), a = stripCanvas(dev.slice(0, h), sc, o, false), b = stripCanvas(dev.slice(h), sc, { ...o, offset: h }, false), gp = a.width * .14;
-      const c = mk(a.width * 2 + gp, Math.max(a.height, b.height)), x = c.getContext('2d'); x.drawImage(a, 0, 0); x.drawImage(b, a.width + gp, 0); return c;
-    }
-    const cols = s.cols, rows = Math.ceil(dev.length / cols), cw = 520 * sc, ch = cw * .75, gap = cw * .07, cap = s.frames ? cw * .1 : 0, m = cw * .2, ml = m * 1.25;
-    const c = mk(ml + m + cols * cw + (cols - 1) * gap, m * 2 + rows * (ch + cap) + (rows - 1) * gap), x = c.getContext('2d');
-    x.fillStyle = '#f1ebdf'; x.fillRect(0, 0, c.width, c.height);
-    const ng = x.getImageData(0, 0, c.width, c.height); for (let i = 0; i < ng.data.length; i += 4) { const n = (Math.random() - .5) * 8; ng.data[i] += n; ng.data[i + 1] += n; ng.data[i + 2] += n; } x.putImageData(ng, 0, 0);
-    dev.forEach((im, i) => { const cx = ml + (i % cols) * (cw + gap), cy = m + Math.floor(i / cols) * (ch + cap + gap);
-      x.fillStyle = 'rgba(0,0,0,.18)'; x.fillRect(cx + 2 * sc, cy + 3 * sc, cw, ch); cover(x, im, cx, cy, cw, ch);
-      if (cap) { x.fillStyle = '#7a4a22'; x.font = `${cap * .62}px VT323, monospace`; x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillText(`${i * 2 + 1}  ▸${i * 2 + 1}A`, cx, cy + ch + cap * .55); } });
-    if (s.markings) { rotText(x, 'RW 400 · 35MM · ROLL 01', ml * .5, c.height - m - (rows * (ch + cap)) * .22, ml * .3, '#b0662a'); rotText(x, 'SAFETY FILM', ml * .5, m + ch * .6, ml * .3, '#b0662a'); }
+    if (s.tab === 'live') return null; // Live Cam only shoots; developing happens in Film Strip / Contact Sheet
+    const P = this.list(); if (!P.length) return null;
+    const ar = s.tab === 'strip' && s.tall ? 1 / 1.32 : 4 / 3;
+    const dev = P.map((p, i) => develop(cropTo(this.imgs[p.id], ar), s.fx, 900 * sc * 1.4, s.stamp, false, i));
+    if (s.tab === 'strip') return stripCanvas(dev, sc, { ...o, tall: s.tall }, false);
+    // Contact sheet: the roll cut into strips of `cols` frames, laid on photo paper
+    const rows = []; for (let i = 0; i < dev.length; i += s.cols) rows.push(stripCanvas(dev.slice(i, i + s.cols), sc, { ...o, offset: i }, true));
+    const m = 80 * sc, gp = 24 * sc, foot = s.markings ? 46 * sc : 0, rnd = rng(dev.length * 131 + s.cols);
+    const c = mk(Math.max(...rows.map(r => r.width)) + m * 2, rows.reduce((a, r) => a + r.height, 0) + gp * (rows.length - 1) + m * 2 + foot), x = c.getContext('2d');
+    x.fillStyle = '#f3efe7'; x.fillRect(0, 0, c.width, c.height);
+    const ng = x.getImageData(0, 0, c.width, c.height); for (let i = 0; i < ng.data.length; i += 4) { const n = (Math.random() - .5) * 7; ng.data[i] += n; ng.data[i + 1] += n; ng.data[i + 2] += n; } x.putImageData(ng, 0, 0);
+    let y = m; rows.forEach(r => { x.save(); x.translate(m + r.width / 2, y + r.height / 2); x.rotate((rnd() - .5) * .012);
+      x.shadowColor = 'rgba(40,25,10,.28)'; x.shadowBlur = 10 * sc; x.shadowOffsetY = 3 * sc; x.drawImage(r, -r.width / 2, -r.height / 2); x.restore(); y += r.height + gp; });
+    if (foot) { x.font = `${26 * sc}px VT323, monospace`; x.fillStyle = '#9a5a26'; x.textBaseline = 'middle'; x.fillText('RW 400 · 35MM · CONTACT SHEET · ROLL 01', m, c.height - m * .55 - foot * .3); }
     return c;
   }
   addFiles(list) {
@@ -368,7 +395,7 @@ class Component extends DCLogic {
   stopCam() { cancelAnimationFrame(this.liveRaf); if (this.stream) { this.stream.getTracks().forEach(t => t.stop()); this.stream = null; } if (this.els.video) this.els.video.srcObject = null; if (this.state.cam === 'on' || this.state.cam === 'asking') this.setState({ cam: 'off' }); }
   liveLoop() {
     let last = 0; const loop = now => { this.liveRaf = requestAnimationFrame(loop); const s = this.state, v = this.els.video;
-      if (s.tab !== 'live' || s.liveView !== 'cam' || s.review || !v || v.readyState < 2 || now - last < 40) return; last = now;
+      if (s.tab !== 'live' || s.review || !v || v.readyState < 2 || now - last < 40) return; last = now;
       const t = mk(640, 480); cover(t.getContext('2d'), v, 0, 0, 640, 480); this.blit(develop(t, s.fx, 640, s.stamp, s.facing === 'user')); };
     this.liveRaf = requestAnimationFrame(loop);
   }
@@ -376,7 +403,7 @@ class Component extends DCLogic {
     if (this.state.facing === 'user') { x.translate(w, 0); x.scale(-1, 1); } cover(x, v, 0, 0, w, h); return c; }
   makeCamThumbs() { const v = this.els.video; if (!v || v.readyState < 2) return; const base = this.grab(160), out = {}; PKEYS.forEach(k => { out[k] = develop(base, k, 120, 'none').toDataURL('image/jpeg', .8); }); this.setState({ camThumbs: out }); }
   async exportCanvas() { this.say('Developing…'); await new Promise(r => setTimeout(r, 30)); const c = this.compose(2); if (!c) { this.say('Add photos first.'); return null; } return c; }
-  name() { return { strip: 'film-strip', sheet: 'contact-sheet', live: 'film-reel' }[this.state.tab]; }
+  name() { return this.state.tab === 'sheet' ? 'contact-sheet' : 'film-strip'; }
   // Develop the share image as soon as the Share menu opens. Browsers (Safari especially) only allow the share sheet and
   // clipboard for a few seconds after a tap, and a full-size print can take that long to build.
   prepShare() { this.shareFile = null; const job = this.sharePrep = new Promise(r => setTimeout(r, 30)).then(() => { const c = this.compose(2); return c ? new Promise(r => c.toBlob(r, 'image/png')) : null; })
@@ -388,11 +415,11 @@ class Component extends DCLogic {
     const IW = 1584, IH = 993, SW = Math.max(s.vw, s.vh * IW / IH), SH = SW * IH / IW, cl = (v, a, b) => Math.max(a, Math.min(b, v));
     const SL = cl(s.vw / 2 - .5 * SW, s.vw - SW, 0), ST = cl(s.vh / 2 - .5 * SH, s.vh - SH, 0), wide = s.vw > 1100 && s.vh > 640;
     const sw = on => ({ track: { position: 'relative', width: 44, height: 26, flexShrink: 0, borderRadius: 4, boxShadow: on ? '0 0 10px rgba(255,255,255,.25)' : 'none', border: '1px solid rgba(255,240,220,.4)', background: on ? 'rgba(255,255,255,.64)' : 'rgba(255,240,220,.1)', cursor: 'pointer', padding: 0, transition: 'background .2s' }, dot: { position: 'absolute', top: 2, left: on ? 20 : 2, width: 20, height: 20, borderRadius: 2, background: on ? dark : 'rgba(243,233,220,.75)', transition: 'left .2s' } });
-    const chip = on => ({ height: 'clamp(30px,4.4vh,38px)', padding: '0 12px', borderRadius: 4, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8, border: '1px solid ' + (on ? '#f3ede4' : 'rgba(255,255,255,.28)'), background: on ? '#f3ede4' : 'rgba(255,255,255,.04)', color: on ? '#1e1a16' : ink, transition: 'background .2s, border-color .2s, color .2s' });
-    const live = tab === 'live', camOn = s.cam === 'on', camList = this.list(true), allList = this.list(false);
-    const empty = live ? (s.liveView === 'cam' ? !camOn && !s.review : !camList.length) : !allList.length;
-    const camMsg = { off: ['Live Cam', 'Starting the camera…', 'Start camera'], asking: ['Live Cam', 'Allow camera access to start shooting. Nothing leaves your device.', 'Start camera'], denied: ['Camera blocked', 'Camera access was declined. Allow it in your browser settings, then try again.', 'Try again'], error: ['No camera found', "We couldn't open a camera on this device.", 'Try again'], unsupported: ['Not supported', "This browser can't open the camera here.", 'Back to Film Strip'] }[s.cam] || ['', '', ''];
-    const [eT, eX, eB] = live ? (s.liveView === 'cam' ? camMsg : ['Your reel is empty', 'Capture a few frames and they’ll appear here on a 35mm reel.', 'Back to camera']) : ['Load your roll', 'Add up to 8 photos. Everything is developed right here on your device.', 'Add Photos'];
+    const chip = on => ({ height: 'clamp(26px,3.7vh,34px)', padding: '0 10px', borderRadius: 4, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8, border: '1px solid ' + (on ? '#f3ede4' : 'rgba(255,255,255,.28)'), background: on ? '#f3ede4' : 'rgba(255,255,255,.04)', color: on ? '#1e1a16' : ink, transition: 'background .2s, border-color .2s, color .2s' });
+    const live = tab === 'live', camOn = s.cam === 'on', allList = this.list();
+    const empty = live ? !camOn && !s.review : !allList.length;
+    const camMsg = { off: ['Live Cam', 'Starting the camera…', 'Start camera'], asking: ['Live Cam', 'Allow camera access to start shooting. Nothing leaves your device.', 'Start camera'], denied: ['Camera blocked', 'Camera access was declined. Allow it in your browser settings and try again, or add photos from your device.', 'Try again'], error: ['No camera found', "We couldn't open a camera on this device. You can still add photos from your device.", 'Try again'], unsupported: ['Not supported', "This browser can't open the camera here. You can still add photos from your device.", 'Add photos'] }[s.cam] || ['', '', ''];
+    const [eT, eX, eB] = live ? camMsg : ['No photos yet', 'Shoot or add photos in Live Cam first. They’ll be waiting here, ready to develop.', 'Go to Live Cam'];
     const dragIdx = this.dragIdx;
     return {
       onTop: { ..._bar, top: 0 }, onBot: { ..._bar, bottom: 0 },
@@ -401,26 +428,27 @@ class Component extends DCLogic {
         if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { window.location.href = href; return; }
         this.setState({ off: 1 }); setTimeout(() => { this.setState({ off: 2 }); setTimeout(() => { this.setState({ off: 3 }); setTimeout(() => { window.location.href = href; }, 200); }, 230); }, 400); },
       fileRef: this.fileRef, videoRef: this.videoRef, previewRef: this.previewRef, clock: s.clock,
-      bodyStyle: { flex: 1, minHeight: 0, overflowY: wide ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', padding: 'clamp(10px,2vh,24px) clamp(20px,3vw,48px) clamp(14px,2.4vh,28px)' },
+      // On narrow screens the panel fills the window: clear the BACK button at the top and the clock/copyright at the bottom.
+      headStyle: { display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'center', gap: '16px 24px', padding: wide ? 'clamp(18px,3vh,32px) clamp(20px,3.4vw,56px) 0' : '58px 14px 0' },
+      bodyStyle: { flex: 1, minHeight: 0, overflowY: wide ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', padding: wide ? 'clamp(10px,2vh,24px) clamp(20px,3vw,48px) clamp(14px,2.4vh,28px)' : '14px 16px 18px' },
       gridStyle: { display: 'flex', flexWrap: wide ? 'nowrap' : 'wrap', gap: 'clamp(18px,2.2vw,32px)', alignItems: 'stretch', flex: 1, minHeight: 0 },
       stageStyle: { position: 'absolute', left: SL, top: ST, width: SW, height: SH },
       panelStyle: { position: 'absolute', zIndex: 2, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflow: 'hidden',
-        ...(wide ? { left: Math.max(24, SL + .295 * SW), top: Math.max(16, ST + .09 * SH), width: Math.min(.672 * SW, s.vw - Math.max(24, SL + .295 * SW) - 36), height: Math.min(.8 * SH, s.vh - 32) } : { left: 10, right: 10, top: 10, bottom: 10 }),
+        ...(wide ? { left: Math.max(24, SL + .295 * SW), top: Math.max(16, ST + .09 * SH), width: Math.min(.672 * SW, s.vw - Math.max(24, SL + .295 * SW) - 36), height: Math.min(.8 * SH, s.vh - 32) } : { left: 10, right: 10, top: 10, bottom: 96 }),
         borderRadius: 18, background: 'linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.04))', backdropFilter: 'blur(26px) brightness(.72) saturate(1.05)', WebkitBackdropFilter: 'blur(26px) brightness(.72) saturate(1.05)', border: '1px solid rgba(255,255,255,.18)', boxShadow: '0 40px 100px rgba(0,0,0,.45), 0 0 60px rgba(255,255,255,.04), inset 0 1px 0 rgba(255,255,255,.18)', color: ink },
-      tabs: [['strip', 'Film Strip'], ['sheet', 'Contact Sheet'], ['live', 'Live Cam']].map(([id, label]) => ({ label, on: tab === id, pick: () => this.setState({ tab: id, shareOpen: false, review: null }),
-        style: { height: 32, minWidth: 'clamp(84px,7vw,116px)', padding: '0 12px', borderRadius: 9, border: 0, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', background: tab === id ? '#f3ede4' : 'transparent', color: tab === id ? '#1e1a16' : ink, fontWeight: tab === id ? 600 : 400, boxShadow: tab === id ? 'inset 0 1px 0 rgba(255,255,255,.3), 0 0 16px rgba(255,255,255,.22)' : 'none', transition: 'background .3s, color .3s' } })),
+      tabs: [['live', 'Live Cam'], ['strip', 'Film Strip'], ['sheet', 'Contact Sheet']].map(([id, label]) => ({ label, on: tab === id, pick: () => this.setState({ tab: id, shareOpen: false, review: null, printing: null }),
+        style: { height: 32, minWidth: wide ? 'clamp(84px,7vw,116px)' : 0, padding: wide ? '0 12px' : '0 8px', borderRadius: 9, border: 0, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: wide ? 17 : 15, ...(wide ? {} : { letterSpacing: '.02em' }), letterSpacing: '.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', background: tab === id ? '#f3ede4' : 'transparent', color: tab === id ? '#1e1a16' : ink, fontWeight: tab === id ? 600 : 400, boxShadow: tab === id ? 'inset 0 1px 0 rgba(255,255,255,.3), 0 0 16px rgba(255,255,255,.22)' : 'none', transition: 'background .3s, color .3s' } })),
       isStrip: tab === 'strip', isSheet: tab === 'sheet', isLive: live, notLive: !live,
-      previewBox: { position: 'relative', flex: 1, minHeight: wide ? 0 : (live ? '46vh' : '52vh'), borderRadius: 18, border: '1px solid rgba(255,240,220,.16)', background: live ? '#0d0a08' : 'rgba(20,14,9,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: live && s.liveView === 'cam' ? 0 : '40px 18px 16px', boxSizing: 'border-box' },
-      showPreviewLabel: !live, previewLabel: 'Preview',
-      previewCanvas: { display: empty ? 'none' : 'block', position: 'absolute', ...(live && s.liveView === 'cam' ? { inset: 0, width: '100%', height: '100%' } : { left: 18, top: 40, width: 'calc(100% - 36px)', height: 'calc(100% - 56px)' }), objectFit: live && s.liveView === 'cam' ? 'cover' : 'contain', borderRadius: live && s.liveView === 'cam' ? 0 : 2, filter: live || tab === 'sheet' ? 'none' : 'drop-shadow(0 18px 30px rgba(0,0,0,.45))' },
+      previewBox: { position: 'relative', flex: 1, minHeight: wide ? 0 : (live ? '46vh' : '52vh'), borderRadius: 18, border: '1px solid rgba(255,240,220,.16)', background: live ? '#0d0a08' : 'rgba(20,14,9,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: live ? 0 : '40px 18px 16px', boxSizing: 'border-box', containerType: 'size' },
+      showPreviewLabel: !live && !s.printing, previewLabel: 'Preview',
+      previewCanvas: { display: empty ? 'none' : 'block', visibility: s.printing ? 'hidden' : 'visible', position: 'absolute', ...(live ? { inset: 0, width: '100%', height: '100%' } : { left: 18, top: 40, width: 'calc(100% - 36px)', height: 'calc(100% - 56px)' }), objectFit: 'contain', borderRadius: live ? 0 : 2, filter: live || tab === 'sheet' ? 'none' : 'drop-shadow(0 18px 30px rgba(0,0,0,.45))' },
       showEmpty: empty, emptyTitle: eT, emptyText: eX, emptyBtn: eB,
-      emptyAction: () => { if (!live) return this.els.file.click(); if (s.liveView === 'reel') return this.setState({ liveView: 'cam' }); if (s.cam === 'unsupported') return this.setState({ tab: 'strip' }); this.startCam(); },
-      liveFrame: { position: 'absolute', inset: 0, pointerEvents: 'none', display: s.liveView === 'cam' && (camOn || s.review) ? 'block' : 'none' },
+      emptyAction: () => { if (!live) return this.setState({ tab: 'live' }); if (s.cam === 'unsupported') return this.els.file.click(); this.startCam(); },
+      liveFrame: { position: 'absolute', inset: 0, pointerEvents: 'none', display: camOn || s.review ? 'block' : 'none' },
       flashStyle: { position: 'absolute', inset: 0, background: '#fff', opacity: s.flash ? .85 : 0, transition: s.flash ? 'none' : 'opacity .45s ease-out' },
-      hasReelToggle: live, liveViews: [['cam', 'Camera'], ['reel', `Reel · ${camList.length}`]].map(([k, label]) => ({ label, on: s.liveView === k, pick: () => this.setState({ liveView: k, review: null }), style: { height: 30, padding: '0 12px', borderRadius: 7, border: 0, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 16, letterSpacing: '.06em', textTransform: 'uppercase', background: s.liveView === k ? cream : 'transparent', color: s.liveView === k ? dark : ink } })),
       reviewing: !!s.review, notReviewing: !s.review, camOff: !camOn,
       switchCam: () => { this.stopCam(); this.setState({ facing: s.facing === 'user' ? 'environment' : 'user' }, () => this.startCam()); },
-      shutterOff: s.liveView !== 'cam' || (!camOn && !s.review) || s.photos.length >= MAX, shutterLabel: s.photos.length >= MAX ? 'Roll full' : 'Take photo',
+      shutterOff: (!camOn && !s.review) || s.photos.length >= MAX, shutterLabel: s.photos.length >= MAX ? 'Roll full' : 'Take photo',
       shutterInner: { display: 'block', width: '100%', height: '100%', borderRadius: '50%', background: s.photos.length >= MAX ? 'rgba(243,233,220,.3)' : '#f3e9dc' },
       shutter: () => { if (s.review || !camOn) return; const c = this.grab(1800); this.setState({ flash: 1, review: { img: c } }); setTimeout(() => this.setState({ flash: 0 }), 60); },
       retake: () => this.setState({ review: null }),
@@ -428,22 +456,32 @@ class Component extends DCLogic {
         c.toBlob(b => { const url = URL.createObjectURL(b), img = new Image(); img.onload = () => { const id = Math.random().toString(36).slice(2, 9); this.imgs[id] = img;
           this.setState(st => ({ photos: [...st.photos, { id, url, name: 'live-cam', cam: true }], review: null, lastUrl: url })); setTimeout(() => this.makeCamThumbs(), 300); }; img.src = url; }, 'image/jpeg', .94); },
       hasLast: !!s.lastUrl, lastUrl: s.lastUrl,
-      count: s.photos.length, canAdd: s.photos.length < MAX, hasThumbs: s.photos.length > 1,
+      count: s.photos.length, canAdd: live && s.photos.length < MAX, showReorderHint: !live && s.photos.length > 1 && s.vh > 820,
       pickFiles: () => this.els.file.click(), onFiles: e => { this.addFiles(e.target.files); e.target.value = ''; },
-      onDragOver: e => e.preventDefault(), onDropFiles: e => { e.preventDefault(); if (e.dataTransfer.files && e.dataTransfer.files.length) this.addFiles(e.dataTransfer.files); },
+      onDragOver: e => e.preventDefault(), onDropFiles: e => { e.preventDefault(); if (!(e.dataTransfer.files && e.dataTransfer.files.length)) return; if (!live) return this.say('Add photos in Live Cam.'); this.addFiles(e.dataTransfer.files); },
       thumbs: s.photos.map((p, i) => ({ url: p.url, aria: `Photo ${i + 1} of ${s.photos.length}. Use left and right arrows to move it.`, removeAria: `Remove photo ${i + 1}`, remove: () => this.remove(p.id),
         key: e => { if (e.key === 'ArrowLeft') { e.preventDefault(); this.move(i, i - 1); } if (e.key === 'ArrowRight') { e.preventDefault(); this.move(i, i + 1); } },
         dragStart: e => { this.dragIdx = i; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', String(i)); } catch (er) {} },
         dragOver: e => { e.preventDefault(); }, drop: e => { if (this.dragIdx == null) return; e.preventDefault(); e.stopPropagation(); this.move(this.dragIdx, i); this.dragIdx = null; } })),
-      twoCols: s.twoCols, toggleCols: () => this.setState({ twoCols: !s.twoCols }), colsSw: sw(s.twoCols),
-      colOpts: [[2, '2 Columns'], [3, '3 Columns']].map(([k, label]) => ({ label, on: s.cols === k, pick: () => this.setState({ cols: k }), style: { flex: '0 1 160px', height: 40, borderRadius: 9, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.06em', textTransform: 'uppercase', border: s.cols === k ? 0 : '1px solid rgba(255,240,220,.22)', background: s.cols === k ? cream : 'transparent', color: s.cols === k ? dark : ink, fontWeight: s.cols === k ? 600 : 400 } })),
+      shapeOpts: [[false, 'Classic'], [true, 'Tall']].map(([k, label]) => ({ label, on: s.tall === k, pick: () => this.setState({ tall: k }), style: { flex: '1 1 0', height: 'clamp(30px,4.4vh,38px)', borderRadius: 9, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.06em', textTransform: 'uppercase', border: s.tall === k ? 0 : '1px solid rgba(255,240,220,.22)', background: s.tall === k ? cream : 'transparent', color: s.tall === k ? dark : ink, fontWeight: s.tall === k ? 600 : 400 } })),
+      colOpts: [[2, '2 per Row'], [3, '3 per Row']].map(([k, label]) => ({ label, on: s.cols === k, pick: () => this.setState({ cols: k }), style: { flex: '1 1 0', height: 'clamp(30px,4.4vh,38px)', borderRadius: 9, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.06em', textTransform: 'uppercase', border: s.cols === k ? 0 : '1px solid rgba(255,240,220,.22)', background: s.cols === k ? cream : 'transparent', color: s.cols === k ? dark : ink, fontWeight: s.cols === k ? 600 : 400 } })),
       effects: PKEYS.map(k => ({ label: PRESETS[k].label, on: s.fx === k, pick: () => this.setState({ fx: k }), chip: chip(s.fx === k), hasThumb: !!s.camThumbs[k], thumb: s.camThumbs[k] || '',
         frame: { display: 'block', width: 54, height: 'clamp(46px,7vh,66px)', borderRadius: 8, overflow: 'hidden', boxSizing: 'border-box', background: 'rgba(255,240,220,.08)', border: s.fx === k ? '2px solid #f3ede4' : '1px solid rgba(255,240,220,.2)', transition: 'border-color .2s' } })),
-      optToggles: [['markings', 'Show Film Markings', 'Markings'], ['frames', 'Show Frame Numbers', 'Frame no.']].map(([k, label, short]) => { const w = sw(s[k]); return { label, short, on: s[k], toggle: () => this.setState({ [k]: !s[k] }), track: w.track, dot: w.dot }; }),
+      optToggles: live ? [] : [['markings', 'Show Film Markings', 'Markings'], ['frames', 'Show Frame Numbers', 'Frame no.']].map(([k, label, short]) => { const w = sw(s[k]); return { label, short, on: s[k], toggle: () => this.setState({ [k]: !s[k] }), track: w.track, dot: w.dot }; }),
       stampStyle: s.stamp, onStamp: e => this.setState({ stamp: e.target.value }), stampOpts: Object.entries(STAMPS).map(([value, v]) => ({ value, label: value === 'none' ? 'No date stamp' : 'Date · ' + v.label })),
-      cantExport: live ? !camList.length : !allList.length,
-      dlLabel: { strip: 'Download Film Strip', sheet: 'Download Contact Sheet', live: 'Download Film Reel' }[tab],
-      download: async () => { const c = await this.exportCanvas(); if (!c) return; c.toBlob(b => { if (!b) return this.say('Export failed — try fewer or smaller photos.'); const u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `camera-room-${this.name()}.png`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); this.say(`Saved camera-room-${this.name()}.png`); }, 'image/png'); },
+      cantExport: !allList.length || !!s.printing,
+      dlLabel: tab === 'sheet' ? 'Download Contact Sheet' : 'Download Film Strip',
+      // The file downloads straight away (so no browser blocks it); meanwhile the preview turns into a photo-booth slot that
+      // feeds the print out, ending in a warm flash.
+      download: async () => { if (s.printing) return; const c = await this.exportCanvas(); if (!c) return;
+        c.toBlob(b => { if (!b) return this.say('Export failed — try fewer or smaller photos.'); const u = URL.createObjectURL(b), a = document.createElement('a'), file = `camera-room-${this.name()}.png`;
+          a.href = u; a.download = file; document.body.appendChild(a); a.click(); a.remove();
+          const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (reduce) { this.say(`Saved ${file}`); setTimeout(() => URL.revokeObjectURL(u), 4000); return; }
+          this.setState({ printing: { url: u, ar: c.width / c.height }, toast: '' }); (this.printT || []).forEach(clearTimeout);
+          this.printT = [setTimeout(() => this.say(`Saved ${file}`), PRINT_MS - 500), setTimeout(() => this.setState({ printing: null }), PRINT_MS), setTimeout(() => URL.revokeObjectURL(u), PRINT_MS + 1500)]; }, 'image/png'); },
+      isPrinting: !!s.printing, printSrc: s.printing ? s.printing.url : '',
+      printImg: s.printing ? (() => { const ar = s.printing.ar, wide = ar > 1; return { position: 'absolute', left: '50%', top: 0, display: 'block', width: `min(${wide ? 84 : 52}cqw, calc(78cqh * ${ar.toFixed(4)}))`, height: 'auto', boxShadow: '0 10px 24px rgba(0,0,0,.45)', transform: 'translate(-50%,-100%)', animation: `cr-feed ${PRINT_MS - 1300}ms cubic-bezier(.45,.05,.4,1) 250ms forwards` }; })() : {},
       shareOpen: s.shareOpen, toggleShare: () => { const open = !s.shareOpen; this.setState({ shareOpen: open }); if (open) this.prepShare(); },
       shareNative: async () => { this.setState({ shareOpen: false }); if (!navigator.canShare) return this.say("This browser can't share files — use Download or Copy image instead.");
         let f = this.shareFile; if (!f) { this.say('Developing…'); f = await (this.sharePrep || this.prepShare()); if (!f) return this.say('Add photos first.'); }
