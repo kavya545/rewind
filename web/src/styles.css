@@ -10,7 +10,7 @@
   --glass-shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .2);
   /* Controls sit above the footer's copyright line (bottom: clamp(8px,1.4vh,14px), ~16px tall). */
   --pad-b: calc(clamp(8px, 1.4vh, 14px) + 34px);
-  --tilt-scale: 1.1;
+  --tilt-scale: 1.05;
   --serif: 'Instrument Serif', serif;
   --mono: 'IBM Plex Mono', monospace;
 }

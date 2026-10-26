@@ -80,21 +80,21 @@ export function useRipple(canvas: RefObject<HTMLCanvasElement>, src: string, gat
 export function useTilt(room: RefObject<HTMLDivElement>, tilt: RefObject<HTMLDivElement>, gate: RefObject<FxGate>, disabled: boolean) {
   useEffect(() => {
     const rm = room.current, tl = tilt.current; if (!rm || !tl || disabled) return;
-    const S = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tilt-scale')) || 1.1;
+    const S = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tilt-scale')) || 1.05;
     let down: { x: number; y: number } | null = null, moved = false;
     // How far the room can slide toward one side before its edge would show: whatever of the (zoomed) photo is
     // hidden past the opposite viewport edge. Kept to 70% so the perspective swing never reveals an edge, and capped
     // so a turn stays small even where lots of the photo is off-screen (phones in portrait).
     const reach = (hidden: number, view: number, cap: number) => Math.min(Math.max(0, hidden) * .7, view * cap);
     const set = (lx: number, ly: number, fast: boolean) => {
-      const st = tl.firstElementChild as HTMLElement | null, vw = window.innerWidth, vh = window.innerHeight;
+      const st = tl.firstElementChild as HTMLElement | null, vw = window.innerWidth, vh = window.innerHeight, vmax = Math.max(vw, vh);
       const L = st ? vw / 2 + (st.offsetLeft - vw / 2) * S : -vw * (S - 1) / 2, R = st ? L + st.offsetWidth * S : vw + vw * (S - 1) / 2;
       const T = st ? vh / 2 + (st.offsetTop - vh / 2) * S : -vh * (S - 1) / 2, B = st ? T + st.offsetHeight * S : vh + vh * (S - 1) / 2;
-      const tx = lx > 0 ? lx * reach(-L, vw, .16) : lx * reach(R - vw, vw, .16);
-      const ty = ly > 0 ? ly * reach(-T, vh, .08) : ly * reach(B - vh, vh, .08);
+      const tx = lx > 0 ? lx * reach(-L, vmax, .04) : lx * reach(R - vw, vmax, .04);
+      const ty = ly > 0 ? ly * reach(-T, vmax, .025) : ly * reach(B - vh, vmax, .025);
       tl.style.transition = fast ? 'transform .12s ease-out' : 'transform .9s cubic-bezier(.2,.8,.2,1)';
       tl.style.transform = (lx || ly)
-        ? `perspective(1800px) translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0) rotateY(${(lx * 2.4).toFixed(2)}deg) rotateX(${(-ly * 1.6).toFixed(2)}deg) scale(${S})`
+        ? `perspective(1800px) translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0) rotateY(${(lx * 1.4).toFixed(2)}deg) rotateX(${(-ly * .9).toFixed(2)}deg) scale(${S})`
         : `scale(${S})`;
     };
     const onDown = (e: PointerEvent) => { if (gate.current?.blocked || e.button > 0) return; down = { x: e.clientX, y: e.clientY }; moved = false; };
