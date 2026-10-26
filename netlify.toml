@@ -1,0 +1,8 @@
+# Netlify: build the homepage app in web/ and publish its output.
+[build]
+  base = "web"
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
