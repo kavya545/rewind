@@ -377,6 +377,11 @@ class Component extends DCLogic {
   makeCamThumbs() { const v = this.els.video; if (!v || v.readyState < 2) return; const base = this.grab(160), out = {}; PKEYS.forEach(k => { out[k] = develop(base, k, 120, 'none').toDataURL('image/jpeg', .8); }); this.setState({ camThumbs: out }); }
   async exportCanvas() { this.say('Developing…'); await new Promise(r => setTimeout(r, 30)); const c = this.compose(2); if (!c) { this.say('Add photos first.'); return null; } return c; }
   name() { return { strip: 'film-strip', sheet: 'contact-sheet', live: 'film-reel' }[this.state.tab]; }
+  // Develop the share image as soon as the Share menu opens. Browsers (Safari especially) only allow the share sheet and
+  // clipboard for a few seconds after a tap, and a full-size print can take that long to build.
+  prepShare() { this.shareFile = null; const job = this.sharePrep = new Promise(r => setTimeout(r, 30)).then(() => { const c = this.compose(2); return c ? new Promise(r => c.toBlob(r, 'image/png')) : null; })
+      .then(b => { if (!b) return null; const f = new File([b], `camera-room-${this.name()}.png`, { type: 'image/png' }); if (this.sharePrep === job) this.shareFile = f; return f; });
+    return job; }
   renderVals() {
     const s = this.state, tab = s.tab, ink = '#f3e9dc', cream = '#f3ede4', dark = '#1e1a16';
     const _o = s.off || 0, _bar = { position: 'absolute', left: 0, right: 0, height: s.arrived && !_o ? 0 : '50%', background: '#000', transition: _o ? 'height .4s cubic-bezier(.7,0,.84,0)' : 'height .55s cubic-bezier(.2,.8,.3,1)' };
@@ -439,11 +444,14 @@ class Component extends DCLogic {
       cantExport: live ? !camList.length : !allList.length,
       dlLabel: { strip: 'Download Film Strip', sheet: 'Download Contact Sheet', live: 'Download Film Reel' }[tab],
       download: async () => { const c = await this.exportCanvas(); if (!c) return; c.toBlob(b => { if (!b) return this.say('Export failed — try fewer or smaller photos.'); const u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `camera-room-${this.name()}.png`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); this.say(`Saved camera-room-${this.name()}.png`); }, 'image/png'); },
-      shareOpen: s.shareOpen, toggleShare: () => this.setState({ shareOpen: !s.shareOpen }),
-      shareNative: async () => { this.setState({ shareOpen: false }); const c = await this.exportCanvas(); if (!c) return; const b = await new Promise(r => c.toBlob(r, 'image/png')); const f = new File([b], `camera-room-${this.name()}.png`, { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: 'Camera Room' }); this.say('Shared.'); } catch (e) { if (e.name !== 'AbortError') this.say('Sharing failed.'); } }
+      shareOpen: s.shareOpen, toggleShare: () => { const open = !s.shareOpen; this.setState({ shareOpen: open }); if (open) this.prepShare(); },
+      shareNative: async () => { this.setState({ shareOpen: false }); if (!navigator.canShare) return this.say("This browser can't share files — use Download or Copy image instead.");
+        let f = this.shareFile; if (!f) { this.say('Developing…'); f = await (this.sharePrep || this.prepShare()); if (!f) return this.say('Add photos first.'); }
+        if (navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: 'Camera Room' }); this.say('Shared.'); } catch (e) { if (e.name !== 'AbortError') this.say('Sharing failed.'); } }
         else this.say("This browser can't share files — use Download or Copy image instead."); },
-      shareCopy: async () => { this.setState({ shareOpen: false }); const c = await this.exportCanvas(); if (!c) return; try { const b = await new Promise(r => c.toBlob(r, 'image/png')); await navigator.clipboard.write([new ClipboardItem({ 'image/png': b })]); this.say('Copied to clipboard.'); } catch (e) { this.say("Couldn't copy here — use Download instead."); } },
+      shareCopy: async () => { this.setState({ shareOpen: false }); const ready = this.shareFile, job = ready ? null : (this.sharePrep || this.prepShare()); if (!ready) this.say('Developing…');
+        // Handing ClipboardItem a promise keeps the write inside the tap's gesture while the image finishes developing.
+        try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': ready || job.then(f => { if (!f) throw new Error('nothing to copy'); return f; }) })]); this.say('Copied to clipboard.'); } catch (e) { this.say("Couldn't copy here — use Download instead."); } },
       hasToast: !!s.toast, toast: s.toast
     };
   }
