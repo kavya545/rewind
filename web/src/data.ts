@@ -16,7 +16,7 @@ export const ROOMS: { label: string; src: string; grade?: string }[] = [
   { label: 'Blue dusk', src: 'assets/room-dusk.png' },
 ];
 
-export type ObjectId = 'tv' | 'cam' | 'tw' | 'deck';
+export type ObjectId = 'tv' | 'cam';
 
 /** Clickable objects in the room. Positions are % of the room photo. */
 export const OBJECTS: {
@@ -26,8 +26,6 @@ export const OBJECTS: {
 }[] = [
   { id: 'tv', no: '01', name: 'Television', verb: 'tune in →', href: 'TV.dc.html', aria: 'Television — tune in', hit: [36.3, 33.8, 27.7, 34.3], radius: '2%', label: [50.1, 32.5] },
   { id: 'cam', no: '02', name: 'Camera', verb: 'shoot →', href: 'Camera.dc.html', aria: 'Camera — shoot', hit: [31.3, 60, 10.5, 11], radius: '8%', glow: [29, 56, 15, 18], label: [36.5, 59] },
-  { id: 'tw', no: '03', name: 'Typewriter', verb: 'type →', href: 'Typewriter.dc.html', aria: 'Typewriter', hit: [65.9, 71.1, 17.4, 16.1], radius: '6%', glow: [64, 66, 21, 25], label: [74.6, 70] },
-  { id: 'deck', no: '04', name: 'Cassette deck', verb: 'play →', href: 'Cassette.dc.html', aria: 'Cassette deck', hit: [34.1, 73.1, 16.1, 13.6], radius: '4%', glow: [32, 69, 20, 22], label: [42.2, 72.5] },
 ];
 
 export const ICON = {
