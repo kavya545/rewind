@@ -8,7 +8,9 @@
   --glass: rgba(255, 255, 255, .09);
   --glass-line: rgba(255, 255, 255, .14);
   --glass-shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .2);
-  --pad-b: clamp(16px, 3vh, 30px);
+  /* Controls sit above the footer's copyright line (bottom: clamp(8px,1.4vh,14px), ~16px tall). */
+  --pad-b: calc(clamp(8px, 1.4vh, 14px) + 34px);
+  --tilt-scale: 1.1;
   --serif: 'Instrument Serif', serif;
   --mono: 'IBM Plex Mono', monospace;
 }
@@ -29,7 +31,7 @@ a:focus-visible, button:focus-visible { outline: 1px solid var(--amber); outline
 
 /* ---------- room ---------- */
 .rw-room { position: relative; height: 100vh; width: 100vw; overflow: hidden; background: var(--ink); cursor: grab; touch-action: pan-y; }
-.rw-tilt { position: absolute; inset: 0; transform: scale(1.06); transition: transform .9s cubic-bezier(.2, .8, .2, 1); }
+.rw-tilt { position: absolute; inset: 0; transform: scale(var(--tilt-scale)); transition: transform .9s cubic-bezier(.2, .8, .2, 1); }
 .rw-stage { position: absolute; will-change: transform; transition: filter .5s ease; }
 .rw-stage.is-blurred { filter: blur(9px) brightness(.72) saturate(.95); }
 .rw-layer { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; pointer-events: none; transition: opacity 1.1s cubic-bezier(.4, 0, .2, 1); will-change: opacity; }
@@ -70,7 +72,7 @@ a:focus-visible, button:focus-visible { outline: 1px solid var(--amber); outline
 .rw-logo { font-family: var(--serif); font-style: italic; font-size: clamp(26px, 2.4vw, 34px); line-height: 1; color: var(--ivory); }
 .rw-side { font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: rgba(239, 230, 212, .7); }
 
-.rw-hint { position: absolute; left: 50%; bottom: calc(var(--pad-b) + 54px); transform: translateX(-50%); font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: rgba(239, 230, 212, .75); text-shadow: 0 1px 8px rgba(0, 0, 0, .7); white-space: nowrap; transition: opacity .5s; pointer-events: none; }
+.rw-hint { position: absolute; left: 50%; bottom: calc(100% + 16px); transform: translateX(-50%); font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: rgba(239, 230, 212, .75); text-shadow: 0 1px 8px rgba(0, 0, 0, .7); white-space: nowrap; transition: opacity .5s; pointer-events: none; }
 .rw-hint.is-hidden { opacity: 0; }
 
 .rw-controls { position: absolute; left: 50%; transform: translateX(-50%); bottom: var(--pad-b); z-index: 6; display: flex; flex-wrap: wrap; justify-content: center; width: max-content; align-items: center; gap: 10px; max-width: calc(100vw - 32px); }
@@ -84,6 +86,13 @@ a:focus-visible, button:focus-visible { outline: 1px solid var(--amber); outline
 
 .rw-liquid { display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 14px; border-radius: 12px; cursor: pointer; font-family: var(--mono); font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--ivory); }
 .rw-liquid:hover { background: rgba(255, 255, 255, .17); }
+/* Phones: compact tabs that fit the width, and the whole group lifted clear of the clock. */
+@media (max-width: 600px) {
+  :root { --pad-b: calc(clamp(12px, 2.6vw, 30px) + clamp(12px, 2.2vh, 24px) + 60px); }
+  .rw-controls { gap: 8px; }
+  .rw-tab { padding: 0 9px; gap: 0; letter-spacing: .12em; }
+  .rw-tab .mark { display: none; }
+}
 .rw-track { position: relative; width: 30px; height: 16px; border-radius: 99px; background: rgba(239, 230, 212, .14); border: 1px solid rgba(255, 255, 255, .15); transition: background .2s; }
 .rw-dot { position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: rgba(239, 230, 212, .6); transition: left .2s, background .2s; }
 .rw-liquid[aria-pressed="true"] .rw-track { background: rgba(255, 255, 255, .41); }

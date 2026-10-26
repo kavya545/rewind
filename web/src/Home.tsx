@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { AR, DUST, FOCUS_X, FOCUS_Y, IH, IW, KEY, OBJECTS, POSTERS, ROOMS, clamp, reducedMotion, store, type ObjectId } from './data';
-import { useRipple, useTilt, type FxGate, type LookBus } from './fx';
+import { useRipple, useTilt, type FxGate } from './fx';
 import { Intro } from './Intro';
 import { PosterPopup } from './PosterPopup';
 import { Footer } from './Footer';
@@ -39,11 +39,10 @@ export function Home({ showIntro = true, oncePerSession = true }: Props) {
   const gate = useRef<FxGate>({ liquid, blocked: false });
   gate.current.liquid = liquid;
   gate.current.blocked = intro || !!leaving || poster != null;
-  const bus = useRef<LookBus>({}).current;
   const navT = useRef<number[]>([]);
 
-  useRipple(rippleEl, ROOMS[room].src, gate, bus, reduce);
-  useTilt(roomEl, tiltEl, gate, bus, reduce);
+  useRipple(rippleEl, ROOMS[room].src, gate, reduce);
+  useTilt(roomEl, tiltEl, gate, reduce);
 
   useEffect(() => {
     if (off === 4) { const id = requestAnimationFrame(() => requestAnimationFrame(() => setOff(0))); return () => cancelAnimationFrame(id); }
@@ -150,9 +149,8 @@ export function Home({ showIntro = true, oncePerSession = true }: Props) {
         <span className="rw-logo">Rewind</span>
         <span className="rw-side">side a — 1994</span>
       </header>
-      <span className={'rw-hint' + (hover || leaving || intro ? ' is-hidden' : '')}>tap anything in the room</span>
-
       <div className="rw-controls" onPointerDown={e => e.stopPropagation()}>
+        <span className={'rw-hint' + (hover || leaving || intro ? ' is-hidden' : '')}>tap anything in the room</span>
         <div role="tablist" aria-label="Room lighting" className="rw-tabs rw-glass">
           {ROOMS.map((r, i) => {
             const on = room === i;
