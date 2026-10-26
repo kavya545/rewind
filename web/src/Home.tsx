@@ -124,7 +124,7 @@ export function Home({ showIntro = true, oncePerSession = true }: Props) {
             return (
               <div key={p.title} aria-hidden="true" className={'rw-label' + (below ? ' is-below' : '') + (hover === 'p' + i && !leaving ? ' is-on' : '')}
                 style={{ left: pct(l + wd / 2), top: pct(below ? tp + hh + 1.2 : tp - .8), fontSize: labelFont }}>
-                <span className="no">{String(i + 5).padStart(2, '0')}</span><span className="name">{p.title}</span><span>view</span>
+                <span className="no">{String(i + 3).padStart(2, '0')}</span><span className="name">{p.title}</span><span>view</span>
               </div>
             );
           })}
