@@ -18,10 +18,6 @@ a{color:#f3e9dc}a:hover{color:#f6c98e}
 button:focus-visible,[tabindex]:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #f6c98e;outline-offset:2px}
 button:disabled{opacity:.45;cursor:not-allowed}
 select option{background:#2a1f16;color:#f3e9dc}
-@keyframes cr-booth{0%{opacity:0}7%{opacity:1}91%{opacity:1}100%{opacity:0}}
-@keyframes cr-feed{0%{transform:translate(-50%,-100%)}14%{transform:translate(-50%,-86%)}18%{transform:translate(-50%,-85.4%)}42%{transform:translate(-50%,-55%)}46%{transform:translate(-50%,-54.4%)}72%{transform:translate(-50%,-21%)}76%{transform:translate(-50%,-20.4%)}100%{transform:translate(-50%,0)}}
-@keyframes cr-hum{0%,100%{transform:translate(0,0)}50%{transform:translate(.5px,-.4px)}}
-@keyframes cr-glow{0%{opacity:0}35%{opacity:.9}100%{opacity:0}}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 <script src="./liquid.js"></script>
@@ -78,18 +74,6 @@ select option{background:#2a1f16;color:#f3e9dc}
                 <span style="{{ flashStyle }}"></span>
               </div>
             </sc-if>
-            <sc-if value="{{ isPrinting }}" hint-placeholder-val="{{ false }}">
-              <div aria-hidden="true" style="position:absolute;inset:0;z-index:4;overflow:hidden;animation:cr-booth 3800ms ease forwards">
-                <div style="position:absolute;left:0;right:0;top:12%;bottom:0;overflow:hidden">
-                  <img src="{{ printSrc }}" alt="" style="{{ printImg }}">
-                  <div style="position:absolute;left:0;right:0;top:0;height:26px;background:linear-gradient(180deg,rgba(0,0,0,.5),transparent)"></div>
-                </div>
-                <div style="position:absolute;left:14%;right:14%;top:7%;height:7%;min-height:18px;border-radius:999px;background:linear-gradient(180deg,#3d3d3d,#0b0b0b 45%,#262626 78%,#0e0e0e);box-shadow:0 6px 14px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.18);animation:cr-hum 120ms linear 250ms 20"></div>
-                <div style="position:absolute;left:10.5%;width:4.5%;top:7.8%;height:5.4%;min-height:14px;border-radius:4px;background:linear-gradient(180deg,#d9d4cc,#8b857c 55%,#bdb6ab);box-shadow:0 3px 6px rgba(0,0,0,.5)"></div>
-                <div style="position:absolute;right:10.5%;width:4.5%;top:7.8%;height:5.4%;min-height:14px;border-radius:4px;background:linear-gradient(180deg,#d9d4cc,#8b857c 55%,#bdb6ab);box-shadow:0 3px 6px rgba(0,0,0,.5)"></div>
-                <div style="position:absolute;inset:0;opacity:0;mix-blend-mode:screen;background:radial-gradient(ellipse 70% 60% at 50% 45%,rgba(255,232,190,.75),rgba(255,160,70,.35) 50%,transparent 80%);animation:cr-glow 900ms ease-out 2700ms forwards"></div>
-              </div>
-            </sc-if>
           </div>
 
           <sc-if value="{{ isLive }}" hint-placeholder-val="{{ false }}">
@@ -143,7 +127,7 @@ select option{background:#2a1f16;color:#f3e9dc}
           </sc-if>
           <sc-if value="{{ isSheet }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding:clamp(5px,1.1vh,14px) 0;border-bottom:1px solid rgba(255,240,220,.12)">
-              <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Frames per Row</span>
+              <span style="font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#f6eee2">Columns</span>
               <div style="display:flex;gap:8px;flex:0 1 300px">
                 <sc-for list="{{ colOpts }}" as="o" hint-placeholder-count="2">
                   <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="{{ o.style }}">{{ o.label }}</button>
@@ -237,7 +221,7 @@ const STAMPS = {
   today: { label: 'Today (90s style)', color: '#ff8a3c', text: () => { const d = new Date(); return `${MON[d.getMonth()]} ${d.getDate()} ${d.getFullYear()}`; } },
   none: { label: 'No date stamp', color: '', text: () => '' }
 };
-const MAX = 8, MAXMB = 25, PRINT_MS = 3800;
+const MAX = 8, MAXMB = 25;
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; };
 const dims = s => [s.videoWidth || s.naturalWidth || s.width, s.videoHeight || s.naturalHeight || s.height];
 
@@ -318,7 +302,7 @@ function stripCanvas(frames, sc, o, horizontal) {
   return c;
 }
 class Component extends DCLogic {
-  state = { photos: [], tab: 'live', fx: 'film90', markings: true, frames: true, stamp: 'classic', tall: false, cols: 2, toast: '', shareOpen: false, cam: 'off', facing: 'user', review: null, printing: null, flash: 0, lastUrl: '', camThumbs: {}, clock: '', arrived: false, off: 0, vw: window.innerWidth, vh: window.innerHeight };
+  state = { photos: [], tab: 'live', fx: 'film90', markings: true, frames: true, stamp: 'classic', tall: false, cols: 2, toast: '', shareOpen: false, cam: 'off', facing: 'user', review: null, flash: 0, lastUrl: '', camThumbs: {}, clock: '', arrived: false, off: 0, vw: window.innerWidth, vh: window.innerHeight };
   els = {}; imgs = {};
   fileRef = el => { this.els.file = el; }; videoRef = el => { this.els.video = el; };
   previewRef = el => { this.els.preview = el; if (el) this.schedule(); };
@@ -333,7 +317,7 @@ class Component extends DCLogic {
     document.fonts && document.fonts.load('40px VT323').then(() => this.schedule());
     if (this.state.tab === 'live') this.startCam();
   }
-  componentWillUnmount() { this.stopCam(); (this.printT || []).forEach(clearTimeout); clearInterval(this.clockT); clearTimeout(this.toastT); cancelAnimationFrame(this.raf); window.removeEventListener('pageshow', this._ps); window.removeEventListener('resize', this.onResize); document.removeEventListener('visibilitychange', this.onVis); document.removeEventListener('pointerdown', this.onDoc); this.state.photos.forEach(p => URL.revokeObjectURL(p.url)); }
+  componentWillUnmount() { this.stopCam(); clearInterval(this.clockT); clearTimeout(this.toastT); cancelAnimationFrame(this.raf); window.removeEventListener('pageshow', this._ps); window.removeEventListener('resize', this.onResize); document.removeEventListener('visibilitychange', this.onVis); document.removeEventListener('pointerdown', this.onDoc); this.state.photos.forEach(p => URL.revokeObjectURL(p.url)); }
   componentDidUpdate(pp, ps) {
     const s = this.state;
     if (ps.tab !== s.tab) { if (s.tab === 'live') this.startCam(); else this.stopCam(); }
@@ -356,15 +340,15 @@ class Component extends DCLogic {
     const ar = s.tab === 'strip' && s.tall ? 1 / 1.32 : 4 / 3;
     const dev = P.map((p, i) => develop(cropTo(this.imgs[p.id], ar), s.fx, 900 * sc * 1.4, s.stamp, false, i));
     if (s.tab === 'strip') return stripCanvas(dev, sc, { ...o, tall: s.tall }, false);
-    // Contact sheet: the roll cut into strips of `cols` frames, laid on photo paper
-    const rows = []; for (let i = 0; i < dev.length; i += s.cols) rows.push(stripCanvas(dev.slice(i, i + s.cols), sc, { ...o, offset: i }, true));
-    const m = 80 * sc, gp = 24 * sc, foot = s.markings ? 46 * sc : 0, rnd = rng(dev.length * 131 + s.cols);
-    const c = mk(Math.max(...rows.map(r => r.width)) + m * 2, rows.reduce((a, r) => a + r.height, 0) + gp * (rows.length - 1) + m * 2 + foot), x = c.getContext('2d');
-    x.fillStyle = '#f3efe7'; x.fillRect(0, 0, c.width, c.height);
-    const ng = x.getImageData(0, 0, c.width, c.height); for (let i = 0; i < ng.data.length; i += 4) { const n = (Math.random() - .5) * 7; ng.data[i] += n; ng.data[i + 1] += n; ng.data[i + 2] += n; } x.putImageData(ng, 0, 0);
-    let y = m; rows.forEach(r => { x.save(); x.translate(m + r.width / 2, y + r.height / 2); x.rotate((rnd() - .5) * .012);
-      x.shadowColor = 'rgba(40,25,10,.28)'; x.shadowBlur = 10 * sc; x.shadowOffsetY = 3 * sc; x.drawImage(r, -r.width / 2, -r.height / 2); x.restore(); y += r.height + gp; });
-    if (foot) { x.font = `${26 * sc}px VT323, monospace`; x.fillStyle = '#9a5a26'; x.textBaseline = 'middle'; x.fillText('RW 400 · 35MM · CONTACT SHEET · ROLL 01', m, c.height - m * .55 - foot * .3); }
+    // Contact sheet: prints laid out in a grid on photo paper, frame numbers under each, roll markings in the margin
+    const cols = s.cols, rows = Math.ceil(dev.length / cols), cw = 520 * sc, ch = cw * .75, gap = cw * .07, cap = s.frames ? cw * .1 : 0, m = cw * .2, ml = m * 1.25;
+    const c = mk(ml + m + cols * cw + (cols - 1) * gap, m * 2 + rows * (ch + cap) + (rows - 1) * gap), x = c.getContext('2d');
+    x.fillStyle = '#f1ebdf'; x.fillRect(0, 0, c.width, c.height);
+    const ng = x.getImageData(0, 0, c.width, c.height); for (let i = 0; i < ng.data.length; i += 4) { const n = (Math.random() - .5) * 8; ng.data[i] += n; ng.data[i + 1] += n; ng.data[i + 2] += n; } x.putImageData(ng, 0, 0);
+    dev.forEach((im, i) => { const cx = ml + (i % cols) * (cw + gap), cy = m + Math.floor(i / cols) * (ch + cap + gap);
+      x.fillStyle = 'rgba(0,0,0,.18)'; x.fillRect(cx + 2 * sc, cy + 3 * sc, cw, ch); cover(x, im, cx, cy, cw, ch);
+      if (cap) { x.fillStyle = '#7a4a22'; x.font = `${cap * .62}px VT323, monospace`; x.textBaseline = 'middle'; x.textAlign = 'left'; x.fillText(`${i * 2 + 1}  ▸${i * 2 + 1}A`, cx, cy + ch + cap * .55); } });
+    if (s.markings) { rotText(x, 'RW 400 · 35MM · ROLL 01', ml * .5, c.height - m - (rows * (ch + cap)) * .22, ml * .3, '#b0662a'); rotText(x, 'SAFETY FILM', ml * .5, m + ch * .6, ml * .3, '#b0662a'); }
     return c;
   }
   addFiles(list) {
@@ -436,12 +420,12 @@ class Component extends DCLogic {
       panelStyle: { position: 'absolute', zIndex: 2, display: 'flex', flexDirection: 'column', boxSizing: 'border-box', overflow: 'hidden',
         ...(wide ? { left: Math.max(24, SL + .295 * SW), top: Math.max(16, ST + .09 * SH), width: Math.min(.672 * SW, s.vw - Math.max(24, SL + .295 * SW) - 36), height: Math.min(.8 * SH, s.vh - 32) } : { left: 10, right: 10, top: 10, bottom: 96 }),
         borderRadius: 18, background: 'linear-gradient(160deg, rgba(255,255,255,.1), rgba(255,255,255,.04))', backdropFilter: 'blur(26px) brightness(.72) saturate(1.05)', WebkitBackdropFilter: 'blur(26px) brightness(.72) saturate(1.05)', border: '1px solid rgba(255,255,255,.18)', boxShadow: '0 40px 100px rgba(0,0,0,.45), 0 0 60px rgba(255,255,255,.04), inset 0 1px 0 rgba(255,255,255,.18)', color: ink },
-      tabs: [['live', 'Live Cam'], ['strip', 'Film Strip'], ['sheet', 'Contact Sheet']].map(([id, label]) => ({ label, on: tab === id, pick: () => this.setState({ tab: id, shareOpen: false, review: null, printing: null }),
+      tabs: [['live', 'Live Cam'], ['strip', 'Film Strip'], ['sheet', 'Contact Sheet']].map(([id, label]) => ({ label, on: tab === id, pick: () => this.setState({ tab: id, shareOpen: false, review: null }),
         style: { height: 32, minWidth: wide ? 'clamp(84px,7vw,116px)' : 0, padding: wide ? '0 12px' : '0 8px', borderRadius: 9, border: 0, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: wide ? 17 : 15, ...(wide ? {} : { letterSpacing: '.02em' }), letterSpacing: '.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', background: tab === id ? '#f3ede4' : 'transparent', color: tab === id ? '#1e1a16' : ink, fontWeight: tab === id ? 600 : 400, boxShadow: tab === id ? 'inset 0 1px 0 rgba(255,255,255,.3), 0 0 16px rgba(255,255,255,.22)' : 'none', transition: 'background .3s, color .3s' } })),
       isStrip: tab === 'strip', isSheet: tab === 'sheet', isLive: live, notLive: !live,
-      previewBox: { position: 'relative', flex: 1, minHeight: wide ? 0 : (live ? '46vh' : '52vh'), borderRadius: 18, border: '1px solid rgba(255,240,220,.16)', background: live ? '#0d0a08' : 'rgba(20,14,9,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: live ? 0 : '40px 18px 16px', boxSizing: 'border-box', containerType: 'size' },
-      showPreviewLabel: !live && !s.printing, previewLabel: 'Preview',
-      previewCanvas: { display: empty ? 'none' : 'block', visibility: s.printing ? 'hidden' : 'visible', position: 'absolute', ...(live ? { inset: 0, width: '100%', height: '100%' } : { left: 18, top: 40, width: 'calc(100% - 36px)', height: 'calc(100% - 56px)' }), objectFit: 'contain', borderRadius: live ? 0 : 2, filter: live || tab === 'sheet' ? 'none' : 'drop-shadow(0 18px 30px rgba(0,0,0,.45))' },
+      previewBox: { position: 'relative', flex: 1, minHeight: wide ? 0 : (live ? '46vh' : '52vh'), borderRadius: 18, border: '1px solid rgba(255,240,220,.16)', background: live ? '#0d0a08' : 'rgba(20,14,9,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: live ? 0 : '40px 18px 16px', boxSizing: 'border-box' },
+      showPreviewLabel: !live, previewLabel: 'Preview',
+      previewCanvas: { display: empty ? 'none' : 'block', position: 'absolute', ...(live ? { inset: 0, width: '100%', height: '100%' } : { left: 18, top: 40, width: 'calc(100% - 36px)', height: 'calc(100% - 56px)' }), objectFit: 'contain', borderRadius: live ? 0 : 2, filter: live || tab === 'sheet' ? 'none' : 'drop-shadow(0 18px 30px rgba(0,0,0,.45))' },
       showEmpty: empty, emptyTitle: eT, emptyText: eX, emptyBtn: eB,
       emptyAction: () => { if (!live) return this.setState({ tab: 'live' }); if (s.cam === 'unsupported') return this.els.file.click(); this.startCam(); },
       liveFrame: { position: 'absolute', inset: 0, pointerEvents: 'none', display: camOn || s.review ? 'block' : 'none' },
@@ -464,24 +448,14 @@ class Component extends DCLogic {
         dragStart: e => { this.dragIdx = i; e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', String(i)); } catch (er) {} },
         dragOver: e => { e.preventDefault(); }, drop: e => { if (this.dragIdx == null) return; e.preventDefault(); e.stopPropagation(); this.move(this.dragIdx, i); this.dragIdx = null; } })),
       shapeOpts: [[false, 'Classic'], [true, 'Tall']].map(([k, label]) => ({ label, on: s.tall === k, pick: () => this.setState({ tall: k }), style: { flex: '1 1 0', height: 'clamp(30px,4.4vh,38px)', borderRadius: 9, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.06em', textTransform: 'uppercase', border: s.tall === k ? 0 : '1px solid rgba(255,240,220,.22)', background: s.tall === k ? cream : 'transparent', color: s.tall === k ? dark : ink, fontWeight: s.tall === k ? 600 : 400 } })),
-      colOpts: [[2, '2 per Row'], [3, '3 per Row']].map(([k, label]) => ({ label, on: s.cols === k, pick: () => this.setState({ cols: k }), style: { flex: '1 1 0', height: 'clamp(30px,4.4vh,38px)', borderRadius: 9, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.06em', textTransform: 'uppercase', border: s.cols === k ? 0 : '1px solid rgba(255,240,220,.22)', background: s.cols === k ? cream : 'transparent', color: s.cols === k ? dark : ink, fontWeight: s.cols === k ? 600 : 400 } })),
+      colOpts: [[2, '2 Columns'], [3, '3 Columns']].map(([k, label]) => ({ label, on: s.cols === k, pick: () => this.setState({ cols: k }), style: { flex: '1 1 0', height: 'clamp(30px,4.4vh,38px)', borderRadius: 9, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: 17, letterSpacing: '.06em', textTransform: 'uppercase', border: s.cols === k ? 0 : '1px solid rgba(255,240,220,.22)', background: s.cols === k ? cream : 'transparent', color: s.cols === k ? dark : ink, fontWeight: s.cols === k ? 600 : 400 } })),
       effects: PKEYS.map(k => ({ label: PRESETS[k].label, on: s.fx === k, pick: () => this.setState({ fx: k }), chip: chip(s.fx === k), hasThumb: !!s.camThumbs[k], thumb: s.camThumbs[k] || '',
         frame: { display: 'block', width: 54, height: 'clamp(46px,7vh,66px)', borderRadius: 8, overflow: 'hidden', boxSizing: 'border-box', background: 'rgba(255,240,220,.08)', border: s.fx === k ? '2px solid #f3ede4' : '1px solid rgba(255,240,220,.2)', transition: 'border-color .2s' } })),
       optToggles: live ? [] : [['markings', 'Show Film Markings', 'Markings'], ['frames', 'Show Frame Numbers', 'Frame no.']].map(([k, label, short]) => { const w = sw(s[k]); return { label, short, on: s[k], toggle: () => this.setState({ [k]: !s[k] }), track: w.track, dot: w.dot }; }),
       stampStyle: s.stamp, onStamp: e => this.setState({ stamp: e.target.value }), stampOpts: Object.entries(STAMPS).map(([value, v]) => ({ value, label: value === 'none' ? 'No date stamp' : 'Date · ' + v.label })),
-      cantExport: !allList.length || !!s.printing,
+      cantExport: !allList.length,
       dlLabel: tab === 'sheet' ? 'Download Contact Sheet' : 'Download Film Strip',
-      // The file downloads straight away (so no browser blocks it); meanwhile the preview turns into a photo-booth slot that
-      // feeds the print out, ending in a warm flash.
-      download: async () => { if (s.printing) return; const c = await this.exportCanvas(); if (!c) return;
-        c.toBlob(b => { if (!b) return this.say('Export failed — try fewer or smaller photos.'); const u = URL.createObjectURL(b), a = document.createElement('a'), file = `camera-room-${this.name()}.png`;
-          a.href = u; a.download = file; document.body.appendChild(a); a.click(); a.remove();
-          const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          if (reduce) { this.say(`Saved ${file}`); setTimeout(() => URL.revokeObjectURL(u), 4000); return; }
-          this.setState({ printing: { url: u, ar: c.width / c.height }, toast: '' }); (this.printT || []).forEach(clearTimeout);
-          this.printT = [setTimeout(() => this.say(`Saved ${file}`), PRINT_MS - 500), setTimeout(() => this.setState({ printing: null }), PRINT_MS), setTimeout(() => URL.revokeObjectURL(u), PRINT_MS + 1500)]; }, 'image/png'); },
-      isPrinting: !!s.printing, printSrc: s.printing ? s.printing.url : '',
-      printImg: s.printing ? (() => { const ar = s.printing.ar, wide = ar > 1; return { position: 'absolute', left: '50%', top: 0, display: 'block', width: `min(${wide ? 84 : 52}cqw, calc(78cqh * ${ar.toFixed(4)}))`, height: 'auto', boxShadow: '0 10px 24px rgba(0,0,0,.45)', transform: 'translate(-50%,-100%)', animation: `cr-feed ${PRINT_MS - 1300}ms cubic-bezier(.45,.05,.4,1) 250ms forwards` }; })() : {},
+      download: async () => { const c = await this.exportCanvas(); if (!c) return; c.toBlob(b => { if (!b) return this.say('Export failed — try fewer or smaller photos.'); const u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = `camera-room-${this.name()}.png`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); this.say(`Saved camera-room-${this.name()}.png`); }, 'image/png'); },
       shareOpen: s.shareOpen, toggleShare: () => { const open = !s.shareOpen; this.setState({ shareOpen: open }); if (open) this.prepShare(); },
       shareNative: async () => { this.setState({ shareOpen: false }); if (!navigator.canShare) return this.say("This browser can't share files — use Download or Copy image instead.");
         let f = this.shareFile; if (!f) { this.say('Developing…'); f = await (this.sharePrep || this.prepShare()); if (!f) return this.say('Add photos first.'); }
