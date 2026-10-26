@@ -127,39 +127,37 @@ a:focus-visible, button:focus-visible { outline: 1px solid var(--amber); outline
 .rw-off[data-stage="3"] .rw-line { width: 4px; height: 4px; }
 .rw-off[data-stage="4"] .rw-line { width: 4px; }
 
-/* ---------- intro ---------- */
-.rw-intro { position: fixed; inset: 0; z-index: 50; overflow: hidden; background: #140d08; perspective: 1400px; }
-.rw-intro-bg { position: absolute; inset: -6%; width: 112%; height: 112%; object-fit: cover; pointer-events: none; }
-.rw-intro-shade { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 65% at 50% 46%, rgba(40, 24, 12, .25), rgba(10, 7, 5, .82) 80%); pointer-events: none; }
-.rw-blinds { position: absolute; inset: -20%; background: repeating-linear-gradient(180deg, rgba(255, 190, 110, 0) 0 34px, rgba(255, 196, 120, .22) 34px 52px); mix-blend-mode: screen; filter: blur(4px); -webkit-mask-image: radial-gradient(ellipse 55% 60% at 62% 45%, #000 20%, transparent 75%); mask-image: radial-gradient(ellipse 55% 60% at 62% 45%, #000 20%, transparent 75%); pointer-events: none; }
-.rw-frame { position: absolute; inset: clamp(16px, 3vw, 32px); border: 1.5px solid rgba(245, 236, 220, .55); border-radius: 6px; pointer-events: none; }
-.rw-hud { position: absolute; font-family: var(--mono); letter-spacing: .08em; color: #f5ecdc; text-shadow: 0 0 6px rgba(255, 220, 170, .6); }
-.rw-hud.mode { left: clamp(36px, 5vw, 64px); top: clamp(30px, 5vh, 56px); font-size: clamp(14px, 1.4vw, 20px); }
-.rw-hud.time { left: clamp(36px, 5vw, 64px); bottom: clamp(30px, 5vh, 56px); font-size: clamp(13px, 1.3vw, 18px); line-height: 1.4; white-space: pre; }
-.rw-battery { position: absolute; right: clamp(36px, 5vw, 64px); top: clamp(30px, 5vh, 56px); width: 30px; height: 14px; border: 1.5px solid #f5ecdc; border-radius: 2px; box-sizing: border-box; padding: 2px; display: flex; gap: 2px; }
-.rw-battery i { flex: 1; background: #f5ecdc; }
-.rw-floor { position: absolute; left: 50%; top: 72%; width: min(420px, 70vw); height: 46px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(0, 0, 0, .6), transparent 70%); filter: blur(8px); }
-.rw-cassette { position: absolute; left: 50%; top: 44%; width: min(460px, 76vw); aspect-ratio: 1.58; transform-style: preserve-3d; box-shadow: 0 40px 80px rgba(0, 0, 0, .45); border-radius: 3.5% / 5.5%; }
-.rw-shell { position: absolute; inset: 0; border-radius: 3.5% / 5.5%; overflow: hidden; container-type: inline-size; background: linear-gradient(165deg, #3b4757 0%, #1e2631 40%, #10151c 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2), inset 0 -3px 8px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(150, 175, 200, .14); font-family: var(--mono); }
-.rw-sticker { position: absolute; left: 7%; right: 7%; top: 7%; height: 60%; border-radius: 1.4%; background: linear-gradient(180deg, #efe6d4, #d9ccb4); }
-.rw-sticker .t { position: absolute; left: 4%; top: 5%; font-family: var(--serif); font-style: italic; font-size: 6cqw; line-height: 1; color: #18202b; }
-.rw-sticker .side { position: absolute; right: 4%; top: 8%; font-size: 1.9cqw; letter-spacing: .3em; color: #18202b; }
-.rw-sticker .s1 { position: absolute; left: 0; right: 0; top: 24%; height: 4%; background: var(--amber); }
-.rw-sticker .s2 { position: absolute; left: 0; right: 0; top: 30%; height: 2.4%; background: #5b6c80; }
-.rw-sticker .fine { position: absolute; bottom: 5%; font-size: 1.5cqw; letter-spacing: .24em; color: #3a4656; }
-.rw-window { position: absolute; left: 23%; right: 23%; top: 33%; height: 27%; border-radius: 5% / 18%; overflow: hidden; background: linear-gradient(180deg, #0a0e14, #1a222d); box-shadow: inset 0 2px 6px rgba(0, 0, 0, .8), 0 0 0 1px rgba(255, 255, 255, .08); }
-.rw-pack { position: absolute; top: 50%; border-radius: 50%; transform: translate(-50%, -50%); background: repeating-radial-gradient(circle, #3b2519 0 .25cqw, #4f3323 .25cqw .5cqw); }
-.rw-hub { position: absolute; top: 50%; width: 9cqw; height: 9cqw; border-radius: 50%; box-sizing: border-box; border: .55cqw solid #efe6d4; background: radial-gradient(circle, #0b0f15 0 30%, transparent 31%), repeating-conic-gradient(#efe6d4 0 18deg, #a99d88 18deg 60deg); box-shadow: 0 .3cqw .8cqw rgba(0, 0, 0, .6); }
-.rw-window-sheen { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(255, 255, 255, .12), transparent 40%, transparent 70%, rgba(255, 255, 255, .05)); pointer-events: none; }
-.rw-lip { position: absolute; left: 19%; right: 19%; bottom: 0; height: 20%; background: linear-gradient(180deg, #242d39, #141a22); clip-path: polygon(7% 0, 93% 0, 100% 100%, 0 100%); }
-.rw-coolcast { position: absolute; inset: 0; background: linear-gradient(290deg, rgba(25, 45, 80, .45), transparent 55%); mix-blend-mode: multiply; pointer-events: none; }
-.rw-sweep { position: absolute; inset: 0; mix-blend-mode: screen; pointer-events: none; background: linear-gradient(100deg, transparent 34%, rgba(255, 214, 150, .38) 46%, rgba(255, 240, 212, .62) 50%, rgba(255, 214, 150, .28) 55%, transparent 66%); background-size: 260% 100%; }
-.rw-flare { position: absolute; left: 58%; top: 30%; width: 60vmax; height: 60vmax; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(255, 206, 140, .6), rgba(255, 170, 90, .16) 30%, transparent 62%); mix-blend-mode: screen; pointer-events: none; }
-.rw-count { position: absolute; left: 50%; bottom: clamp(40px, 11vh, 110px); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.rw-count .cap { font-size: 10px; letter-spacing: .34em; text-transform: uppercase; color: rgba(239, 230, 212, .55); }
-.rw-digit { font-weight: 300; font-size: clamp(40px, 5vw, 64px); line-height: 1; letter-spacing: .06em; color: var(--ivory); font-variant-numeric: tabular-nums; }
-.rw-skip { position: absolute; right: clamp(20px, 4vw, 56px); bottom: clamp(20px, 4vh, 40px); background: transparent; border: 0; border-bottom: 1px solid rgba(239, 230, 212, .35); color: rgba(239, 230, 212, .75); font-family: var(--mono); font-size: 10px; letter-spacing: .3em; text-transform: uppercase; padding: 4px 0; cursor: pointer; }
-.rw-skip:hover { color: var(--amber); border-color: var(--amber); }
+/* ---------- intro: camcorder viewfinder countdown ---------- */
+@keyframes rw-vf-blink { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
+@keyframes rw-vf-track { from { transform: translateY(-20vh) } to { transform: translateY(120vh) } }
+@keyframes rw-vf-glitch {
+  0% { opacity: 0; transform: translateX(-14px) skewX(-8deg); clip-path: inset(-40% -60% 55% -60%); }
+  12% { opacity: 1; transform: translateX(10px); clip-path: inset(30% -60% 20% -60%); }
+  24% { transform: translateX(-6px); clip-path: inset(-40% -60% -40% -60%); }
+  36% { transform: translateX(3px) skewX(3deg); }
+  50%, 88% { transform: none; }
+  92% { transform: translateX(-4px); }
+  100% { transform: none; }
+}
+@keyframes rw-vf-jitter { 0%, 100% { transform: translate(0, 0) } 25% { transform: translate(-.6px, .3px) } 50% { transform: translate(.5px, -.4px) } 75% { transform: translate(-.3px, -.2px) } }
+.rw-intro { position: fixed; inset: 0; z-index: 50; overflow: hidden; background: #040404; color: #f2f2f2; font-family: 'VT323', monospace; }
+.rw-vf-scan { position: absolute; inset: 0; background: repeating-linear-gradient(180deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 3px); pointer-events: none; }
+.rw-vf-track { position: absolute; left: 0; right: 0; top: 0; height: 9vh; background: linear-gradient(180deg, transparent, rgba(255, 255, 255, .05) 45%, rgba(255, 255, 255, .02) 55%, transparent); animation: rw-vf-track 2.6s linear infinite; pointer-events: none; }
+.rw-vf-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 55%, rgba(0, 0, 0, .75)); pointer-events: none; }
+.rw-vf-corner { position: absolute; width: clamp(48px, 6vw, 90px); height: clamp(48px, 6vw, 90px); border: 0 solid rgba(242, 242, 242, .85); pointer-events: none; }
+.rw-vf-corner.tl { left: clamp(16px, 2.8vw, 46px); top: clamp(16px, 4.2vh, 44px); border-left-width: 2px; border-top-width: 2px; }
+.rw-vf-corner.tr { right: clamp(16px, 2.8vw, 46px); top: clamp(16px, 4.2vh, 44px); border-right-width: 2px; border-top-width: 2px; }
+.rw-vf-corner.bl { left: clamp(16px, 2.8vw, 46px); bottom: clamp(16px, 4.2vh, 44px); border-left-width: 2px; border-bottom-width: 2px; }
+.rw-vf-corner.br { right: clamp(16px, 2.8vw, 46px); bottom: clamp(16px, 4.2vh, 44px); border-right-width: 2px; border-bottom-width: 2px; }
+.rw-vf-mode { position: absolute; left: calc(clamp(16px, 2.8vw, 46px) + clamp(18px, 2.4vw, 38px)); top: calc(clamp(16px, 4.2vh, 44px) + clamp(18px, 3.4vh, 34px)); font-size: clamp(24px, 2.6vw, 40px); letter-spacing: .08em; text-shadow: 0 0 6px rgba(255, 255, 255, .35); }
+.rw-vf-play { display: inline-block; width: .62em; height: .7em; margin-left: .35em; vertical-align: -.02em; animation: rw-vf-blink 1s steps(1) infinite; }
+.rw-vf-battery { position: absolute; right: calc(clamp(16px, 2.8vw, 46px) + clamp(18px, 2.4vw, 38px)); top: calc(clamp(16px, 4.2vh, 44px) + clamp(18px, 3.4vh, 34px)); width: clamp(44px, 4.8vw, 74px); color: #f2f2f2; }
+.rw-vf-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -54%); display: flex; flex-direction: column; align-items: center; gap: clamp(6px, 1.4vh, 16px); width: min(92vw, 760px); text-align: center; }
+.rw-vf-line { margin: 0; min-height: 1.2em; font-size: clamp(19px, 2.3vw, 34px); letter-spacing: .1em; text-transform: uppercase; color: #ff7ab8; text-shadow: 0 0 10px rgba(255, 90, 170, .55), 1.5px 0 rgba(0, 200, 255, .25); }
+.rw-vf-caret { animation: rw-vf-blink .6s steps(1) infinite; }
+.rw-vf-digit { display: block; font-size: clamp(130px, 17vw, 260px); line-height: .9; color: #dcdcdc; text-shadow: -4px 0 rgba(255, 30, 110, .7), 4px 0 rgba(30, 200, 255, .65), 0 0 22px rgba(255, 255, 255, .28), -40px 0 18px rgba(255, 255, 255, .06), 40px 0 18px rgba(255, 255, 255, .06); animation: rw-vf-glitch .9s steps(14) both, rw-vf-jitter .16s linear .9s infinite; }
+.rw-skip { position: absolute; right: calc(clamp(16px, 2.8vw, 46px) + clamp(18px, 2.4vw, 38px)); bottom: calc(clamp(16px, 4.2vh, 44px) + clamp(18px, 3.4vh, 34px)); background: transparent; border: 0; border-bottom: 1px solid rgba(242, 242, 242, .35); color: rgba(242, 242, 242, .7); font-family: 'VT323', monospace; font-size: 18px; letter-spacing: .16em; text-transform: uppercase; padding: 2px 0; cursor: pointer; }
+.rw-skip:hover { color: #ff7ab8; border-color: #ff7ab8; }
 
 /* ---------- footer (clock + copyright) ---------- */
 .rw-footer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; pointer-events: none; font-family: 'VT323', monospace; color: #f6efe4; text-shadow: 0 0 8px rgba(0, 0, 0, .6); }

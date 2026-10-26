@@ -79,16 +79,15 @@ select option{background:#2a1f16;color:#f3e9dc}
               </div>
             </sc-if>
             <sc-if value="{{ isPrinting }}" hint-placeholder-val="{{ false }}">
-              <div aria-hidden="true" style="position:absolute;inset:0;z-index:4;overflow:hidden;animation:cr-booth 3800ms ease forwards;background:radial-gradient(ellipse 70% 55% at 50% 30%,rgba(255,236,205,.22),transparent 70%),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px),linear-gradient(90deg,#4a3a2c,#7d6852 16%,#a08a70 50%,#7d6852 84%,#4a3a2c);box-shadow:inset 0 0 0 10px rgba(36,26,18,.55),inset 0 0 70px rgba(0,0,0,.6)">
-                <div style="position:absolute;left:9%;right:9%;top:9%;bottom:-2%;border-radius:10px 10px 0 0;background:linear-gradient(180deg,#2c221a,#3b2f24 30%,#4d3e30);box-shadow:inset 0 10px 24px rgba(0,0,0,.65),0 0 0 2px rgba(255,236,205,.12)"></div>
-                <div style="position:absolute;left:0;right:0;top:17%;bottom:0;overflow:hidden">
+              <div aria-hidden="true" style="position:absolute;inset:0;z-index:4;overflow:hidden;animation:cr-booth 3800ms ease forwards">
+                <div style="position:absolute;left:0;right:0;top:12%;bottom:0;overflow:hidden">
                   <img src="{{ printSrc }}" alt="" style="{{ printImg }}">
-                  <div style="position:absolute;left:0;right:0;top:0;height:28px;background:linear-gradient(180deg,rgba(0,0,0,.55),transparent)"></div>
+                  <div style="position:absolute;left:0;right:0;top:0;height:26px;background:linear-gradient(180deg,rgba(0,0,0,.5),transparent)"></div>
                 </div>
-                <div style="position:absolute;left:15%;right:15%;top:12%;height:7%;min-height:18px;border-radius:999px;background:linear-gradient(180deg,#3d3d3d,#0b0b0b 45%,#262626 78%,#0e0e0e);box-shadow:0 6px 12px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.18);animation:cr-hum 120ms linear 250ms 20"></div>
-                <div style="position:absolute;left:11.5%;width:4.5%;top:12.8%;height:5.4%;min-height:14px;border-radius:4px;background:linear-gradient(180deg,#d9d4cc,#8b857c 55%,#bdb6ab);box-shadow:0 3px 6px rgba(0,0,0,.5)"></div>
-                <div style="position:absolute;right:11.5%;width:4.5%;top:12.8%;height:5.4%;min-height:14px;border-radius:4px;background:linear-gradient(180deg,#d9d4cc,#8b857c 55%,#bdb6ab);box-shadow:0 3px 6px rgba(0,0,0,.5)"></div>
-                <div style="position:absolute;inset:0;opacity:0;mix-blend-mode:screen;background:radial-gradient(ellipse 80% 70% at 50% 45%,rgba(255,232,190,.95),rgba(255,160,70,.6) 45%,rgba(190,70,20,.3) 80%);animation:cr-glow 900ms ease-out 2700ms forwards"></div>
+                <div style="position:absolute;left:14%;right:14%;top:7%;height:7%;min-height:18px;border-radius:999px;background:linear-gradient(180deg,#3d3d3d,#0b0b0b 45%,#262626 78%,#0e0e0e);box-shadow:0 6px 14px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.18);animation:cr-hum 120ms linear 250ms 20"></div>
+                <div style="position:absolute;left:10.5%;width:4.5%;top:7.8%;height:5.4%;min-height:14px;border-radius:4px;background:linear-gradient(180deg,#d9d4cc,#8b857c 55%,#bdb6ab);box-shadow:0 3px 6px rgba(0,0,0,.5)"></div>
+                <div style="position:absolute;right:10.5%;width:4.5%;top:7.8%;height:5.4%;min-height:14px;border-radius:4px;background:linear-gradient(180deg,#d9d4cc,#8b857c 55%,#bdb6ab);box-shadow:0 3px 6px rgba(0,0,0,.5)"></div>
+                <div style="position:absolute;inset:0;opacity:0;mix-blend-mode:screen;background:radial-gradient(ellipse 70% 60% at 50% 45%,rgba(255,232,190,.75),rgba(255,160,70,.35) 50%,transparent 80%);animation:cr-glow 900ms ease-out 2700ms forwards"></div>
               </div>
             </sc-if>
           </div>
@@ -441,8 +440,8 @@ class Component extends DCLogic {
         style: { height: 32, minWidth: wide ? 'clamp(84px,7vw,116px)' : 0, padding: wide ? '0 12px' : '0 8px', borderRadius: 9, border: 0, cursor: 'pointer', fontFamily: "'VT323',monospace", fontSize: wide ? 17 : 15, ...(wide ? {} : { letterSpacing: '.02em' }), letterSpacing: '.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', background: tab === id ? '#f3ede4' : 'transparent', color: tab === id ? '#1e1a16' : ink, fontWeight: tab === id ? 600 : 400, boxShadow: tab === id ? 'inset 0 1px 0 rgba(255,255,255,.3), 0 0 16px rgba(255,255,255,.22)' : 'none', transition: 'background .3s, color .3s' } })),
       isStrip: tab === 'strip', isSheet: tab === 'sheet', isLive: live, notLive: !live,
       previewBox: { position: 'relative', flex: 1, minHeight: wide ? 0 : (live ? '46vh' : '52vh'), borderRadius: 18, border: '1px solid rgba(255,240,220,.16)', background: live ? '#0d0a08' : 'rgba(20,14,9,.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: live ? 0 : '40px 18px 16px', boxSizing: 'border-box', containerType: 'size' },
-      showPreviewLabel: !live, previewLabel: 'Preview',
-      previewCanvas: { display: empty ? 'none' : 'block', position: 'absolute', ...(live ? { inset: 0, width: '100%', height: '100%' } : { left: 18, top: 40, width: 'calc(100% - 36px)', height: 'calc(100% - 56px)' }), objectFit: 'contain', borderRadius: live ? 0 : 2, filter: live || tab === 'sheet' ? 'none' : 'drop-shadow(0 18px 30px rgba(0,0,0,.45))' },
+      showPreviewLabel: !live && !s.printing, previewLabel: 'Preview',
+      previewCanvas: { display: empty ? 'none' : 'block', visibility: s.printing ? 'hidden' : 'visible', position: 'absolute', ...(live ? { inset: 0, width: '100%', height: '100%' } : { left: 18, top: 40, width: 'calc(100% - 36px)', height: 'calc(100% - 56px)' }), objectFit: 'contain', borderRadius: live ? 0 : 2, filter: live || tab === 'sheet' ? 'none' : 'drop-shadow(0 18px 30px rgba(0,0,0,.45))' },
       showEmpty: empty, emptyTitle: eT, emptyText: eX, emptyBtn: eB,
       emptyAction: () => { if (!live) return this.setState({ tab: 'live' }); if (s.cam === 'unsupported') return this.els.file.click(); this.startCam(); },
       liveFrame: { position: 'absolute', inset: 0, pointerEvents: 'none', display: camOn || s.review ? 'block' : 'none' },
@@ -482,7 +481,7 @@ class Component extends DCLogic {
           this.setState({ printing: { url: u, ar: c.width / c.height }, toast: '' }); (this.printT || []).forEach(clearTimeout);
           this.printT = [setTimeout(() => this.say(`Saved ${file}`), PRINT_MS - 500), setTimeout(() => this.setState({ printing: null }), PRINT_MS), setTimeout(() => URL.revokeObjectURL(u), PRINT_MS + 1500)]; }, 'image/png'); },
       isPrinting: !!s.printing, printSrc: s.printing ? s.printing.url : '',
-      printImg: s.printing ? (() => { const ar = s.printing.ar, wide = ar > 1; return { position: 'absolute', left: '50%', top: 0, display: 'block', width: `min(${wide ? 84 : 52}cqw, calc(70cqh * ${ar.toFixed(4)}))`, height: 'auto', boxShadow: '0 10px 24px rgba(0,0,0,.45)', transform: 'translate(-50%,-100%)', animation: `cr-feed ${PRINT_MS - 1300}ms cubic-bezier(.45,.05,.4,1) 250ms forwards` }; })() : {},
+      printImg: s.printing ? (() => { const ar = s.printing.ar, wide = ar > 1; return { position: 'absolute', left: '50%', top: 0, display: 'block', width: `min(${wide ? 84 : 52}cqw, calc(78cqh * ${ar.toFixed(4)}))`, height: 'auto', boxShadow: '0 10px 24px rgba(0,0,0,.45)', transform: 'translate(-50%,-100%)', animation: `cr-feed ${PRINT_MS - 1300}ms cubic-bezier(.45,.05,.4,1) 250ms forwards` }; })() : {},
       shareOpen: s.shareOpen, toggleShare: () => { const open = !s.shareOpen; this.setState({ shareOpen: open }); if (open) this.prepShare(); },
       shareNative: async () => { this.setState({ shareOpen: false }); if (!navigator.canShare) return this.say("This browser can't share files — use Download or Copy image instead.");
         let f = this.shareFile; if (!f) { this.say('Developing…'); f = await (this.sharePrep || this.prepShare()); if (!f) return this.say('Add photos first.'); }

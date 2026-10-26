@@ -174,7 +174,7 @@ export function Home({ showIntro = true, oncePerSession = true }: Props) {
       <div className="rw-off" data-stage={off} aria-hidden="true">
         <div className="rw-bar top" /><div className="rw-bar bot" /><div className="rw-line" />
       </div>
-      {intro && <Intro roomSrc={ROOMS[room].src} onReveal={onReveal} onDone={endIntro} />}
+      {intro && <Intro onReveal={onReveal} onDone={endIntro} />}
       <Footer />
     </div>
   );
