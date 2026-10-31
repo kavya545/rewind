@@ -11,9 +11,9 @@ export const FOCUS_X = .46, FOCUS_Y = .55;
 export const GOLDEN_GRADE = 'saturate(.78) sepia(.08) brightness(.96) contrast(.97)';
 
 export const ROOMS: { label: string; src: string; grade?: string }[] = [
-  { label: 'Golden hour', src: 'assets/room-home.png', grade: GOLDEN_GRADE },
-  { label: 'Faded afternoon', src: 'assets/room-afternoon.png' },
-  { label: 'Blue dusk', src: 'assets/room-dusk.png' },
+  { label: 'Golden hour', src: 'assets/room-home.webp', grade: GOLDEN_GRADE },
+  { label: 'Faded afternoon', src: 'assets/room-afternoon.webp' },
+  { label: 'Blue dusk', src: 'assets/room-dusk.webp' },
 ];
 
 export type ObjectId = 'tv' | 'cam';
@@ -42,13 +42,13 @@ export type Poster = {
 };
 
 export const POSTERS: Poster[] = [
-  { title: 'Nirvana', src: 'assets/poster-nirvana.png', ar: 670 / 1000, year: '1987 – 1994', kind: 'band', creditLabel: 'Fronted by', credit: 'Kurt Cobain', px: [120, 28, 168, 262], desc: 'The Aberdeen, Washington trio that dragged grunge into the mainstream. Nevermind knocked pop off the top of the charts and made flannel a uniform for a generation.' },
-  { title: 'Pulp Fiction', src: 'assets/poster-pulp.png', ar: 250 / 369, year: '1994', kind: 'film', creditLabel: 'Directed by', credit: 'Quentin Tarantino', px: [305, 65, 173, 275], desc: 'Hitmen, a boxer and a mysterious briefcase, told out of order. It won the Palme d\'Or and made sharp, rambling dialogue the new special effect.' },
-  { title: 'Back to the Future', src: 'assets/poster-bttf.png', ar: 1200 / 1900, year: '1985', kind: 'film', creditLabel: 'Directed by', credit: 'Robert Zemeckis', px: [500, 15, 188, 305], desc: 'A teenager, a DeLorean and 1.21 gigawatts. Marty McFly\'s accidental trip to 1955 became one of the most rewound VHS tapes of all time — sci-fi, comedy and heart in one.' },
-  { title: 'Jurassic Park', src: 'assets/poster-jurassic.png', ar: 240 / 360, year: '1993', kind: 'film', creditLabel: 'Directed by', credit: 'Steven Spielberg', px: [703, 100, 159, 230], desc: 'Dinosaurs cloned from amber, and computer effects that changed blockbusters forever. The T. rex in the rain still holds up.' },
-  { title: 'Titanic', src: 'assets/poster-titanic.png', ar: 2015 / 3000, year: '1997', kind: 'film', creditLabel: 'Directed by', credit: 'James Cameron', px: [878, 0, 92, 238], desc: 'A love story aboard the "unsinkable" ship. It swept eleven Oscars and became the highest-grossing film of its era.' },
-  { title: 'The Cure', src: 'assets/poster-cure.png', ar: 768 / 1024, year: '1978 –', kind: 'band', creditLabel: 'Fronted by', credit: 'Robert Smith', px: [0, 318, 113, 210], desc: 'Crawley\'s gloomiest export — eyeliner, big hair and songs that swing from heartbreak to pure pop. Disintegration was on repeat in a lot of bedrooms.' },
-  { title: 'MTV', src: 'assets/poster-mtv.png', ar: 1568 / 818, year: '1981', kind: 'tv', creditLabel: 'Launched', credit: 'August 1, 1981', px: [205, 333, 117, 115], desc: 'Music Television — the channel that turned songs into short films and VJs into stars. In the \'90s it was the background noise of every teenage bedroom.' },
+  { title: 'Nirvana', src: 'assets/poster-nirvana.webp', ar: 670 / 1000, year: '1987 – 1994', kind: 'band', creditLabel: 'Fronted by', credit: 'Kurt Cobain', px: [120, 28, 168, 262], desc: 'The Aberdeen, Washington trio that dragged grunge into the mainstream. Nevermind knocked pop off the top of the charts and made flannel a uniform for a generation.' },
+  { title: 'Pulp Fiction', src: 'assets/poster-pulp.webp', ar: 250 / 369, year: '1994', kind: 'film', creditLabel: 'Directed by', credit: 'Quentin Tarantino', px: [305, 65, 173, 275], desc: 'Hitmen, a boxer and a mysterious briefcase, told out of order. It won the Palme d\'Or and made sharp, rambling dialogue the new special effect.' },
+  { title: 'Back to the Future', src: 'assets/poster-bttf.webp', ar: 1200 / 1900, year: '1985', kind: 'film', creditLabel: 'Directed by', credit: 'Robert Zemeckis', px: [500, 15, 188, 305], desc: 'A teenager, a DeLorean and 1.21 gigawatts. Marty McFly\'s accidental trip to 1955 became one of the most rewound VHS tapes of all time — sci-fi, comedy and heart in one.' },
+  { title: 'Jurassic Park', src: 'assets/poster-jurassic.webp', ar: 240 / 360, year: '1993', kind: 'film', creditLabel: 'Directed by', credit: 'Steven Spielberg', px: [703, 100, 159, 230], desc: 'Dinosaurs cloned from amber, and computer effects that changed blockbusters forever. The T. rex in the rain still holds up.' },
+  { title: 'Titanic', src: 'assets/poster-titanic.webp', ar: 2015 / 3000, year: '1997', kind: 'film', creditLabel: 'Directed by', credit: 'James Cameron', px: [878, 0, 92, 238], desc: 'A love story aboard the "unsinkable" ship. It swept eleven Oscars and became the highest-grossing film of its era.' },
+  { title: 'The Cure', src: 'assets/poster-cure.webp', ar: 768 / 1024, year: '1978 –', kind: 'band', creditLabel: 'Fronted by', credit: 'Robert Smith', px: [0, 318, 113, 210], desc: 'Crawley\'s gloomiest export — eyeliner, big hair and songs that swing from heartbreak to pure pop. Disintegration was on repeat in a lot of bedrooms.' },
+  { title: 'MTV', src: 'assets/poster-mtv.webp', ar: 1568 / 818, year: '1981', kind: 'tv', creditLabel: 'Launched', credit: 'August 1, 1981', px: [205, 333, 117, 115], desc: 'Music Television — the channel that turned songs into short films and VJs into stars. In the \'90s it was the background noise of every teenage bedroom.' },
 ];
 
 /** Deterministic torn-paper outline for the poster card. */

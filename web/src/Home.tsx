@@ -28,6 +28,9 @@ export function Home({ showIntro = true, oncePerSession = true }: Props) {
   // Returning visitors land with the screen "off" and get the switch-on bars instead of the intro.
   const [off, setOff] = useState<Off>(() => (seen ? 4 : 0));
   const [room, setRoom] = useState(() => { const i = +(store.get('local', KEY.room) || 0) || 0; return i >= 0 && i < ROOMS.length ? i : 0; });
+  // Only the room you see loads first; the other lighting options start once it is in (or after 4 s at the latest).
+  const [allRooms, setAllRooms] = useState(false);
+  useEffect(() => { const id = setTimeout(() => setAllRooms(true), 4000); return () => clearTimeout(id); }, []);
   const [liquid, setLiquid] = useState(() => store.get('local', KEY.liquid) !== '0');
   const [hover, setHover] = useState<Hover>(null);
   const [poster, setPoster] = useState<number | null>(null);
@@ -92,8 +95,9 @@ export function Home({ showIntro = true, oncePerSession = true }: Props) {
       <div ref={tiltEl} className="rw-tilt">
         <div ref={stageEl} className={'rw-stage' + (poster != null ? ' is-blurred' : '')} style={{ left: L, top: T, width: W, height: H }}>
           {ROOMS.map((r, i) => (
-            <img key={r.src} src={r.src} alt={i === room ? 'A sunlit 1997 bedroom with a TV and a film camera — ' + r.label : ''}
-              draggable={false} decoding="async" className="rw-layer" style={{ opacity: i === room ? 1 : 0, filter: r.grade || 'none' }} />
+            (i === room || allRooms) && <img key={r.src} src={r.src} alt={i === room ? 'A sunlit 1997 bedroom with a TV and a film camera — ' + r.label : ''}
+              draggable={false} decoding="async" fetchPriority={i === room ? 'high' : 'low'} onLoad={i === room ? () => setAllRooms(true) : undefined}
+              className="rw-layer" style={{ opacity: i === room ? 1 : 0, filter: r.grade || 'none' }} />
           ))}
           <canvas ref={rippleEl} className="rw-ripple" aria-hidden="true" style={{ filter: grade || 'none' }} />
           <div className="rw-sun" />
