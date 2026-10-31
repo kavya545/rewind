@@ -24,7 +24,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <div aria-hidden="true" style="position:fixed;inset:0;z-index:90;pointer-events:none"><div style="{{ onTop }}"></div><div style="{{ onBot }}"></div><div style="{{ offLine }}"></div></div>
 <div style="{{ pageStyle }}" onDragOver="{{ onDragOver }}" onDrop="{{ onDrop }}">
   <div style="{{ stageStyle }}">
-    <img src="assets/tv-room-plate.png" data-liquid="" alt="A sunlit room with a wooden dresser" draggable="false" style="{{ bgFullStyle }}">
+    <img src="assets/tv-room-plate.webp" data-liquid="" alt="A sunlit room with a wooden dresser" draggable="false" style="{{ bgFullStyle }}">
     <div style="{{ tvStyle }}">
     <div style="{{ glowStyle }}"></div>
     <div onClick="{{ onScreenClick }}" style="{{ scrBox }}">
@@ -375,7 +375,7 @@ class Component extends DCLogic {
       pageStyle: { height: '100vh', width: '100vw', position: 'relative', overflow: 'hidden', background: '#16110b', color: ivory },
       stageStyle: { position: 'absolute', left: SL, top: ST, width: SW, height: SH },
       ...(() => { const cx = SL + .5013 * SW, target = (vw - 360) / 2, dx = open ? target - cx : 0, k = open ? .9 : 1;
-        return { tvStyle: { position: 'absolute', left: '22.46%', top: '17.38%', width: '55.34%', height: '62.9%', borderRadius: '2.4% / 3.2%', backgroundImage: 'url(assets/tv-room-full.png)', backgroundSize: '180.7% auto', backgroundPosition: '50.29% 46.84%', transformOrigin: '50% 100%', transform: `translate3d(${dx}px,0,0) scale(${k})`, transition: 'transform .8s cubic-bezier(.65,0,.35,1)', willChange: 'transform', filter: `drop-shadow(0 ${open ? 10 : 14}px 22px rgba(0,0,0,.45))` + (dark ? ' brightness(.55) saturate(.9)' : '') } }; })(),
+        return { tvStyle: { position: 'absolute', left: '22.46%', top: '17.38%', width: '55.34%', height: '62.9%', borderRadius: '2.4% / 3.2%', backgroundImage: 'url(assets/tv-room-full.webp)', backgroundSize: '180.7% auto', backgroundPosition: '50.29% 46.84%', transformOrigin: '50% 100%', transform: `translate3d(${dx}px,0,0) scale(${k})`, transition: 'transform .8s cubic-bezier(.65,0,.35,1)', willChange: 'transform', filter: `drop-shadow(0 ${open ? 10 : 14}px 22px rgba(0,0,0,.45))` + (dark ? ' brightness(.55) saturate(.9)' : '') } }; })(),
       bgFullStyle: { position: 'absolute', inset: 0, width: '100%', height: '100%', display: 'block', userSelect: 'none', filter: dark ? 'brightness(.55) saturate(.9)' : 'none', transition: 'filter .6s', boxShadow: '0 0 80px 40px rgba(10,7,4,.6)' },
       glowStyle: { position: 'absolute', left: '-6%', top: '-6%', width: '94%', height: '100%', background: 'radial-gradient(ellipse at 50% 50%, rgba(170,210,255,.18), transparent 65%)', mixBlendMode: 'screen', opacity: on && playing ? 1 : 0, transition: 'opacity .8s', pointerEvents: 'none' },
       ...(() => { const L = full ? { scr: [7.66, 9.57, 74.63, 77.27], vol: [86.27, 6.23, 10.3, 38.31], knob: [88.07, 47.57, 6.6, 8.74], int: [86.27, 59.33, 10.3, 28.3], slot: [34.77, 93.2, 31.8, 3.66], pow: [69.82, 93.2, 4.34, 3.5], led: [82.65, 94.47] } : { scr: [21.1, 28.3, 34.3, 41.9], vol: [57.9, 27.9, 4.4, 20], knob: [58.4, 49.2, 3.3, 5], int: [57.9, 55.6, 4.4, 15.6], slot: [31.7, 74.2, 16.5, 2.6], pow: [49.7, 74.3, 2.5, 2.5], led: [59.1, 75.1] };
